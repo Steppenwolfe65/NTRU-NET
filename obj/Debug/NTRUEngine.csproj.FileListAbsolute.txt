@@ -1,0 +1,9 @@
+C:\Users\John\Documents\Visual Studio 2010\Projects\Samples\NTRUEngine\bin\Debug\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\Samples\NTRUEngine\bin\Debug\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Samples\NTRUEngine\obj\Debug\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\Samples\NTRUEngine\obj\Debug\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\NTRUEngine\obj\Debug\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\NTRUEngine\obj\Debug\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\NTRUEngine\bin\Debug\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\NTRUEngine\bin\Debug\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\NTRUEngine\obj\Debug\NTRUEngine.csprojResolveAssemblyReference.cache

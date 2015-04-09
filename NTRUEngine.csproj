@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A25C6AB8-531E-4A7E-9968-305003D56332}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NTRUEngine</RootNamespace>
+    <AssemblyName>NTRUEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\NTRUEngine.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Crypto\Digest\Keccak256.cs" />
+    <Compile Include="Crypto\Prng\BBSG.cs" />
+    <Compile Include="Crypto\Prng\CCG.cs" />
+    <Compile Include="Crypto\Prng\MODEXPG.cs" />
+    <Compile Include="Crypto\Prng\QCG1.cs" />
+    <Compile Include="Crypto\Prng\QCG2.cs" />
+    <Compile Include="NTRU\Arithmetic\BigIntEuclidean.cs" />
+    <Compile Include="NTRU\Arithmetic\IntEuclidean.cs" />
+    <Compile Include="NTRU\Arithmetic\SchonhageStrassen.cs" />
+    <Compile Include="Crypto\Digest\Blake256.cs" />
+    <Compile Include="Crypto\Digest\Blake512.cs" />
+    <Compile Include="Crypto\Digest\IDigest.cs" />
+    <Compile Include="Crypto\Digest\Keccak512.cs" />
+    <Compile Include="Crypto\Digest\SHA256.cs" />
+    <Compile Include="Crypto\Digest\SHA512.cs" />
+    <Compile Include="Crypto\Digest\Skein1024.cs" />
+    <Compile Include="Crypto\Digest\Skein256.cs" />
+    <Compile Include="Crypto\Digest\Skein512.cs" />
+    <Compile Include="NTRU\Curve\Curve25519.cs" />
+    <Compile Include="NTRU\Encrypt\NtruKeyPair.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Encrypt\NtruParameters.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Encrypt\NtruPrivateKey.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Encrypt\NtruPublicKey.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Encrypt\IndexGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Encrypt\NtruEncrypt.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Crypto\Prng\PBPRng.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="NTRU\Exception\NtruException.cs" />
+    <Compile Include="Crypto\Generator\DGCDRBG.cs" />
+    <Compile Include="Crypto\Generator\HKDF.cs" />
+    <Compile Include="Crypto\Generator\IGenerator.cs" />
+    <Compile Include="Crypto\Generator\PBKDF2.cs" />
+    <Compile Include="Crypto\Generator\PKCS5.cs" />
+    <Compile Include="Crypto\Helper\Enums.cs" />
+    <Compile Include="Crypto\Helper\KeyParams.cs" />
+    <Compile Include="Crypto\Mac\HMAC.cs" />
+    <Compile Include="Crypto\Mac\IMac.cs" />
+    <Compile Include="Crypto\Mac\SHA256HMAC.cs" />
+    <Compile Include="Crypto\Mac\SHA512HMAC.cs" />
+    <Compile Include="NTRU\Polynomial\BigDecimalPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\BigIntPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\DenseTernaryPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\IntegerPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\LongPolynomial2.cs" />
+    <Compile Include="NTRU\Polynomial\LongPolynomial5.cs" />
+    <Compile Include="NTRU\Polynomial\ModularResultant.cs" />
+    <Compile Include="NTRU\Polynomial\IPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\PolynomialGenerator.cs" />
+    <Compile Include="NTRU\Polynomial\ProductFormPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\Resultant.cs" />
+    <Compile Include="NTRU\Polynomial\SparseTernaryPolynomial.cs" />
+    <Compile Include="NTRU\Polynomial\ITernaryPolynomial.cs" />
+    <Compile Include="Crypto\Prng\CSPRng.cs" />
+    <Compile Include="Crypto\Prng\IRandom.cs" />
+    <Compile Include="Crypto\Prng\SecureRandom.cs" />
+    <Compile Include="NTRU\Encode\ArrayEncoder.cs" />
+    <Compile Include="Utility\ArrayExtensions.cs" />
+    <Compile Include="Utility\Compare.cs" />
+    <Compile Include="Utility\SystemUtilities.cs" />
+    <Compile Include="Crypto\Numeric\BigDecimal.cs" />
+    <Compile Include="Crypto\Numeric\BigInteger.cs" />
+    <Compile Include="Crypto\Numeric\BitLevel.cs" />
+    <Compile Include="Crypto\Numeric\CharUtils.cs" />
+    <Compile Include="Crypto\Numeric\Conversion.cs" />
+    <Compile Include="Crypto\Numeric\Division.cs" />
+    <Compile Include="Crypto\Numeric\Elementary.cs" />
+    <Compile Include="Crypto\Numeric\IntUtils.cs" />
+    <Compile Include="Crypto\Numeric\Logical.cs" />
+    <Compile Include="Crypto\Numeric\MathContext.cs" />
+    <Compile Include="Crypto\Numeric\Multiplication.cs" />
+    <Compile Include="Crypto\Numeric\Primality.cs" />
+    <Compile Include="Crypto\Numeric\RoundingModes.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bibliography.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="License.txt" />
+    <Content Include="Patents.txt" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
