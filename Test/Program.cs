@@ -1,11 +1,10 @@
 ﻿#region Directives
 using System;
 using Test.Tests.Arith;
+using Test.Tests.Encode;
 using Test.Tests.Encrypt;
 using Test.Tests.Polynomial;
-using NTRU.Encrypt;
-using VTDev.Libraries.CEXEngine.Crypto.Prng;
-using Test.Tests.Encode;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
 #endregion
 
 namespace Test
@@ -69,6 +68,21 @@ namespace Test
 
             Console.WriteLine("Completed! Press any key to close..");
             Console.ReadKey();
+        }
+
+        private static void Tex()
+        {
+            NTRUParameters param = NTRUParamSets.CX2100SK1024;
+            NTRUEncrypt ntru = new NTRUEncrypt(param);
+            NTRUKeyPair kp;
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+                kp = kg.GenerateKeyPair();
+
+            byte[] plainText = Test.Tests.ByteUtils.GetBytes("text to encrypt");
+            ntru.Initialize(true, kp);
+            byte[] encrypted = ntru.Encrypt(plainText);
+            ntru.Initialize(false, kp);
+            byte[] decrypted = ntru.Decrypt(encrypted);
         }
 
         private static void RunTest(ITest Test)

@@ -1,9 +1,9 @@
 #region Directives
 using System;
 using System.IO;
-using NTRU.Encrypt;
-using NTRU.Polynomial;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -62,62 +62,64 @@ namespace Test.Tests.Encrypt
         private void IsValid()
         {
             // test valid key pairs
-            NtruParameters[] paramSets = new NtruParameters[] 
+            NTRUParameters[] paramSets = new NTRUParameters[] 
             { 
-                DefinedParameters.APR2011439,
-                DefinedParameters.APR2011439FAST,
-                DefinedParameters.APR2011743FAST,
-                DefinedParameters.EES1087EP2,
-                DefinedParameters.EES1499EP1,
+                NTRUParamSets.APR2011439,
+                NTRUParamSets.APR2011439FAST,
+                NTRUParamSets.APR2011743FAST,
+                NTRUParamSets.EES1087EP2,
+                NTRUParamSets.EES1499EP1,
             };
 
-            foreach (NtruParameters ep in paramSets)
+            foreach (NTRUParameters ep in paramSets)
             {
-                NtruEncrypt ntru = new NtruEncrypt(ep);
-                NtruKeyPair kp1 = ntru.GenerateKeyPair();
+                NTRUKeyGenerator ntru = new NTRUKeyGenerator(ep);
+                NTRUKeyPair kp1 = ntru.GenerateKeyPair();
                 if (!Compare.True(kp1.IsValid()))
                     throw new Exception("NtruKeyPair generated key pair is invalid!");
             }
 
             // test an invalid key pair
-            NtruParameters param = DefinedParameters.APR2011439;
-            NtruEncrypt ntru2 = new NtruEncrypt(param);
-            NtruKeyPair kp = ntru2.GenerateKeyPair();
-            kp.PublicKey.H.Coeffs[55]++;
+            NTRUParameters param = NTRUParamSets.APR2011439;
+            NTRUKeyGenerator ntru2 = new NTRUKeyGenerator(param);
+            NTRUKeyPair kp = ntru2.GenerateKeyPair();
+            ((NTRUPublicKey)kp.PublicKey).H.Coeffs[55]++;
             if (!Compare.False(kp.IsValid()))
                 throw new Exception("NtruKeyPair coefficients comparison failed!");
 
-            kp.PublicKey.H.Coeffs[55]--;
-            IntegerPolynomial t = kp.PrivateKey.T.ToIntegerPolynomial();
+            ((NTRUPublicKey)kp.PublicKey).H.Coeffs[55]--;
+            IntegerPolynomial t = ((NTRUPrivateKey)kp.PrivateKey).T.ToIntegerPolynomial();
             t.Coeffs[66]++;
-            kp.PrivateKey.T = t;
+            ((NTRUPrivateKey)kp.PrivateKey).T = t;
             if (!Compare.False(kp.IsValid()))
                 throw new Exception("NtruKeyPair T comparison failed!");
         }
 
         private void Encode()
         {
-            NtruParameters[] paramSets = new NtruParameters[] 
+            NTRUParameters[] paramSets = new NTRUParameters[] 
             {
-                DefinedParameters.APR2011439,
-                DefinedParameters.APR2011439FAST,
-                DefinedParameters.APR2011743FAST,
-                DefinedParameters.EES1087EP2,
-                DefinedParameters.EES1499EP1,
+                NTRUParamSets.APR2011439,
+                NTRUParamSets.APR2011439FAST,
+                NTRUParamSets.APR2011743FAST,
+                NTRUParamSets.EES1087EP2,
+                NTRUParamSets.EES1499EP1,
             };
 
-            foreach (NtruParameters param in paramSets)
+            foreach (NTRUParameters param in paramSets)
                 Encode(param);
         }
 
-        private void Encode(NtruParameters param)
+        private void Encode(NTRUParameters param)
         {
-            NtruEncrypt ntru = new NtruEncrypt(param);
-            NtruKeyPair kp = ntru.GenerateKeyPair();
+            NTRUEncrypt ntru = new NTRUEncrypt(param);
+            NTRUKeyPair kp;
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+                kp = kg.GenerateKeyPair();
 
             // encode to byte[] and reconstruct
-            byte[] enc = kp.GetEncoded();
-            NtruKeyPair kp2 = new NtruKeyPair(enc);
+            byte[] enc = kp.ToBytes();
+            NTRUKeyPair kp2 = new NTRUKeyPair(enc);
             if (!Compare.Equals(kp, kp2))
                 throw new Exception("NtruKeyPair encoding test failed!");
 
@@ -125,7 +127,7 @@ namespace Test.Tests.Encrypt
             MemoryStream bos = new MemoryStream();
             kp.WriteTo(bos);
             MemoryStream bis = new MemoryStream(bos.ToArray());
-            NtruKeyPair kp3 = new NtruKeyPair(bis);
+            NTRUKeyPair kp3 = new NTRUKeyPair(bis);
             if (!Compare.Equals(kp, kp3))
                 throw new Exception("NtruKeyPair encoding test failed!");
         }

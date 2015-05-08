@@ -1,7 +1,7 @@
 #region Directives
 using System;
-using NTRU.Exceptions;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Exceptions;
+using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
 using VTDev.Libraries.CEXEngine.Crypto.Prng ;
@@ -117,7 +117,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             }
             catch (Exception e)
             {
-                throw new NtruException(e.Message);
+                throw new NTRUException(e.Message);
             }
 
             _position = 0;
@@ -155,7 +155,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             }
             catch (Exception e)
             {
-                throw new NtruException(e.Message);
+                throw new NTRUException(e.Message);
             }
 
             newRng._rndData = (byte[])_rndData.Clone();

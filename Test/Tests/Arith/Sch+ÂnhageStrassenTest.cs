@@ -1,7 +1,8 @@
 #region Directives
 using System;
-using NTRU.Arithmetic;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic;
+using VTDev.Libraries.CEXEngine.Numeric;
+using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
 #endregion
 
@@ -105,12 +106,14 @@ namespace Test.Tests.Arith
                 throw new Exception("SchönhageStrassen:TestMult test has failed!");
             if (!Compare.Equals(pow20.Add(pow19), SchonhageStrassen.Multiply(pow19, pow19.Add(BigInteger.One))))
                 throw new Exception("SchönhageStrassen:TestMult test has failed!");
+            OnProgress(new TestEventArgs("Passed Known Value Multiplication test"));
 
             Random rng = new Random();
             TestMult(BigInteger.ValueOf(rng.Next(1000000000) + 524288), BigInteger.ValueOf(rng.Next(1000000000) + 524288));
             TestMult(BigInteger.ValueOf((rng.Next() >> 1) + 1000), BigInteger.ValueOf((rng.Next() >> 1) + 1000));
             TestMult(BigInteger.ValueOf(rng.Next(1000000000) + 524288), BigInteger.ValueOf(rng.Next(1000000000) + 524288));
             TestMult(BigInteger.ValueOf((rng.Next() >> 1) + 1000), BigInteger.ValueOf((rng.Next() >> 1) + 1000));
+            OnProgress(new TestEventArgs("Passed Random Multiplication test"));
 
             int aLength = 80000 + rng.Next(20000);
             int bLength = 80000 + rng.Next(20000);
@@ -128,6 +131,7 @@ namespace Test.Tests.Arith
                 aLength *= 2;
                 bLength *= 2;
             }
+            OnProgress(new TestEventArgs("Passed Large Number Multiplication test"));
         }
 
         private void TestMultKaratsuba()
@@ -330,7 +334,7 @@ namespace Test.Tests.Arith
                 throw new Exception("SchönhageStrassen:Multiply test has failed!");
         }
 
-        /** verifies idft(dft(a)) = a */
+        //verifies idft(dft(a)) = a 
         private void TestInversion()
         {
             Random rng = new Random();
@@ -340,8 +344,7 @@ namespace Test.Tests.Arith
             int numElements = m % 2 == 0 ? 1 << n : 1 << (n + 1);
             numElements /= 2;
 
-            int[][] a = ArrayExtensions.CreateJagged<int[][]>(numElements, 1 << (n + 1 - 5));
-            //int[][] a = new int[numElements][1<<(n+1-5)];
+            int[][] a = ArrayUtils.CreateJagged<int[][]>(numElements, 1 << (n + 1 - 5));
             for (int i = 0; i < a.Length; i++)
             {
                 for (int j = 0; j < a[i].Length; j++)

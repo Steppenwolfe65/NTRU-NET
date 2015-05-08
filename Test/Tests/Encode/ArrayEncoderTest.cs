@@ -1,8 +1,8 @@
 #region Directives
 using System;
-using NTRU.Encode;
 using Test.Tests.Polynomial;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encode

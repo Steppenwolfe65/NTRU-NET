@@ -3,7 +3,7 @@ using System;
 using System.Text;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encrypt

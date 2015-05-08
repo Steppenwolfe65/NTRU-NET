@@ -55,7 +55,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0" author="John Underhill">Initial release</revision>
+    ///     <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>

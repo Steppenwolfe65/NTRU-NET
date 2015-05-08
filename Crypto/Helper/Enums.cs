@@ -23,6 +23,10 @@
         /// </summary>
         Keccak512,
         /// <summary>
+        /// The SHA-3 digest based on Keccak with a 1024 bit return size
+        /// </summary>
+        Keccak1024,
+        /// <summary>
         ///The SHA-2 digest with a 256 bit return size
         /// </summary>
         SHA256,

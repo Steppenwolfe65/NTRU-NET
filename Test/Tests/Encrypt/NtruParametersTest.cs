@@ -1,8 +1,8 @@
 #region Directives
 using System;
 using System.IO;
-using NTRU.Encrypt;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -62,21 +62,21 @@ namespace Test.Tests.Encrypt
         #region Private Methods
         public void LoadSave()
         {
-            NtruParameters param = DefinedParameters.EES1499EP1;
+            NTRUParameters param = NTRUParamSets.EES1499EP1;
             MemoryStream os = new MemoryStream();
             param.WriteTo(os);
             MemoryStream ins = new MemoryStream(os.ToArray());
-            if (!Compare.Equals(param, new NtruParameters(ins)))
+            if (!Compare.Equals(param, new NTRUParameters(ins)))
                 throw new Exception("NtruParameters: load and save test failed!");
         }
 
         public void Clone()
         {
-            NtruParameters param = DefinedParameters.APR2011439;
+            NTRUParameters param = NTRUParamSets.APR2011439;
             if (!Compare.Equals(param, param.Clone()))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
 
-            param = DefinedParameters.APR2011439FAST;
+            param = NTRUParamSets.APR2011439FAST;
             if (!Compare.Equals(param, param.Clone()))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
         }

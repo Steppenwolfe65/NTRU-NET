@@ -1,8 +1,8 @@
 #region Directives
 using System;
 using System.IO;
-using NTRU.Encrypt;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -60,20 +60,20 @@ namespace Test.Tests.Encrypt
         #region Private Methods
         private void Encode()
         {
-            foreach (NtruParameters param in new NtruParameters[] { 
-                DefinedParameters.APR2011743, 
-                DefinedParameters.APR2011743FAST, 
-                DefinedParameters.EES1499EP1})
+            foreach (NTRUParameters param in new NTRUParameters[] { 
+                NTRUParamSets.APR2011743, 
+                NTRUParamSets.APR2011743FAST, 
+                NTRUParamSets.EES1499EP1})
                     Encode(param);
         }
 
-        private void Encode(NtruParameters param)
+        private void Encode(NTRUParameters param)
         {
-            NtruEncrypt ntru = new NtruEncrypt(param);
-            NtruKeyPair kp = ntru.GenerateKeyPair();
-            byte[] priv = kp.PrivateKey.GetEncoded();
-            byte[] pub = kp.PublicKey.GetEncoded();
-            NtruKeyPair kp2 = new NtruKeyPair(new NtruPrivateKey(priv), new NtruPublicKey(pub));
+            NTRUKeyGenerator ntru = new NTRUKeyGenerator(param);
+            NTRUKeyPair kp = ntru.GenerateKeyPair();
+            byte[] priv = ((NTRUPrivateKey)kp.PrivateKey).ToBytes();
+            byte[] pub = ((NTRUPublicKey)kp.PublicKey).ToBytes();
+            NTRUKeyPair kp2 = new NTRUKeyPair(new NTRUPrivateKey(priv), new NTRUPublicKey(pub));
             if (!Compare.Equals(kp.PublicKey, kp2.PublicKey))
                 throw new Exception("EncryptionKey: public key comparison test failed!");
             if (!Compare.Equals(kp.PrivateKey, kp2.PrivateKey))
@@ -81,11 +81,11 @@ namespace Test.Tests.Encrypt
 
             MemoryStream bos1 = new MemoryStream();
             MemoryStream bos2 = new MemoryStream();
-            kp.PrivateKey.WriteTo(bos1);
-            kp.PublicKey.WriteTo(bos2);
+            ((NTRUPrivateKey)kp.PrivateKey).WriteTo(bos1);
+            ((NTRUPublicKey)kp.PublicKey).WriteTo(bos2);
             MemoryStream bis1 = new MemoryStream(bos1.ToArray());
             MemoryStream bis2 = new MemoryStream(bos2.ToArray());
-            NtruKeyPair kp3 = new NtruKeyPair(new NtruPrivateKey(bis1), new NtruPublicKey(bis2));
+            NTRUKeyPair kp3 = new NTRUKeyPair(new NTRUPrivateKey(bis1), new NTRUPublicKey(bis2));
             if (!Compare.Equals(kp.PublicKey, kp3.PublicKey))
                 throw new Exception("EncryptionKey: public key comparison test failed!");
             if (!Compare.Equals(kp.PrivateKey, kp3.PrivateKey))

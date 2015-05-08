@@ -1,7 +1,8 @@
 #region Directives
 using System;
-using NTRU.Encrypt;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -12,7 +13,7 @@ namespace Test.Tests.Encrypt
     public class IndexGeneratorTest : ITest
     {
         #region Fields
-        private NtruParameters _parameters;
+        private NTRUParameters _parameters;
         private byte[] _seed;
         private IndexGenerator _gen;
         private int[] _indices;
@@ -71,7 +72,7 @@ namespace Test.Tests.Encrypt
         {
             _seed = new byte[100];
             new Random().NextBytes(_seed);
-            _parameters = DefinedParameters.APR2011743;
+            _parameters = NTRUParamSets.APR2011743;
             _gen = new IndexGenerator(_seed, _parameters);
             _indices = initIndices();
         }

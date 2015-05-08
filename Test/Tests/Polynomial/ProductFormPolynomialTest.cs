@@ -1,9 +1,9 @@
 #region Directives
 using System;
-using NTRU.Encrypt;
-using NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
-using VTDev.Libraries.CEXEngine.Utility;
+using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
 namespace Test.Tests.Polynomial
@@ -20,7 +20,7 @@ namespace Test.Tests.Polynomial
         #endregion
 
         #region Fields
-        private NtruParameters _parameters;
+        private NTRUParameters _parameters;
         private int _N;
         private int _df1;
         private int _df2;
@@ -74,7 +74,7 @@ namespace Test.Tests.Polynomial
         #region Private Methods
         private void SetUp()
         {
-            _parameters = DefinedParameters.APR2011439FAST;
+            _parameters = NTRUParamSets.APR2011439FAST;
             _N = _parameters.N;
             _df1 = _parameters.DF1;
             _df2 = _parameters.DF2;

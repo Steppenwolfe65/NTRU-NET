@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("VTDev.com")]
 [assembly: AssemblyProduct("CEXEngine")]
-[assembly: AssemblyCopyright("Copyright © VTDev.com  2014")]
+[assembly: AssemblyCopyright("Copyright ©VTDev.com 2015")]
 [assembly: AssemblyTrademark("VTDev.com")]
 [assembly: System.CLSCompliant(true)]
 

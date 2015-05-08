@@ -1,6 +1,6 @@
 ﻿#region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Numeric;
 #endregion
 
 #region License Information

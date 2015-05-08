@@ -1,6 +1,6 @@
 #region Directives
 using System;
-using NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
 #endregion
 

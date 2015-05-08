@@ -51,7 +51,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0" author="John Underhill">Initial release</revision>
+    ///     <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    ///     <revision date="2015/04/28" version="1.4.0.0">Added thread safety</revision>
     /// </revisionHistory>
     public sealed class SecureRandom : IDisposable
     {
@@ -61,15 +62,26 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 
         #region Fields
         private bool _isDisposed = false;
-        private RNGCryptoServiceProvider _rngCrypto;
+        private static RNGCryptoServiceProvider _rngCrypto;
+        private static byte[] _byteBuffer;
+        private static int _bufferIndex = 0;
+        private static int _bufferSize = 0;
+        private static readonly object _objLock = new object();
         #endregion
 
         #region Constructor
         /// <summary>
-        /// Initialize the class
+        /// Initialize this class
         /// </summary>
-        public SecureRandom()
+        /// 
+        /// <param name="BufferSize">Size of the internal buffer; must be more than zero</param>
+        public SecureRandom(int BufferSize = 1024)
         {
+            if (BufferSize < 1)
+                throw new ArgumentException("The buffer size must be more than zero!");
+
+            _byteBuffer = new byte[BufferSize];
+            _bufferSize = BufferSize;
             Reset();
         }
 
@@ -88,13 +100,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// </summary>
         public void Reset()
         {
-            if (_rngCrypto != null)
+            lock (_objLock)
             {
-                _rngCrypto.Dispose();
-                _rngCrypto = null;
-            }
+                if (_rngCrypto != null)
+                {
+                    _rngCrypto.Dispose();
+                    _rngCrypto = null;
+                }
 
-            _rngCrypto = new RNGCryptoServiceProvider();
+                _rngCrypto = new RNGCryptoServiceProvider();
+                _rngCrypto.GetBytes(_byteBuffer);
+                _bufferIndex = 0;
+            }
         }
         #endregion
 
@@ -176,7 +193,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                 Buffer.BlockCopy(rand, 0, num, 0, rand.Length);
             } while (num[0] > Maximum);
 
-            if (num[0] == -1) 
+            if (num[0] == -1)
                 num[0] = 0;
 
             return num[0];
@@ -465,7 +482,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 
         #region Array Generators
         /// <summary>
-        /// Gets bytes pseudo random from RNGCryptoServiceProvider
+        /// Gets bytes of pseudo random
         /// </summary>
         /// 
         /// <param name="Size">Size of request</param>
@@ -473,19 +490,40 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <returns>P-Rand bytes</returns>
         public byte[] GetBytes(int Size)
         {
-            byte[] data = new byte[Size];
-            _rngCrypto.GetBytes(data);
-            return data;
+            lock (_objLock)
+            {
+                byte[] data = new byte[Size];
+                if (_byteBuffer.Length - _bufferIndex < data.Length)
+                {
+                    Array.Clear(_byteBuffer, 0, _byteBuffer.Length);
+                    _rngCrypto.GetBytes(_byteBuffer);
+                    _bufferIndex = 0;
+                }
+                Array.Copy(_byteBuffer, _bufferIndex, data, 0, data.Length);
+                _bufferIndex += data.Length;
+
+                return data;
+            }
         }
 
         /// <summary>
-        /// Gets bytes pseudo random from RNGCryptoServiceProvider
+        /// Gets bytes of pseudo random
         /// </summary>
         /// 
         /// <param name="Data">Array to fill with pseudo random</param>
         public void GetBytes(byte[] Data)
         {
-            _rngCrypto.GetBytes(Data);
+            lock (_objLock)
+            {
+                if (_byteBuffer.Length - _bufferIndex < Data.Length)
+                {
+                    Array.Clear(_byteBuffer, 0, _byteBuffer.Length);
+                    _rngCrypto.GetBytes(_byteBuffer);
+                    _bufferIndex = 0;
+                }
+                Array.Copy(_byteBuffer, _bufferIndex, Data, 0, Data.Length);
+                _bufferIndex += Data.Length;
+            }
         }
 
         /// <summary>

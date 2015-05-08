@@ -239,7 +239,7 @@
     <title>VMPC One-Way Function and Stream Cipher</title>
     <author>Bartosz Zoltak</author>
     <link>http://www.okna.wroc.pl/vmpc.pdf</link>
-  </reference>//http://www.jstatsoft.org/v08/i14/paper
+  </reference>
   <reference name="VMPC-MAC">
     <title>VMPC-MAC: A Stream Cipher Based Authenticated Encryption Scheme</title>
     <author>Bartosz Zoltak</author>

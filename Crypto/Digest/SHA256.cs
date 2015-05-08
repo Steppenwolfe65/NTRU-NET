@@ -41,7 +41,7 @@ using System;
 namespace VTDev.Libraries.CEXEngine.Crypto.Digest
 {
     /// <summary>
-    /// <h3>SHA256: An implementation of the SHA-2 digest with a 256 bit digest return size</h3>.
+    /// <h3>SHA256: An implementation of the SHA-2 digest with a 256 bit digest return size.</h3>
     /// <para>The SHA-2<cite>Fips 180-4</cite> 256 digest</para>
     /// </summary> 
     /// 
@@ -57,8 +57,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2014/11/11" version="1.2.0.0" author="John Underhill">Initial release</revision>
-    ///     <revision date="2015/01/23" version="1.3.0.0" author="John Underhill">Changes to formatting and documentation</revision>
+    ///     <revision date="2014/11/11" version="1.2.0.0">Initial release</revision>
+    ///     <revision date="2015/01/23" version="1.3.0.0">Changes to formatting and documentation</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>

@@ -1,7 +1,7 @@
 #region Directives
 using System;
-using NTRU.Arithmetic;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic;
+using VTDev.Libraries.CEXEngine.Numeric;
 #endregion
 
 namespace Test.Tests.Arith

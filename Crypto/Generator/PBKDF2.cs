@@ -24,7 +24,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/28/15" version="1.3.1.1" author="John Underhill">Initial release</revision>
+    ///     <revision date="2015/28/15" version="1.3.1.1">Initial release</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC HMAC</seealso>

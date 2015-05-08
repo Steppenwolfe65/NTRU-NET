@@ -1,10 +1,10 @@
 #region Directives
 using System;
-using NTRU.Encrypt;
-using NTRU.Polynomial;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Numeric;
+using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
-using Test.Tests.Encode;
 #endregion
 
 namespace Test.Tests.Polynomial
@@ -336,7 +336,7 @@ namespace Test.Tests.Polynomial
 
         private void AddTest()
         {
-            NtruParameters param = DefinedParameters.EES1087EP2;
+            NTRUParameters param = NTRUParamSets.EES1087EP2;
             IntegerPolynomial a = PolynomialGeneratorForTesting.GenerateRandom(param.N, param.Q);
             ITernaryPolynomial b = PolynomialGeneratorForTesting.generateRandom(1087);
 

@@ -1,9 +1,8 @@
 #region Directives
 using System;
-using NTRU.Encrypt;
-using VTDev.Libraries.CEXEngine.Crypto.Numeric;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
-using Test.Tests.Encode;
 #endregion
 
 namespace Test.Tests.Encrypt
