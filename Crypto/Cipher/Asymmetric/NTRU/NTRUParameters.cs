@@ -330,9 +330,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <summary>
         /// Get: Three bytes that uniquely identify the parameter set
         /// </summary>
-        public byte[] Oid
+        public byte[] OId
         {
             get { return _oId; }
+            private set
+            {
+                if (value == null)
+                    throw new NTRUException("OId can not be null!");
+                if (value.Length != 3)
+                    throw new NTRUException("OId must be 3 bytes in length!");
+
+                _oId = value;
+            }
         }
 
         /// <summary>
@@ -380,13 +389,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="MinIGFHashCalls">Minimum number of hash calls for the IGF to make</param>
         /// <param name="MinMGFHashCalls">Minimum number of calls to generate the masking polynomial</param>
         /// <param name="HashSeed">Whether to hash the seed in the MGF first (true), or use the seed directly (false)</param>
-        /// <param name="Oid">Three bytes that uniquely identify the parameter set</param>
+        /// <param name="OId">Three bytes that uniquely identify the parameter set</param>
         /// <param name="Sparse">Whether to treat ternary polynomials as sparsely populated; SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
         /// <param name="FastFp">Whether <c>f=1+p*F</c> for a ternary <c>F</c> (true) or <c>f</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
         /// <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
-        public NTRUParameters(int N, int Q, int Df, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls, 
-            bool HashSeed, byte[] Oid, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
+        public NTRUParameters(int N, int Q, int Df, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
+            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
         {
             _N = N;
             _Q = Q;
@@ -398,12 +407,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             _minIGFHashCalls = MinIGFHashCalls;
             _minMGFHashCalls = MinMGFHashCalls;
             _hashSeed = HashSeed;
-            _oId = Oid;
             _sparseMode = Sparse;
             _fastFp = FastFp;
             _polyType = TernaryPolynomialType.SIMPLE;
             _messageDigest = Digest;
             _randomEngine = Random;
+            this.OId = OId;
 
             Initialize();
         }
@@ -424,13 +433,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="MinIGFHashCalls">Minimum number of hash calls for the IGF to make</param>
         /// <param name="MinMGFHashCalls">Minimum number of calls to generate the masking polynomial</param>
         /// <param name="HashSeed">Whether to hash the seed in the MGF first (true) or use the seed directly (false)</param>
-        /// <param name="Oid">Three bytes that uniquely identify the parameter set</param>
+        /// <param name="OId">Three bytes that uniquely identify the parameter set</param>
         /// <param name="Sparse">Whether to treat ternary polynomials as sparsely populated SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
         /// <param name="FastFp">Whether <c>F=1+p*F</c> for a ternary <c>F</c> (true) or <c>F</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
         /// <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
-        public NTRUParameters(int N, int Q, int Df1, int Df2, int Df3, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls, 
-            bool HashSeed, byte[] Oid, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
+        public NTRUParameters(int N, int Q, int Df1, int Df2, int Df3, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
+            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
         {
             _N = N;
             _Q = Q;
@@ -444,12 +453,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             _minIGFHashCalls = MinIGFHashCalls;
             _minMGFHashCalls = MinMGFHashCalls;
             _hashSeed = HashSeed;
-            _oId = Oid;
             _sparseMode = Sparse;
             _fastFp = FastFp;
             _polyType = TernaryPolynomialType.PRODUCT;
             _messageDigest = Digest;
             _randomEngine = Random;
+            this.OId = OId;
 
             Initialize();
         }
@@ -523,7 +532,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public int GetOutputLength()
         {
             // ceil(log q)
-            int logq = 32 - IntUtils.NumberOfLeadingZeros(Q - 1); 
+            int logq = 32 - IntUtils.NumberOfLeadingZeros(Q - 1);
             return (N * logq + 7) / 8;
         }
 
@@ -695,7 +704,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             result = prime * result + MaxMsgLenBytes;
             result = prime * result + MinMGFHashCalls;
             result = prime * result + MinIGFHashCalls;
-            result = prime * result + Oid.GetHashCode();
+            result = prime * result + OId.GetHashCode();
             result = prime * result + PkLen;
             result = prime * result + PolyType.GetHashCode();
             result = prime * result + Q;
@@ -767,7 +776,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 return false;
             if (MinIGFHashCalls != other.MinIGFHashCalls)
                 return false;
-            if (!Compare.AreEqual(Oid, other.Oid))
+            if (!Compare.AreEqual(OId, other.OId))
                 return false;
             if (PkLen != other.PkLen)
                 return false;

@@ -8,7 +8,7 @@
     <ProjectGuid>{A25C6AB8-531E-4A7E-9968-305003D56332}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU</RootNamespace>
+    <RootNamespace>VTDev.Libraries.CEXEngine</RootNamespace>
     <AssemblyName>NTRUEngine</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

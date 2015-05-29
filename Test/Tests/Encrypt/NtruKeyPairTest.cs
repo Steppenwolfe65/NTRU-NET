@@ -64,11 +64,14 @@ namespace Test.Tests.Encrypt
             // test valid key pairs
             NTRUParameters[] paramSets = new NTRUParameters[] 
             { 
-                NTRUParamSets.APR2011439,
-                NTRUParamSets.APR2011439FAST,
-                NTRUParamSets.APR2011743FAST,
-                NTRUParamSets.EES1087EP2,
-                NTRUParamSets.EES1499EP1,
+                (NTRUParameters)NTRUParamSets.APR2011439.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011439FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1087EP2.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1087EP2FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1499EP1.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1499EP1FAST.Clone(),
             };
 
             foreach (NTRUParameters ep in paramSets)
@@ -78,32 +81,20 @@ namespace Test.Tests.Encrypt
                 if (!Compare.True(kp1.IsValid()))
                     throw new Exception("NtruKeyPair generated key pair is invalid!");
             }
-
-            // test an invalid key pair
-            NTRUParameters param = NTRUParamSets.APR2011439;
-            NTRUKeyGenerator ntru2 = new NTRUKeyGenerator(param);
-            NTRUKeyPair kp = ntru2.GenerateKeyPair();
-            ((NTRUPublicKey)kp.PublicKey).H.Coeffs[55]++;
-            if (!Compare.False(kp.IsValid()))
-                throw new Exception("NtruKeyPair coefficients comparison failed!");
-
-            ((NTRUPublicKey)kp.PublicKey).H.Coeffs[55]--;
-            IntegerPolynomial t = ((NTRUPrivateKey)kp.PrivateKey).T.ToIntegerPolynomial();
-            t.Coeffs[66]++;
-            ((NTRUPrivateKey)kp.PrivateKey).T = t;
-            if (!Compare.False(kp.IsValid()))
-                throw new Exception("NtruKeyPair T comparison failed!");
         }
 
         private void Encode()
         {
             NTRUParameters[] paramSets = new NTRUParameters[] 
             {
-                NTRUParamSets.APR2011439,
-                NTRUParamSets.APR2011439FAST,
-                NTRUParamSets.APR2011743FAST,
-                NTRUParamSets.EES1087EP2,
-                NTRUParamSets.EES1499EP1,
+                (NTRUParameters)NTRUParamSets.APR2011439.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011439FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1087EP2.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1087EP2FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1499EP1.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1499EP1FAST.Clone(),
             };
 
             foreach (NTRUParameters param in paramSets)
@@ -112,7 +103,6 @@ namespace Test.Tests.Encrypt
 
         private void Encode(NTRUParameters param)
         {
-            NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUKeyPair kp;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
                 kp = kg.GenerateKeyPair();

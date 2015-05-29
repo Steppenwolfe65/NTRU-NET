@@ -74,7 +74,8 @@ namespace Test.Tests.Encrypt
         private void DigestTest()
         {
             CSPRng rng = new CSPRng();
-            NTRUParameters param = NTRUParamSets.EES1087EP2;
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.EES1087EP2.Clone();
+
             for (int i = 0; i < 3; i++)
             {
                 if (i == 0)
@@ -104,123 +105,95 @@ namespace Test.Tests.Encrypt
 
         private void EncryptDecrypt()
         {
-            NTRUParameters param = NTRUParamSets.APR2011743;
-            // set df1..df3 and dr1..dr3 so params can be used for SIMPLE as well as PRODUCT
-            param.DF1 = NTRUParamSets.APR2011743FAST.DF1;
-            param.DF2 = NTRUParamSets.APR2011743FAST.DF2;
-            param.DF3 = NTRUParamSets.APR2011743FAST.DF3;
-            param.DR1 = NTRUParamSets.APR2011743FAST.DR1;
-            param.DR2 =  NTRUParamSets.APR2011743FAST.DR2;
-            param.DR3 = NTRUParamSets.APR2011743FAST.DR3;
-            EncryptDecrypt(param);
+            // test each param set //
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.APR2011439.Clone());
+            OnProgress(new TestEventArgs("Passed the APR2011439 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.APR2011439FAST.Clone());
+            OnProgress(new TestEventArgs("Passed the APR2011439FAST encryption test"));
+
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.APR2011743.Clone());
             OnProgress(new TestEventArgs("Passed the APR2011743 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.APR2011743FAST.Clone());
+            OnProgress(new TestEventArgs("Passed the APR2011743FAST encryption test"));
 
-            param = NTRUParamSets.EES1087EP2;
-            // set df1..df3 and dr1..dr3 so params can be used for SIMPLE as well as PRODUCT
-            param.DF1 = NTRUParamSets.EES1087EP2FAST.DF1;
-            param.DF2 = NTRUParamSets.EES1087EP2FAST.DF2;
-            param.DF3 = NTRUParamSets.EES1087EP2FAST.DF3;
-            param.DR1 = NTRUParamSets.EES1087EP2FAST.DR1;
-            param.DR2 = NTRUParamSets.EES1087EP2FAST.DR2;
-            param.DR3 = NTRUParamSets.EES1087EP2FAST.DR3;
-            EncryptDecrypt(param);
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1087EP2.Clone());
             OnProgress(new TestEventArgs("Passed the EES1087EP2 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1087EP2FAST.Clone());
+            OnProgress(new TestEventArgs("Passed the EES1087EP2FAST encryption test"));
 
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1171EP1.Clone());
+            OnProgress(new TestEventArgs("Passed the EES1171EP1 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.APR2011439FAST.Clone());
+            OnProgress(new TestEventArgs("Passed the EES1171EP1FAST encryption test"));
+
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1499EP1.Clone());
+            OnProgress(new TestEventArgs("Passed the EES1499EP1 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1499EP1FAST.Clone());
+            OnProgress(new TestEventArgs("Passed the EES1499EP1 encryption test"));
+
+
+            // test the digests //
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.APR2011439.Clone();
             // blake 256
-            param = NTRUParamSets.APR2011439;
             param.MessageDigest = Digests.Blake256;
-            param.DF1 = NTRUParamSets.APR2011439FAST.DF1;
-            param.DF2 = NTRUParamSets.APR2011439FAST.DF2;
-            param.DF3 = NTRUParamSets.APR2011439FAST.DF3;
-            param.DR1 = NTRUParamSets.APR2011439FAST.DR1;
-            param.DR2 = NTRUParamSets.APR2011439FAST.DR2;
-            param.DR3 = NTRUParamSets.APR2011439FAST.DR3;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the APR2011439/Blake256 encryption test"));
 
-            // keccak 256
-            param.MessageDigest = Digests.Keccak256;
-            param.DF1 = NTRUParamSets.APR2011439FAST.DF1;
-            param.DF2 = NTRUParamSets.APR2011439FAST.DF2;
-            param.DF3 = NTRUParamSets.APR2011439FAST.DF3;
-            param.DR1 = NTRUParamSets.APR2011439FAST.DR1;
-            param.DR2 = NTRUParamSets.APR2011439FAST.DR2;
-            EncryptDecrypt(param);
-            OnProgress(new TestEventArgs("Passed the APR2011439/Keccak256 encryption test"));
-
-            // skein 256 
-            param.MessageDigest = Digests.Skein256;
-            param.DF1 = NTRUParamSets.APR2011439FAST.DF1;
-            param.DF2 = NTRUParamSets.APR2011439FAST.DF2;
-            param.DF3 = NTRUParamSets.APR2011439FAST.DF3;
-            param.DR1 = NTRUParamSets.APR2011439FAST.DR1;
-            param.DR2 = NTRUParamSets.APR2011439FAST.DR2;
-            param.DR3 = NTRUParamSets.APR2011439FAST.DR3;
-            EncryptDecrypt(param);
-            OnProgress(new TestEventArgs("Passed the APR2011439/Skein256 encryption test"));
-
             // blake 512
-            param = NTRUParamSets.EES1087EP2;
+            param = (NTRUParameters)NTRUParamSets.EES1087EP2.Clone();
             param.MessageDigest = Digests.Blake512;
-            param.DF1 = NTRUParamSets.EES1087EP2FAST.DF1;
-            param.DF2 = NTRUParamSets.EES1087EP2FAST.DF2;
-            param.DF3 = NTRUParamSets.EES1087EP2FAST.DF3;
-            param.DR1 = NTRUParamSets.EES1087EP2FAST.DR1;
-            param.DR2 = NTRUParamSets.EES1087EP2FAST.DR2;
-            param.DR3 = NTRUParamSets.EES1087EP2FAST.DR3;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Blake512 encryption test"));
 
+            // keccak 256
+            param.MessageDigest = Digests.Keccak256;
+            EncryptDecrypt(param);
+            OnProgress(new TestEventArgs("Passed the APR2011439/Keccak256 encryption test"));
+
             // keccak 512
             param.MessageDigest = Digests.Keccak512;
-            param.DF1 = NTRUParamSets.EES1087EP2FAST.DF1;
-            param.DF2 = NTRUParamSets.EES1087EP2FAST.DF2;
-            param.DF3 = NTRUParamSets.EES1087EP2FAST.DF3;
-            param.DR1 = NTRUParamSets.EES1087EP2FAST.DR1;
-            param.DR2 = NTRUParamSets.EES1087EP2FAST.DR2;
-            param.DR3 = NTRUParamSets.EES1087EP2FAST.DR3;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Keccak512 encryption test"));
 
+            // keccak 1024
+            param.MessageDigest = Digests.Keccak1024;
+            EncryptDecrypt(param);
+            OnProgress(new TestEventArgs("Passed the EES1087EP2/Keccak1024 encryption test"));
+
+            // skein 256 
+            param.MessageDigest = Digests.Skein256;
+            EncryptDecrypt(param);
+            OnProgress(new TestEventArgs("Passed the APR2011439/Skein256 encryption test"));
+
             // skein 512
             param.MessageDigest = Digests.Skein512;
-            param.DF1 = NTRUParamSets.EES1087EP2FAST.DF1;
-            param.DF2 = NTRUParamSets.EES1087EP2FAST.DF2;
-            param.DF3 = NTRUParamSets.EES1087EP2FAST.DF3;
-            param.DR1 = NTRUParamSets.EES1087EP2FAST.DR1;
-            param.DR2 = NTRUParamSets.EES1087EP2FAST.DR2;
-            param.DR3 = NTRUParamSets.EES1087EP2FAST.DR3;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Skein512 encryption test"));
+
+            // skein 1024
+            param.MessageDigest = Digests.Skein1024;
+            EncryptDecrypt(param);
+            OnProgress(new TestEventArgs("Passed the EES1087EP2/Skein1024 encryption test"));
         }
 
         // params must have df1..df3 and dr1..dr3 set as well as df and dr 
         private void EncryptDecrypt(NTRUParameters param)
         {
-            foreach (TernaryPolynomialType polyType in Enum.GetValues(typeof(TernaryPolynomialType)))
-            {
-                foreach (bool fastP in new bool[] { true, false })
-                {
-                    param.PolyType = polyType;
-                    param.FastFp = fastP;
+            NTRUEncrypt ntru = new NTRUEncrypt(param);
+            NTRUKeyPair kp;
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+                kp = kg.GenerateKeyPair();
 
-                    NTRUEncrypt ntru = new NTRUEncrypt(param);
-                    NTRUKeyPair kp;
-                    using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                        kp = kg.GenerateKeyPair();
+            TextTest(ntru, kp, param);
+            // sparse/dense
+            param.Sparse = !param.Sparse;
+            TextTest(ntru, kp, param);
+            param.Sparse = !param.Sparse;
+            EmptyTest(ntru, kp, param);
+            MaxLength(ntru, kp, param);
+            TooLong(ntru, kp, param);
 
-                    TextTest(ntru, kp, param);
-                    // sparse/dense
-                    param.Sparse = !param.Sparse;
-                    TextTest(ntru, kp, param);
-                    param.Sparse = !param.Sparse;
-
-                    EmptyTest(ntru, kp, param);
-                    MaxLength(ntru, kp, param);
-                    TooLong(ntru, kp, param);
-                    InvalidEncoding(ntru, kp, param);
-                }
-            }
+            kp.Dispose();
         }
 
         // encrypts and decrypts text
@@ -231,6 +204,7 @@ namespace Test.Tests.Encrypt
             byte[] encrypted = ntru.Encrypt(plainText);
             ntru.Initialize(false, kp);
             byte[] decrypted = ntru.Decrypt(encrypted);
+
             if (!Compare.AreEqual(plainText, decrypted))
                 throw new Exception("NtruEncryptTest: text encryption test failed!");
         }
@@ -243,6 +217,7 @@ namespace Test.Tests.Encrypt
             byte[] encrypted = ntru.Encrypt(plainText);
             ntru.Initialize(false, kp);
             byte[] decrypted = ntru.Decrypt(encrypted);
+
             if (!Compare.AreEqual(plainText, decrypted))
                 throw new Exception("NtruEncryptTest: empty bytes encryption test failed!");
         }
@@ -256,6 +231,7 @@ namespace Test.Tests.Encrypt
             byte[] encrypted = ntru.Encrypt(plainText);
             ntru.Initialize(false, kp);
             byte[] decrypted = ntru.Decrypt(encrypted);
+
             if (!Compare.AreEqual(plainText, decrypted))
                 throw new Exception("NtruEncryptTest: maximum length test failed!");
         }
@@ -271,29 +247,9 @@ namespace Test.Tests.Encrypt
                 byte[] encrypted = ntru.Encrypt(plainText);
                 ntru.Initialize(false, kp);
                 byte[] decrypted = ntru.Decrypt(encrypted);
+
                 if (!Compare.AreEqual(plainText, decrypted))
                     throw new Exception("NtruEncryptTest: maximum length test failed!");
-                // should have thrown
-                throw new Exception("NtruEncryptTest: maximum exceeded message test failed!");
-            }
-            catch
-            {
-            }
-        }
-
-        // tests that altering the public key *AFTER* encryption causes the decrypted message to be rejected
-        private void InvalidEncoding(NTRUEncrypt ntru, NTRUKeyPair kp, NTRUParameters param)
-        {
-            try
-            {
-                byte[] plainText = ByteUtils.GetBytes("secret encrypted text");
-                ntru.Initialize(true, kp);
-                byte[] encrypted = ntru.Encrypt(plainText);
-                IntegerPolynomial h = ((NTRUPublicKey)kp.PublicKey).H.Clone();
-                h.Coeffs[0] = (h.Coeffs[0] + 111) % param.Q;   // alter h
-                kp = new NTRUKeyPair(kp.PrivateKey, new NTRUPublicKey(h, param.N, param.Q));
-                ntru.Initialize(false, kp);
-                ntru.Decrypt(encrypted);
                 // should have thrown
                 throw new Exception("NtruEncryptTest: maximum exceeded message test failed!");
             }
@@ -308,11 +264,12 @@ namespace Test.Tests.Encrypt
             byte[] plainText = ByteUtils.GetBytes("secret encrypted text");
 
             // dense polynomials
-            NTRUParameters param = NTRUParamSets.APR2011743;
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.APR2011743.Clone();
             NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUPrivateKey priv = new NTRUPrivateKey(ByteUtils.ToBytes(new sbyte[] { 2, -25, 8, 0, 0, 2, -94, 95, 65, -107, 27, 98, 62, -15, -62, 21, -4, 119, -117, 7, 68, 100, 113, -36, -82, 87, -87, -82, 24, -45, -75, -74, -108, 105, 24, 123, 117, 124, 74, -27, 42, -106, -78, 114, 27, 18, 77, -41, 105, -113, 39, 49, 46, 109, -69, 61, 77, 49, 117, 14, -29, 42, 3, 120, -121, -120, -37, 95, 84, 60, -9, -31, -64, 31, 72, 115, -15, 21, -6, 27, -60, -73, -29, -33, -81, -43, 106, 65, 114, 102, -14, -115, -96, 9, 54, 23, -18, -24, -76, 84, -41, -79, 35, 88, 11, 41, 67, 44, -63, -28, 76, 84, -41, -103, 106, -22, 35, -2, -40, -48, -121, -128, 76, 63, 123, -11, 103, -35, -32, 21, -51, -99, -40, -103, -12, 64, -80, 57, -56, 1, -51, 103, 83, 50, 111, -87, -98, 7, -109, 25, -51, 23, -92 }));
             NTRUPublicKey pub = new NTRUPublicKey(ByteUtils.ToBytes(new sbyte[] { 2, -25, 8, 0, 91, -66, -25, -81, -66, -33, 25, -31, 48, 23, -38, 20, -30, -120, -17, 1, 21, 51, -11, 102, -50, 62, 71, 79, 32, -49, -57, 105, 21, -34, -45, -67, 113, -46, -103, 57, 28, -54, -21, 94, -112, -63, 105, -100, -95, 21, -52, 50, 11, -22, -63, -35, -42, 50, 93, -40, 23, 0, 121, 23, -93, 111, -98, -14, 92, -24, -117, -8, -109, -118, -4, -107, -60, 100, -128, -47, -92, -117, -108, 39, -113, 43, 48, 68, 95, 123, -112, 41, -27, -99, 59, 33, -57, -120, -44, 72, -98, -105, -91, -52, -89, 107, 119, 87, -36, -102, -83, 67, -8, 30, -54, 74, 93, 119, -3, 126, 69, -104, -44, -24, 124, 108, -125, 73, 98, 121, -49, -37, -24, 87, -71, 91, 8, -31, -50, 95, 112, 27, 97, -93, 3, -73, -54, -16, -92, -108, -74, 88, -5, 23, 70, 69, -49, -46, -50, 65, 69, -54, -41, 109, 8, -80, -23, -84, 120, -77, 26, 99, -104, -33, 82, 91, 22, -17, 113, -29, 66, -7, -114, -101, -111, -47, -1, -3, -57, 62, 79, -70, -58, 45, 76, 28, -117, 59, -117, 113, 84, -55, 48, 119, 58, -105, -20, 80, 102, 14, -69, -69, 5, 11, -87, 107, 15, 105, -69, -27, -24, 47, -18, -54, -45, -67, 27, -52, -20, -94, 64, -26, -58, 98, 33, -61, 71, -101, 120, 28, 113, 72, 127, 50, 123, 36, -97, 78, 32, -74, 105, 62, 92, 84, -17, 21, -75, 24, -90, -78, -4, -121, 47, -82, 119, 27, -61, 17, -66, 43, 96, -49, -6, 66, -13, -75, -95, 64, -12, -39, 111, 46, -3, -123, 82, 12, -26, -30, -29, 71, -108, -79, -112, 13, 16, -70, 7, 100, 84, 89, -100, 114, 47, 56, 71, 83, 63, -61, -39, -53, -100, 23, -31, -52, -46, 36, -13, 62, 107, 28, -28, 92, 116, -59, 28, -111, -23, -44, 21, -2, 127, -112, 54, -126, 13, -104, 47, -43, -109, -19, 107, -94, -126, 50, 92, -69, 1, 115, -121, -52, -100, 25, 126, -7, 86, 77, 72, -2, -104, -42, 98, -16, 54, -67, 117, 14, -73, 4, 58, 121, 35, 1, 99, -127, -9, -60, 32, -37, -106, 6, -108, -13, -62, 23, -20, -9, 21, 15, 4, 126, -112, 123, 34, -67, -51, 43, -30, -75, 119, -112, -58, -55, -90, 2, -5, -46, -12, 119, 87, 24, -52, 2, -29, 113, 61, -82, -101, 57, -11, -107, -11, 67, -42, -43, -13, 112, -49, 82, 60, 13, -50, 108, 64, -64, 53, -107, -9, 102, -33, 75, -100, -115, 102, -113, -48, 19, -119, -72, -65, 22, -65, -93, 34, -71, 75, 101, 54, 126, 75, 34, -21, -53, -36, 127, -21, 70, 24, 89, -88, 63, -43, -4, 68, 97, -45, -101, -125, -38, 98, -118, -34, -63, 23, 78, 15, 17, 101, -107, 119, -41, 107, 117, 17, 108, 43, -93, -6, -23, -30, 49, -61, 27, 61, -125, -68, 51, 40, -106, -61, 51, 127, 2, 123, 7, -50, -115, -32, -95, -96, 67, 4, 5, 59, -45, 61, 95, 14, 2, -76, -121, 8, 125, 16, -126, 58, 118, -32, 19, -113, -113, 120, -101, 86, 76, -90, 50, -92, 51, -92, 1, 121, -74, -101, -33, 53, -53, -83, 46, 20, -87, -112, -61, -87, 106, -126, 64, 99, -60, 70, 120, 47, -53, 36, 20, -90, 110, 61, -93, 55, -10, 85, 45, 52, 79, 87, 100, -81, -85, 34, 55, -91, 27, 116, -18, -71, -11, 87, -11, 76, 48, 97, -78, 64, -100, -59, -12, 19, -90, 121, 48, -19, 64, 113, -70, -14, -70, 92, 124, 42, 95, 7, -115, 36, 127, 73, 33, 30, 121, 88, 16, -90, 99, 120, -68, 64, -125, -78, 76, 112, 68, 8, 105, 10, -47, -124, 39, -107, -101, 46, -61, 118, -74, 102, -62, -6, -128, 17, -45, 61, 76, 63, -10, -41, 50, -113, 75, -83, -59, -51, -23, -61, 47, 7, -80, 126, -2, 79, -53, 110, -93, -38, -91, -22, 20, -84, -113, -124, -73, 124, 0, 33, -58, 63, -26, 52, 7, 74, 65, 38, -33, 21, -9, -1, 120, -16, 47, -96, 59, -64, 74, 6, 48, -67, -32, -26, 35, 68, 47, 82, 36, 52, 41, 112, -28, -22, -51, -6, -49, 105, 16, -34, 99, -41, 75, 7, 79, -22, -125, -30, -126, 35, 119, -43, -30, 32, 8, 44, -42, -98, 78, -92, -95, -10, -94, -1, -91, -122, 77, 0, 40, -23, 36, 85, 123, -57, -74, -69, -90, 89, 111, -120, 22, 5, -48, 114, 59, 31, 31, -25, -3, 24, 110, -110, 73, -40, 92, -26, -12, 52, 83, -98, -119, -6, -117, -89, 95, 83, -25, 122, -26, 114, 81, 25, 110, 79, -49, -39, 10, -78, -65, 57, -90, -46, -126, 15, -124, -104, -89, -66, -87, 24, -45, 39, -34, -40, -13, 106, 12, -25, -116, -47, 79, -81, 64, -17, -31, -70, 87, 36, 46, 102, 107, 48, 88, 34, 46, 24, 63, -100, 106, 27, 58, -71, 38, 60, -66, 45, -89, 39, -60, -116, -14, -119, 118, 0, -24, -9, 38, -71, -79, 124, -119, -64, -9, 71, -56, -82, -73, -69, 127, -1, -20, 123, 32, -43, 49, 5, 49, 105, -5, -2, 5, -105, -111, 89, -30, -41, -49, 61, 80, 69, 44, -33, -116, -45, -96, 63, 28, -17, -106, -94, 90, -40, -88, 122, 116, 116, 113, -65, 104, 119, -3, 96, -45, 18, -120, -111, 83, 43, -5, 101, 71, 48, 104, -112, -95, -46, 53, -96, -93, -126, 96, 56, 104, -111, 114, -1, -44, -120, -112, -19, 100, 41, -122, 23, -78, 33, -35, 11, 57, -18, 106, -40, 74, 61, 66, 54, -77, 96, 70, 108, -128, 91, -97, -36, -23, -86, -91, 44, 58, 117, 2, 26, 44, 95, 79, -101, -81, -92, 110, -81, -12, -88, -21, -83, 60, 93, -121, -114, -48, -34, -119, -1, 127, -121, 54, -128, -106, -39, -108, 81, 17, -3, -13, -57, 74, 41, -122, -65, -107, -118, -65, -61, 103, -69, 19 }));
             NTRUKeyPair kp = new NTRUKeyPair(priv, pub);
+
             ntru.Initialize(true, kp);
             byte[] encrypted = ntru.Encrypt(plainText);
             ntru.Initialize(false, kp);
@@ -339,11 +296,12 @@ namespace Test.Tests.Encrypt
         {
             byte[] plainText = ByteUtils.GetBytes("secret encrypted text");
 
-            NTRUParameters param = NTRUParamSets.APR2011743FAST;
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.APR2011743FAST.Clone();
             NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUPrivateKey priv = new NTRUPrivateKey(ByteUtils.ToBytes(new sbyte[] { 2, -25, 8, 0, 7, 0, 11, 0, 11, 10, 16, 2, 30, -40, -63, -109, -77, -72, -122, 66, 23, -30, -44, -82, 0, 95, 64, 68, 48, -62, -14, 26, -19, -72, -25, 72, 123, 98, 84, -83, 0, 0, 11, 0, 11, 7, 40, 65, 35, 68, 113, 12, -112, 32, -123, 58, 85, -30, -109, -74, 0, 34, -8, -126, 57, 30, 98, -107, -45, -88, 102, 68, 42, -30, -108, -89, 0, 0, 15, 0, 15, 38, -40, -61, 37, 82, 113, -115, 123, -100, 5, 46, 125, -23, 78, -111, -76, 36, -90, 67, -31, 10, 2, 96, -127, 21, 50, -79, 13, -125, -124, 38, 55, -67, -95, 81, -107, 12, 117, -86, 99, -127, 11 }));
             NTRUPublicKey pub = new NTRUPublicKey(ByteUtils.ToBytes(new sbyte[] { 2, -25, 8, 0, 108, -76, -104, -75, -87, -65, -18, -5, 45, -57, -100, -83, 51, 99, 94, 15, -73, 89, -100, 40, -114, 91, -107, 104, 127, 22, 13, 5, -16, 69, -104, -126, -44, 119, 47, -48, 75, 66, 83, -37, -66, -84, 73, 52, 23, -27, 53, 63, 56, 14, -2, 43, -59, -85, -80, 46, 38, -126, 75, -8, -63, 88, 104, 13, 72, -25, -10, -58, -51, 117, -84, 115, -24, -53, 83, -103, -97, 46, 90, -82, -61, 113, -49, -24, -72, 24, -124, -42, -36, 7, 41, 8, 14, -71, -75, -84, -24, -39, 56, 67, 88, 67, 66, -13, 70, -119, -64, 74, -100, -58, 35, 105, -20, 93, 80, -116, -55, 37, -52, 64, 0, -36, -71, 8, 77, -10, -41, -22, -73, 4, -115, -74, -74, -73, 23, -10, -26, 48, 125, -114, -32, -116, 74, 19, -104, 59, 43, 4, 97, -84, 112, 45, 16, 3, -110, -13, 119, -6, 29, -80, 109, 82, -31, 82, 30, 76, -111, -122, -50, -69, -41, -123, 107, 78, -35, 24, -121, -87, -108, 13, 70, 32, -74, 112, 104, -40, -61, 86, -125, 60, -94, -5, -18, 55, 54, -128, 83, -88, 71, 71, -66, 29, -113, 120, 30, 16, -38, 37, 96, -90, 38, -85, 88, 59, 15, -69, 6, -8, 1, 1, 71, 12, 60, -26, -110, 97, 77, 33, 58, 63, 104, 108, 83, 72, -21, -99, 115, -125, -16, 12, 99, 68, 39, -97, -6, 17, 26, -59, 123, -110, -37, -71, 47, 50, 5, 110, -34, 89, -74, 20, 79, -108, -7, 42, 106, -112, 44, 107, 106, -50, 55, 127, -124, 53, 123, -119, -46, -114, -52, -85, 75, 34, -39, -125, 58, -5, -31, -81, -37, -94, -123, 113, 11, -104, -124, 96, -103, 9, 108, 115, 97, -6, 98, -43, 26, -89, -23, 83, 60, 34, -86, -54, 107, 78, -48, 118, -31, -19, 29, -106, 108, 117, 83, 119, 51, -45, 115, 108, -13, -89, -29, 29, -120, 108, 20, 22, -3, 22, 78, -109, 95, 3, -68, -10, -53, -117, -96, -49, 9, 7, 38, 116, 33, -65, 31, 9, -5, -73, 127, 52, 113, 87, -39, 119, -96, 74, -105, 75, -89, 63, 69, -109, -127, 92, -54, 17, -98, -23, -69, 123, -125, 23, -93, 44, -11, -25, -101, 120, -29, 113, -33, 0, -117, -100, -114, 22, 41, -46, 29, -109, 107, 37, -94, 125, 46, 17, 16, -65, -14, 105, -118, 51, -21, 121, -5, 56, 29, 30, -69, -38, -10, -77, -74, 6, -105, 83, 110, 23, 114, -11, -123, -14, 30, -11, -9, 84, -90, -20, -29, 72, -85, 97, -74, -59, -112, -15, -51, -105, 117, 123, -17, -64, -127, 127, -33, -102, 88, 77, 122, -127, -15, 121, -125, -32, 53, 113, 45, -22, 84, -87, 20, 36, 65, 83, -84, -66, -22, 4, 15, -108, -92, 109, -128, -48, 4, -27, -13, 25, 51, -10, 34, 87, 88, 38, -87, 89, -64, -62, 20, 78, 35, -26, -2, 55, 3, -72, -64, 30, 28, -105, 6, -37, -38, -8, 26, -118, 105, -37, -30, 85, -66, 105, -46, -37, -11, -72, 71, 43, -65, -44, 17, -79, 98, 79, -77, -111, 95, 74, 101, -40, -106, 14, -108, -112, 86, 108, 49, 72, -38, -103, -31, 65, -119, 8, 78, -89, 100, -28, 116, 94, 15, -18, 108, 101, 85, 8, -6, 111, -82, -49, -66, -89, 28, -84, -85, -119, 111, 45, 83, -60, -40, -45, -101, -105, -35, 123, -1, 13, -112, 79, -80, -85, -109, -71, 69, 104, 95, -93, 121, -17, 83, 117, -73, -63, -65, -107, -72, 118, -102, -56, 38, 79, 121, -25, -86, -81, -38, 8, 122, 97, 37, 82, -40, 53, 11, 124, -94, -76, -107, -125, -9, -119, 63, 52, -34, -72, -21, 59, 3, -100, -127, 47, -102, 19, -37, -45, -114, -65, 39, -106, 6, -127, -110, -38, 96, -38, -51, 110, -3, 28, 8, 102, -102, 96, -127, 109, -56, -53, -13, 59, -98, 92, 80, 1, 55, -91, -122, -105, 28, 69, -85, 109, -38, 105, 87, -5, 3, -102, 62, -92, 60, 43, -20, -7, -23, -84, 106, 121, -48, 123, -112, 56, -17, -52, 14, -123, -122, 64, 14, -23, -71, 60, 70, -121, 6, 37, -15, 77, 96, 104, -34, 58, -125, -61, 1, -26, 118, -78, -35, -1, 0, 5, 33, -98, -86, -127, 25, 56, -91, 82, -33, 60, -64, -86, 27, 31, -80, -79, 118, -12, -18, 40, -72, 32, 119, -28, -62, 100, -121, -71, -79, -9, 38, -37, 25, 65, -46, 8, -112, 37, 9, -56, 123, -40, -44, -90, -21, -54, -2, -7, 107, -93, 24, -126, 69, 42, -111, -84, 57, 69, -119, 21, 60, 57, -122, 111, -99, 49, -46, -119, 100, 98, 24, -62, 112, 122, 46, 18, -35, -67, 89, 104, 82, 12, 125, 57, -70, -112, -109, 96, 51, -68, 1, -101, -59, -92, 54, 85, -41, 17, 31, 94, 75, -128, 53, 84, 0, -83, -94, -123, 49, -30, -24, 18, 46, 48, -33, 120, 66, -69, 70, 23, -124, -117, 81, 96, 46, 47, -33, 83, -13, -14, -94, 49, 66, -46, 84, -27, -77, 6, 0, -75, -18, 86, -119, -88, 82, -50, 55, -20, 63, 55, -57, 22, -108, -103, -17, -22, 64, 65, 90, -34, -96, -117, 51, 119, -103, -35, 95, -15, -118, 2, -31, 31, -9, -58, 84, -75, 80, 39, -101, -56, 16, -75, 59, 48, -63, -24, -95, 119, 73, -110, -115, 49, -18, 54, -124, 112, -61, -40, -105, -118, -66, 15, -107, 75, 82, -70, -87, -11, -11, 48, 41, 119, -42, -34, -33, 57, 23, -14, -45, -125, -108, -75, 3, 44, 44, 58, 126, -126, -20, -123, 58, 114, 79, -102, -115, 115, 12, 66, 108, 84, 43, -46, -80, -41, -70, 111, -114, 123, 21, 1, 34, -72, 23, 105, -52, -39, -54, -119, 45, 77, -16, -66, -105, -11, 91, -46, 77, -104, -93, 52, -3, 17, 55, -10, 67, -33, 43, 75, -103, 106, 7, -35, -65, -21, 68, 118, -38, 59, -115, 31 }));
             NTRUKeyPair kp = new NTRUKeyPair(priv, pub);
+
             ntru.Initialize(true, kp);
             byte[] encrypted = ntru.Encrypt(plainText);
             ntru.Initialize(false, kp);
@@ -355,7 +313,7 @@ namespace Test.Tests.Encrypt
         // tests key pair generation from a passphrase
         private void GenerateKeyPair()
         {
-            NTRUParameters param = NTRUParamSets.EES1087EP2FAST;
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.EES1087EP2FAST.Clone();
             NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUEncrypt ntru2 = new NTRUEncrypt(NTRUParamSets.EES1087EP2FAST);
             byte[] passphrase = Encoding.Unicode.GetBytes("password123");
@@ -384,13 +342,13 @@ namespace Test.Tests.Encrypt
         {
             NTRUParameters[] paramSets = new NTRUParameters[] 
             { 
-                NTRUParamSets.APR2011439,
-                NTRUParamSets.APR2011439FAST,
-                NTRUParamSets.APR2011743,
-                NTRUParamSets.APR2011743FAST,
-                NTRUParamSets.EES1087EP2,
-                NTRUParamSets.EES1171EP1,
-                NTRUParamSets.EES1499EP1,
+                (NTRUParameters)NTRUParamSets.APR2011439.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011439FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743.Clone(),
+                (NTRUParameters)NTRUParamSets.APR2011743FAST.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1087EP2.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1171EP1.Clone(),
+                (NTRUParameters)NTRUParamSets.EES1499EP1.Clone(),
             };
 
             byte[] plainText = ByteUtils.GetBytes("secret encrypted text");

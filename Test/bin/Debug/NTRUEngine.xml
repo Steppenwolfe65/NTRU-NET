@@ -6125,6 +6125,23 @@
             based on <see href="https://github.com/tbuktu/ntru/blob/master/src/main/java/net/sf/ntru/encrypt/EncryptionParameters.java">EncryptionParameters.java</see>.
             </summary>
         </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.FromId(System.Byte[],System.Boolean)">
+            <summary>
+            Retrieve a parameter set by its identity code
+            </summary>
+            
+            <param name="OId">The 3 byte parameter set identity code</param>
+            <param name="UseProduct">Uses the product form</param>
+            
+            <returns>A parameter set</returns>
+            
+            <exception cref="!:MPKCException">Thrown if an invalid or unknown OId is used.</exception>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX2100SK1024">
+            <summary>
+            Just an experiment, do not use!
+            </summary>
+        </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1087EP2">
             <summary>
             A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
@@ -6132,7 +6149,7 @@
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1087EP2FAST">
             <summary>
-            A product-form version of <c>EES1087EP2</c> 
+            A product-form version of <c>EES1087EP2</c>
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1171EP1">
@@ -7237,7 +7254,7 @@
             <param name="MinIGFHashCalls">Minimum number of hash calls for the IGF to make</param>
             <param name="MinMGFHashCalls">Minimum number of calls to generate the masking polynomial</param>
             <param name="HashSeed">Whether to hash the seed in the MGF first (true), or use the seed directly (false)</param>
-            <param name="Oid">Three bytes that uniquely identify the parameter set</param>
+            <param name="OId">Three bytes that uniquely identify the parameter set</param>
             <param name="Sparse">Whether to treat ternary polynomials as sparsely populated; SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
             <param name="FastFp">Whether <c>f=1+p*F</c> for a ternary <c>F</c> (true) or <c>f</c> is ternary (false)</param>
             <param name="Digest">The Message Digest engine to use; default is SHA512</param>
@@ -7260,7 +7277,7 @@
             <param name="MinIGFHashCalls">Minimum number of hash calls for the IGF to make</param>
             <param name="MinMGFHashCalls">Minimum number of calls to generate the masking polynomial</param>
             <param name="HashSeed">Whether to hash the seed in the MGF first (true) or use the seed directly (false)</param>
-            <param name="Oid">Three bytes that uniquely identify the parameter set</param>
+            <param name="OId">Three bytes that uniquely identify the parameter set</param>
             <param name="Sparse">Whether to treat ternary polynomials as sparsely populated SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
             <param name="FastFp">Whether <c>F=1+p*F</c> for a ternary <c>F</c> (true) or <c>F</c> is ternary (false)</param>
             <param name="Digest">The Message Digest engine to use; default is SHA512</param>
@@ -7489,7 +7506,7 @@
             Get: Minimum number of calls to generate the masking polynomial
             </summary>
         </member>
-        <member name="P:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters.Oid">
+        <member name="P:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters.OId">
             <summary>
             Get: Three bytes that uniquely identify the parameter set
             </summary>

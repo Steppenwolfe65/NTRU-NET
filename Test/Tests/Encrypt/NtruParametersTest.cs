@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
 using VTDev.Libraries.CEXEngine.Tools;
+using VTDev.Libraries.CEXEngine.Crypto;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -62,7 +63,7 @@ namespace Test.Tests.Encrypt
         #region Private Methods
         public void LoadSave()
         {
-            NTRUParameters param = NTRUParamSets.EES1499EP1;
+            NTRUParameters param = (NTRUParameters)NTRUParamSets.EES1499EP1.Clone();
             MemoryStream os = new MemoryStream();
             param.WriteTo(os);
             MemoryStream ins = new MemoryStream(os.ToArray());
@@ -73,11 +74,18 @@ namespace Test.Tests.Encrypt
         public void Clone()
         {
             NTRUParameters param = NTRUParamSets.APR2011439;
-            if (!Compare.Equals(param, param.Clone()))
+            NTRUParameters param2 = (NTRUParameters)param.Clone();
+            if (!Compare.Equals(param, param2))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
 
             param = NTRUParamSets.APR2011439FAST;
-            if (!Compare.Equals(param, param.Clone()))
+            param2 = (NTRUParameters)param.Clone();
+
+            if (!Compare.Equals(param, param2))
+                throw new Exception("NtruParameters: cloned copy is not equal!");
+
+            param2.MessageDigest = Digests.Blake512;
+            if (Compare.Equals(param, param2))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
         }
         #endregion

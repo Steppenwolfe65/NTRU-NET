@@ -5,6 +5,7 @@ using Test.Tests.Encode;
 using Test.Tests.Encrypt;
 using Test.Tests.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using System.Runtime.InteropServices;
 #endregion
 
 namespace Test
@@ -22,6 +23,10 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            ConsoleUtils.SizeConsole(80, 60);
+            ConsoleUtils.CenterConsole();
+            Console.Title = "NTRU Sharp Test Suite";
+
             // header
             Console.WriteLine("**********************************************");
             Console.WriteLine("* NTRU Encrypt in C# (NTRU Sharp)            *");
@@ -59,30 +64,15 @@ namespace Test
             Console.WriteLine("******TESTING ENCRYPTION ENGINE******");
             RunTest(new BitStringTest());
             RunTest(new NtruKeyPairTest());
+            RunTest(new NtruEncryptTest());
             RunTest(new NtruKeyTest());
             RunTest(new NtruParametersTest());
             RunTest(new IndexGeneratorTest());
-            RunTest(new NtruEncryptTest());
             RunTest(new PBPRngTest());
             Console.WriteLine("");/**/
 
             Console.WriteLine("Completed! Press any key to close..");
             Console.ReadKey();
-        }
-
-        private static void Tex()
-        {
-            NTRUParameters param = NTRUParamSets.CX2100SK1024;
-            NTRUEncrypt ntru = new NTRUEncrypt(param);
-            NTRUKeyPair kp;
-            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                kp = kg.GenerateKeyPair();
-
-            byte[] plainText = Test.Tests.ByteUtils.GetBytes("text to encrypt");
-            ntru.Initialize(true, kp);
-            byte[] encrypted = ntru.Encrypt(plainText);
-            ntru.Initialize(false, kp);
-            byte[] decrypted = ntru.Decrypt(encrypted);
         }
 
         private static void RunTest(ITest Test)

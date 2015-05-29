@@ -463,7 +463,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <returns>A byte array containing a seed value</returns>
         private byte[] GetSeed(byte[] Message, IntegerPolynomial PubKey, byte[] Bits)
         {
-            byte[] oid = _encParams.Oid;
+            byte[] oid = _encParams.OId;
             byte[] hTrunc = PubKey.ToBinaryTrunc(_encParams.Q, _encParams.PkLen / 8);
             // sData = OID|m|b|hTrunc
             byte[] sData = new byte[oid.Length + Message.Length + Bits.Length + hTrunc.Length];

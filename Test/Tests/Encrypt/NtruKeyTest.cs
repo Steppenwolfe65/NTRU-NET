@@ -60,11 +60,12 @@ namespace Test.Tests.Encrypt
         #region Private Methods
         private void Encode()
         {
-            foreach (NTRUParameters param in new NTRUParameters[] { 
-                NTRUParamSets.APR2011743, 
-                NTRUParamSets.APR2011743FAST, 
-                NTRUParamSets.EES1499EP1})
-                    Encode(param);
+            foreach (NTRUParameters param in new NTRUParameters[] 
+            { 
+                (NTRUParameters)NTRUParamSets.APR2011743.Clone(), 
+                (NTRUParameters)NTRUParamSets.APR2011743FAST.Clone(), 
+                (NTRUParameters)NTRUParamSets.EES1499EP1.Clone()})
+                Encode(param);
         }
 
         private void Encode(NTRUParameters param)
