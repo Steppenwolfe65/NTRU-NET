@@ -122,6 +122,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
         }
 
+        private NTRUPublicKey()
+        {
+        }
+
         /// <summary>
         /// Finalize objects
         /// </summary>

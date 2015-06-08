@@ -8,11 +8,139 @@ using System.IO;
 namespace VTDev.Libraries.CEXEngine.Utility
 {
     /// <summary>
-    /// Array extension and static methods
+    /// Extended array methods
     /// </summary>
     public static class ArrayUtils
     {
-        #region Static Methods
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Value">The new value</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddAt(ref byte[] Source, byte Value, int Index)
+        {
+            byte[] copy = new byte[Source.Length + 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            copy[Index] = Value;
+
+            if (Index < copy.Length - 1)
+                Array.Copy(Source, Index, copy, Index + 1, Source.Length - Index);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Value">The new value</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddAt(ref int[] Source, int Value, int Index)
+        {
+            int[] copy = new int[Source.Length + 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            copy[Index] = Value;
+
+            if (Index < copy.Length - 1)
+                Array.Copy(Source, Index, copy, Index + 1, Source.Length - Index);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Value">The new value</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddAt(ref long[] Source, long Value, int Index)
+        {
+            long[] copy = new long[Source.Length + 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            copy[Index] = Value;
+
+            if (Index < copy.Length - 1)
+                Array.Copy(Source, Index, copy, Index + 1, Source.Length - Index);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Data">The new value members</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddRange(ref byte[] Source, byte[] Data, int Index)
+        {
+            byte[] copy = new byte[Source.Length + Data.Length];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+
+            Array.Copy(Data, 0, copy, Index, Data.Length);
+
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index, copy, Index + Data.Length, Source.Length - Index);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Data">The new value members</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddRange(ref int[] Source, int[] Data, int Index)
+        {
+            int[] copy = new int[Source.Length + Data.Length];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+
+            Array.Copy(Data, 0, copy, Index, Data.Length);
+
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index, copy, Index + Data.Length, Source.Length - Index);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Add a new value member to an array
+        /// </summary>
+        /// 
+        /// <param name="Source">The source array to be expanded</param>
+        /// <param name="Data">The new value members</param>
+        /// <param name="Index">The insertion point within the source array</param>
+        public static void AddRange(ref long[] Source, long[] Data, int Index)
+        {
+            long[] copy = new long[Source.Length + Data.Length];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+
+            Array.Copy(Data, 0, copy, Index, Data.Length);
+
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index, copy, Index + Data.Length, Source.Length - Index);
+
+            Source = copy;
+        }
+
         /// <summary>
         /// Concatenate 2 arrays
         /// </summary>
@@ -43,7 +171,6 @@ namespace VTDev.Libraries.CEXEngine.Utility
         /// <param name="Arrays">Arrays to be joined</param>
         /// 
         /// <returns>Joined array</returns>
-        [CLSCompliant(false)]
         public static int[] Concat(params int[][] Arrays)
         {
             int len = 0;
@@ -56,7 +183,7 @@ namespace VTDev.Libraries.CEXEngine.Utility
             foreach (int[] array in Arrays)
             {
                 Array.Copy(array, 0, rv, offset, array.Length);
-                offset += array.Length * 4;
+                offset += array.Length;
             }
             return rv;
         }
@@ -69,6 +196,30 @@ namespace VTDev.Libraries.CEXEngine.Utility
         /// 
         /// <returns>Joined array</returns>
         [CLSCompliant(false)]
+        public static uint[] Concat(params uint[][] Arrays)
+        {
+            int len = 0;
+            for (int i = 0; i < Arrays.Length; i++)
+                len += Arrays[i].Length;
+
+            uint[] rv = new uint[len];
+            int offset = 0;
+
+            foreach (uint[] array in Arrays)
+            {
+                Array.Copy(array, 0, rv, offset, array.Length);
+                offset += array.Length;
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Concatenate 2 arrays
+        /// </summary>
+        /// 
+        /// <param name="Arrays">Arrays to be joined</param>
+        /// 
+        /// <returns>Joined array</returns>
         public static long[] Concat(params long[][] Arrays)
         {
             int len = 0;
@@ -81,7 +232,32 @@ namespace VTDev.Libraries.CEXEngine.Utility
             foreach (long[] array in Arrays)
             {
                 Array.Copy(array, 0, rv, offset, array.Length);
-                offset += array.Length * 4;
+                offset += array.Length;
+            }
+            return rv;
+        }
+
+        /// <summary>
+        /// Concatenate 2 arrays
+        /// </summary>
+        /// 
+        /// <param name="Arrays">Arrays to be joined</param>
+        /// 
+        /// <returns>Joined array</returns>
+        [CLSCompliant(false)]
+        public static ulong[] Concat(params ulong[][] Arrays)
+        {
+            int len = 0;
+            for (int i = 0; i < Arrays.Length; i++)
+                len += Arrays[i].Length;
+
+            ulong[] rv = new ulong[len];
+            int offset = 0;
+
+            foreach (ulong[] array in Arrays)
+            {
+                Array.Copy(array, 0, rv, offset, array.Length);
+                offset += array.Length;
             }
             return rv;
         }
@@ -107,7 +283,7 @@ namespace VTDev.Libraries.CEXEngine.Utility
         /// <param name="Index">The first row index of the array outer array</param>
         /// <param name="Lengths">The arrays lengths</param>
         /// 
-        /// <returns></returns>
+        /// <returns>The initialized array</returns>
         public static object InitializeJagged(Type Type, int Index, int[] Lengths)
         {
             Array arr = Array.CreateInstance(Type, Lengths[Index]);
@@ -123,6 +299,212 @@ namespace VTDev.Libraries.CEXEngine.Utility
         }
 
         /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <typeparam name="T">The type of array</typeparam>
+        /// <param name="Source">The source array</param>
+        /// <param name="Index">The index of the element to remove</param>
+        public static void RemoveAt(ref byte[] Source, int Index)
+        {
+            byte[] copy = new byte[Source.Length - 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index + 1, copy, Index, Source.Length - Index - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <typeparam name="T">The type of array</typeparam>
+        /// <param name="Source">The source array</param>
+        /// <param name="Index">The index of the element to remove</param>
+        public static void RemoveAt(ref int[] Source, int Index)
+        {
+            int[] copy = new int[Source.Length - 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index + 1, copy, Index, Source.Length - Index - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <typeparam name="T">The type of array</typeparam>
+        /// <param name="Source">The source array</param>
+        /// <param name="Index">The index of the element to remove</param>
+        public static void RemoveAt(ref long[] Source, int Index)
+        {
+            long[] copy = new long[Source.Length - 1];
+
+            if (Index > 0)
+                Array.Copy(Source, 0, copy, 0, Index);
+            if (Index < Source.Length - 1)
+                Array.Copy(Source, Index + 1, copy, Index, Source.Length - Index - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <param name="Source">The source array</param>
+        /// <param name="From">First element to remove</param>
+        /// <param name="To">Last element to remove</param>
+        public static void RemoveRange(ref byte[] Source, int From, int To)
+        {
+            int len = Source.Length - To - From - 1;
+            byte[] copy = new byte[len];
+
+            if (From > 0)
+                Array.Copy(Source, 0, copy, 0, From);
+            if (To < Source.Length - 1)
+                Array.Copy(Source, To + 1, copy, From, Source.Length - To - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <param name="Source">The source array</param>
+        /// <param name="From">First element to remove</param>
+        /// <param name="To">Last element to remove</param>
+        public static void RemoveRange(ref int[] Source, int From, int To)
+        {
+            int len = Source.Length - To - From - 1;
+            int[] copy = new int[len];
+
+            if (From > 0)
+                Array.Copy(Source, 0, copy, 0, From);
+            if (To < Source.Length - 1)
+                Array.Copy(Source, To + 1, copy, From, Source.Length - To - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Remove an element from the array
+        /// </summary>
+        /// <param name="Source">The source array</param>
+        /// <param name="From">First element to remove</param>
+        /// <param name="To">Last element to remove</param>
+        public static void RemoveRange(ref long[] Source, long From, long To)
+        {
+            long len = Source.Length - To - From - 1;
+            long[] copy = new long[len];
+
+            if (From > 0)
+                Array.Copy(Source, 0, copy, 0, From);
+            if (To < Source.Length - 1)
+                Array.Copy(Source, To + 1, copy, From, Source.Length - To - 1);
+
+            Source = copy;
+        }
+
+        /// <summary>
+        /// Split an array
+        /// </summary>
+        /// 
+        /// <param name="Data">The array to be split</param>
+        /// <param name="Index">The starting position of the second array</param>
+        /// 
+        /// <returns>A jagged array containing the split array</returns>
+        [CLSCompliant(false)]
+        public static byte[][] Split(byte[] Data, int Index)
+        {
+            byte[] rd1 = new byte[Index];
+            byte[] rd2 = new byte[Data.Length - Index];
+            Array.Copy(Data, 0, rd1, 0, rd1.Length);
+            Array.Copy(Data, Index, rd2, 0, rd2.Length);
+
+            return new byte[][] { rd1, rd2 };
+        }
+
+        /// <summary>
+        /// Split an array
+        /// </summary>
+        /// 
+        /// <param name="Data">The array to be split</param>
+        /// <param name="Index">The starting position of the second array</param>
+        /// 
+        /// <returns>A jagged array containing the split array</returns>
+        [CLSCompliant(false)]
+        public static int[][] Split(int[] Data, int Index)
+        {
+            int[] rd1 = new int[Index];
+            int[] rd2 = new int[Data.Length - Index];
+            Array.Copy(Data, 0, rd1, 0, rd1.Length);
+            Array.Copy(Data, Index, rd2, 0, rd2.Length);
+
+            return new int[][] { rd1, rd2 };
+        }
+
+        /// <summary>
+        /// Split an array
+        /// </summary>
+        /// 
+        /// <param name="Data">The array to be split</param>
+        /// <param name="Index">The starting position of the second array</param>
+        /// 
+        /// <returns>A jagged array containing the split array</returns>
+        [CLSCompliant(false)]
+        public static uint[][] Split(uint[] Data, int Index)
+        {
+            uint[] rd1 = new uint[Index];
+            uint[] rd2 = new uint[Data.Length - Index];
+            Array.Copy(Data, 0, rd1, 0, rd1.Length);
+            Array.Copy(Data, Index, rd2, 0, rd2.Length);
+
+            return new uint[][] { rd1, rd2 };
+        }
+
+        /// <summary>
+        /// Split an array
+        /// </summary>
+        /// 
+        /// <param name="Data">The array to be split</param>
+        /// <param name="Index">The starting position of the second array</param>
+        /// 
+        /// <returns>A jagged array containing the split array</returns>
+        [CLSCompliant(false)]
+        public static long[][] Split(long[] Data, int Index)
+        {
+            long[] rd1 = new long[Index];
+            long[] rd2 = new long[Data.Length - Index];
+            Array.Copy(Data, 0, rd1, 0, rd1.Length);
+            Array.Copy(Data, Index, rd2, 0, rd2.Length);
+
+            return new long[][] { rd1, rd2 };
+        }
+
+        /// <summary>
+        /// Split an array
+        /// </summary>
+        /// 
+        /// <param name="Data">The array to be split</param>
+        /// <param name="Index">The starting position of the second array</param>
+        /// 
+        /// <returns>A jagged array containing the split array</returns>
+        [CLSCompliant(false)]
+        public static ulong[][] Split(ulong[] Data, int Index)
+        {
+            ulong[] rd1 = new ulong[Index];
+            ulong[] rd2 = new ulong[Data.Length - Index];
+            Array.Copy(Data, 0, rd1, 0, rd1.Length);
+            Array.Copy(Data, Index, rd2, 0, rd2.Length);
+
+            return new ulong[][] { rd1, rd2 };
+        }
+
+        /// <summary>
         /// Copy an sbyte array to a byte array
         /// </summary>
         /// 
@@ -132,9 +514,53 @@ namespace VTDev.Libraries.CEXEngine.Utility
         [CLSCompliant(false)]
         public static byte[] ToBytes(sbyte[] Data)
         {
-            byte[] data = new byte[Data.Length];
-            Buffer.BlockCopy(Data, 0, data, 0, Data.Length);
-            return data;
+            byte[] rd = new byte[Data.Length];
+            Buffer.BlockCopy(Data, 0, rd, 0, Data.Length);
+            return rd;
+        }
+
+        /// <summary>
+        /// Copy an int array to a byte array
+        /// </summary>
+        /// 
+        /// <param name="Data">Array to convert</param>
+        /// 
+        /// <returns>Int array converted to bytes</returns>
+        public static byte[] ToBytes(int[] Data)
+        {
+            byte[] rd = new byte[Data.Length * 4];
+            Buffer.BlockCopy(Data, 0, rd, 0, rd.Length);
+            return rd;
+        }
+
+        /// <summary>
+        /// Copy an uint array to a byte array
+        /// </summary>
+        /// 
+        /// <param name="Data">Array to convert</param>
+        /// 
+        /// <returns>Uint array converted to bytes</returns>
+        [CLSCompliant(false)]
+        public static byte[] ToBytes(uint[] Data)
+        {
+            byte[] rd = new byte[Data.Length * 4];
+            Buffer.BlockCopy(Data, 0, rd, 0, rd.Length);
+            return rd;
+        }
+
+        /// <summary>
+        /// Copy an long array to a byte array
+        /// </summary>
+        /// 
+        /// <param name="Data">Array to convert</param>
+        /// 
+        /// <returns>Long array converted to bytes</returns>
+        [CLSCompliant(false)]
+        public static byte[] ToBytes(long[] Data)
+        {
+            byte[] rd = new byte[Data.Length * 8];
+            Buffer.BlockCopy(Data, 0, rd, 0, rd.Length);
+            return rd;
         }
 
         /// <summary>
@@ -148,186 +574,5 @@ namespace VTDev.Libraries.CEXEngine.Utility
         {
             return System.Text.Encoding.ASCII.GetBytes(Value);
         }
-
-        #endregion
-
-        #region Extensions
-
-        /// <summary>
-        /// Convert a byte array to a class objct
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Return object type</typeparam>
-        /// <param name="Data">The byte array containing the class</param>
-        /// 
-        /// <returns>The class object</returns>
-        public static T Deserialize<T>(this byte[] Data) where T : class
-        {
-            if (Data == null)
-                return null;
-
-            using (var memStream = new MemoryStream())
-            {
-                var format = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                memStream.Write(Data, 0, Data.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                var obj = (T)format.Deserialize(memStream);
-                return obj;
-            }
-        }
-
-        /// <summary>
-        /// Serialize an object to a byte array
-        /// </summary>
-        /// 
-        /// <param name="Obj">The object to serialize</param>
-        /// 
-        /// <returns>The object as a serialized byte array</returns>
-        public static byte[] Serialize(this object Obj)
-        {
-            if (Obj == null)
-                return null;
-
-            var format = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                format.Serialize(ms, Obj);
-                return ms.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// Create a copy of an array
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">Array source</param>
-        /// <param name="Length">Number of elements to copy</param>
-        /// 
-        /// <returns>A copy of the source array</returns>
-        public static T[] CopyOf<T>(this T[] Source, int Length)
-        {
-            T[] copy = new T[Length];
-            Array.Copy(Source, copy, Math.Min(Source.Length, Length));
-
-            return copy;
-        }
-
-        /// <summary>
-        /// Create a ranged copy of a byte array
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">Byte source array</param>
-        /// <param name="From">First element to copy</param>
-        /// <param name="To">Last element to copy</param>
-        /// 
-        /// <returns>Byte array copy</returns>
-        public static T[] CopyOfRange<T>(this T[] Source, int From, int To)
-        {
-            int newLen = To - From;
-            T[] copy = new T[newLen];
-
-            if (newLen < 0)
-                throw new Exception(From + " > " + To);
-
-            Array.Copy(Source, From, copy, 0, Math.Min(Source.Length - From, newLen));
-
-            return copy;
-        }
-
-        /// <summary>
-        /// Fill an array with a value; defaults to zeroes
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">Array to fill</param>
-        /// <param name="Value">Value used to fill array</param>
-        public static void Fill<T>(this T[] Source, T Value = default(T))
-        {
-            for (int i = 0; i < Source.Length; i++)
-                Source[i] = Value;
-        }
-
-        /// <summary>
-        /// Fill an array with a value; defaults to zeroes
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">Array to fill</param>
-        /// <param name="Value">Value used to fill array</param>
-        public static void Fill<T>(this T[,] Source, T Value = default(T))
-        {
-            for (int x = 0; x < Source.GetLength(0); x++)
-            {
-                for (int y = 0; y < Source.GetLength(1); y++)
-                    Source[x, y] = Value;
-            }
-        }
-
-        /// <summary>
-        /// Shuffle an array using the SecureRandom class
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">The list instance</param>
-        public static void Shuffle<T>(this T[] Source)
-        {
-            using (SecureRandom rnd = new SecureRandom())
-            {
-                for (int i = 0; i < Source.Length - 1; i++)
-                {
-                    int index = (int)rnd.NextInt32(i, Source.Length - 1);
-
-                    if (i != index)
-                    {
-                        T temp = Source[i];
-                        Source[i] = Source[index];
-                        Source[index] = temp;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Shuffle an array with a specific Prng class
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of list</typeparam>
-        /// <param name="Source">The list instance</param>
-        /// <param name="Rng">The pseudo random generator</param>
-        public static void Shuffle<T>(this T[] Source, IRandom Rng)
-        {
-            for (int i = 0; i < Source.Length - 1; i++)
-            {
-                int index = (int)Rng.Next(i, Source.Length - 1);
-
-                if (i != index)
-                {
-                    T temp = Source[i];
-                    Source[i] = Source[index];
-                    Source[index] = temp;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Return a sub array
-        /// </summary>
-        /// 
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="Source">The source array</param>
-        /// <param name="Index">The starting position within the source array</param>
-        /// <param name="Count">The number of bytes to copy</param>
-        /// 
-        /// <returns>The sub array</returns>
-        public static T[] SubArray<T>(this T[] Source, int Index, int Count)
-        {
-            T[] result = new T[Count];
-            Array.Copy(Source, Index, result, 0, Count);
-
-            return result;
-        }
-        #endregion
     }
 }

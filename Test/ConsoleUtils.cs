@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace Test
 {
@@ -19,6 +20,7 @@ namespace Test
             int x = scr.WorkingArea.Left + (scr.WorkingArea.Width - (rc.right - rc.left)) / 2;
             int y = scr.WorkingArea.Top + (scr.WorkingArea.Height - (rc.bottom - rc.top)) / 2;
             MoveWindow(hWin, x, y, rc.right - rc.left, rc.bottom - rc.top, false);
+            Thread.Sleep(100);
         }
 
         /// <summary>
@@ -30,6 +32,7 @@ namespace Test
         public static void SizeConsole(int Width, int Height)
         {
             Console.SetWindowSize(Math.Min(Width, Console.LargestWindowWidth), Math.Min(Height, Console.LargestWindowHeight));
+            Thread.Sleep(100);
         }
 
         private struct RECT { public int left, top, right, bottom; }

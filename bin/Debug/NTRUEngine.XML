@@ -4801,6 +4801,146 @@
             
             <returns>Decoded bytes</returns>
         </member>
+        <member name="T:VTDev.Libraries.CEXEngine.Utility.ArrayEx">
+            <summary>
+            Array type extensions
+            </summary>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.AddAt``1(System.Int32[],System.Int32,``0)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">The source array to be expanded</param>
+            <param name="Index">The insertion point within the source array</param>
+            <param name="Value">The new value</param>
+            
+            <returns>Resized array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.AddRange``1(``0[],``0[],System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">The source array to be expanded</param>
+            <param name="Data">The new value members</param>
+            <param name="Index">The insertion point within the source array</param>
+            
+            <returns>Resized array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Deserialize``1(System.Byte[])">
+            <summary>
+            Convert a byte array to a class objct
+            </summary>
+            
+            <typeparam name="T">Return object type</typeparam>
+            <param name="Data">The byte array containing the class</param>
+            
+            <returns>The class object</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.CopyOf``1(``0[],System.Int32)">
+            <summary>
+            Create a copy of an array
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">Array source</param>
+            <param name="Length">Number of elements to copy</param>
+            
+            <returns>A copy of the source array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.CopyOfRange``1(``0[],System.Int32,System.Int32)">
+            <summary>
+            Create a ranged copy of a byte array
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">Byte source array</param>
+            <param name="From">First element to copy</param>
+            <param name="To">Last element to copy</param>
+            
+            <returns>Byte array copy</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Fill``1(``0[],``0)">
+            <summary>
+            Fill an array with a value; defaults to zeroes
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">Array to fill</param>
+            <param name="Value">Value used to fill array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Fill``1(``0[0:,0:],``0)">
+            <summary>
+            Fill an array with a value; defaults to zeroes
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">Array to fill</param>
+            <param name="Value">Value used to fill array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.RemoveAt``1(``0[],System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            
+            <typeparam name="T">The type of array</typeparam>
+            <param name="Source">The source array</param>
+            <param name="Index">The index of the element to remove</param>
+            
+            <returns>Resized array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.RemoveRange``1(``0[],System.Int32,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            
+            <param name="Source">The source array</param>
+            <param name="From">First element to remove</param>
+            <param name="To">Last element to remove</param>
+            
+            /// <returns>Resized array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Serialize(System.Object)">
+            <summary>
+            Serialize an object to a byte array
+            </summary>
+            
+            <param name="Obj">The object to serialize</param>
+            
+            <returns>The object as a serialized byte array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Shuffle``1(``0[])">
+            <summary>
+            Shuffle an array using the SecureRandom class
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">The list instance</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Shuffle``1(``0[],VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom)">
+            <summary>
+            Shuffle an array with a specific Prng class
+            </summary>
+            
+            <typeparam name="T">Type of list</typeparam>
+            <param name="Source">The list instance</param>
+            <param name="Rng">The pseudo random generator</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.SubArray``1(``0[],System.Int32,System.Int32)">
+            <summary>
+            Return a sub array
+            </summary>
+            
+            <typeparam name="T">Type of array</typeparam>
+            <param name="Source">The source array</param>
+            <param name="Index">The starting position within the source array</param>
+            <param name="Count">The number of bytes to copy</param>
+            
+            <returns>The sub array</returns>
+        </member>
         <member name="T:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial.Resultant">
             <summary>
             Contains a resultant and a polynomial <c>rho</c> such that <c>res = rho*this + t*(x^n-1) for some integer t</c>.
@@ -5499,8 +5639,62 @@
         </member>
         <member name="T:VTDev.Libraries.CEXEngine.Utility.ArrayUtils">
             <summary>
-            Array extension and static methods
+            Extended array methods
             </summary>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddAt(System.Byte[]@,System.Byte,System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Value">The new value</param>
+            <param name="Index">The insertion point within the source array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddAt(System.Int32[]@,System.Int32,System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Value">The new value</param>
+            <param name="Index">The insertion point within the source array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddAt(System.Int64[]@,System.Int64,System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Value">The new value</param>
+            <param name="Index">The insertion point within the source array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddRange(System.Byte[]@,System.Byte[],System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Data">The new value members</param>
+            <param name="Index">The insertion point within the source array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddRange(System.Int32[]@,System.Int32[],System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Data">The new value members</param>
+            <param name="Index">The insertion point within the source array</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.AddRange(System.Int64[]@,System.Int64[],System.Int32)">
+            <summary>
+            Add a new value member to an array
+            </summary>
+            
+            <param name="Source">The source array to be expanded</param>
+            <param name="Data">The new value members</param>
+            <param name="Index">The insertion point within the source array</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Concat(System.Byte[][])">
             <summary>
@@ -5520,7 +5714,25 @@
             
             <returns>Joined array</returns>
         </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Concat(System.UInt32[][])">
+            <summary>
+            Concatenate 2 arrays
+            </summary>
+            
+            <param name="Arrays">Arrays to be joined</param>
+            
+            <returns>Joined array</returns>
+        </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Concat(System.Int64[][])">
+            <summary>
+            Concatenate 2 arrays
+            </summary>
+            
+            <param name="Arrays">Arrays to be joined</param>
+            
+            <returns>Joined array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Concat(System.UInt64[][])">
             <summary>
             Concatenate 2 arrays
             </summary>
@@ -5548,7 +5760,105 @@
             <param name="Index">The first row index of the array outer array</param>
             <param name="Lengths">The arrays lengths</param>
             
-            <returns></returns>
+            <returns>The initialized array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveAt(System.Byte[]@,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <typeparam name="T">The type of array</typeparam>
+            <param name="Source">The source array</param>
+            <param name="Index">The index of the element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveAt(System.Int32[]@,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <typeparam name="T">The type of array</typeparam>
+            <param name="Source">The source array</param>
+            <param name="Index">The index of the element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveAt(System.Int64[]@,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <typeparam name="T">The type of array</typeparam>
+            <param name="Source">The source array</param>
+            <param name="Index">The index of the element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveRange(System.Byte[]@,System.Int32,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <param name="Source">The source array</param>
+            <param name="From">First element to remove</param>
+            <param name="To">Last element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveRange(System.Int32[]@,System.Int32,System.Int32)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <param name="Source">The source array</param>
+            <param name="From">First element to remove</param>
+            <param name="To">Last element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.RemoveRange(System.Int64[]@,System.Int64,System.Int64)">
+            <summary>
+            Remove an element from the array
+            </summary>
+            <param name="Source">The source array</param>
+            <param name="From">First element to remove</param>
+            <param name="To">Last element to remove</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Split(System.Byte[],System.Int32)">
+            <summary>
+            Split an array
+            </summary>
+            
+            <param name="Data">The array to be split</param>
+            <param name="Index">The starting position of the second array</param>
+            
+            <returns>A jagged array containing the split array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Split(System.Int32[],System.Int32)">
+            <summary>
+            Split an array
+            </summary>
+            
+            <param name="Data">The array to be split</param>
+            <param name="Index">The starting position of the second array</param>
+            
+            <returns>A jagged array containing the split array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Split(System.UInt32[],System.Int32)">
+            <summary>
+            Split an array
+            </summary>
+            
+            <param name="Data">The array to be split</param>
+            <param name="Index">The starting position of the second array</param>
+            
+            <returns>A jagged array containing the split array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Split(System.Int64[],System.Int32)">
+            <summary>
+            Split an array
+            </summary>
+            
+            <param name="Data">The array to be split</param>
+            <param name="Index">The starting position of the second array</param>
+            
+            <returns>A jagged array containing the split array</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Split(System.UInt64[],System.Int32)">
+            <summary>
+            Split an array
+            </summary>
+            
+            <param name="Data">The array to be split</param>
+            <param name="Index">The starting position of the second array</param>
+            
+            <returns>A jagged array containing the split array</returns>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.ToBytes(System.SByte[])">
             <summary>
@@ -5559,6 +5869,33 @@
             
             <returns>Sbyte array converted to bytes</returns>
         </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.ToBytes(System.Int32[])">
+            <summary>
+            Copy an int array to a byte array
+            </summary>
+            
+            <param name="Data">Array to convert</param>
+            
+            <returns>Int array converted to bytes</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.ToBytes(System.UInt32[])">
+            <summary>
+            Copy an uint array to a byte array
+            </summary>
+            
+            <param name="Data">Array to convert</param>
+            
+            <returns>Uint array converted to bytes</returns>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.ToBytes(System.Int64[])">
+            <summary>
+            Copy an long array to a byte array
+            </summary>
+            
+            <param name="Data">Array to convert</param>
+            
+            <returns>Long array converted to bytes</returns>
+        </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.ToBytes(System.String)">
             <summary>
             Copy a string to an ASCII byte array
@@ -5567,95 +5904,6 @@
             <param name="Value">String to copy</param>
             
             <returns>The byte array representation</returns>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Deserialize``1(System.Byte[])">
-            <summary>
-            Convert a byte array to a class objct
-            </summary>
-            
-            <typeparam name="T">Return object type</typeparam>
-            <param name="Data">The byte array containing the class</param>
-            
-            <returns>The class object</returns>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Serialize(System.Object)">
-            <summary>
-            Serialize an object to a byte array
-            </summary>
-            
-            <param name="Obj">The object to serialize</param>
-            
-            <returns>The object as a serialized byte array</returns>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.CopyOf``1(``0[],System.Int32)">
-            <summary>
-            Create a copy of an array
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">Array source</param>
-            <param name="Length">Number of elements to copy</param>
-            
-            <returns>A copy of the source array</returns>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.CopyOfRange``1(``0[],System.Int32,System.Int32)">
-            <summary>
-            Create a ranged copy of a byte array
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">Byte source array</param>
-            <param name="From">First element to copy</param>
-            <param name="To">Last element to copy</param>
-            
-            <returns>Byte array copy</returns>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Fill``1(``0[],``0)">
-            <summary>
-            Fill an array with a value; defaults to zeroes
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">Array to fill</param>
-            <param name="Value">Value used to fill array</param>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Fill``1(``0[0:,0:],``0)">
-            <summary>
-            Fill an array with a value; defaults to zeroes
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">Array to fill</param>
-            <param name="Value">Value used to fill array</param>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Shuffle``1(``0[])">
-            <summary>
-            Shuffle an array using the SecureRandom class
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">The list instance</param>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.Shuffle``1(``0[],VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom)">
-            <summary>
-            Shuffle an array with a specific Prng class
-            </summary>
-            
-            <typeparam name="T">Type of list</typeparam>
-            <param name="Source">The list instance</param>
-            <param name="Rng">The pseudo random generator</param>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayUtils.SubArray``1(``0[],System.Int32,System.Int32)">
-            <summary>
-            Return a sub array
-            </summary>
-            
-            <typeparam name="T">Type of array</typeparam>
-            <param name="Source">The source array</param>
-            <param name="Index">The starting position within the source array</param>
-            <param name="Count">The number of bytes to copy</param>
-            
-            <returns>The sub array</returns>
         </member>
         <member name="T:VTDev.Libraries.CEXEngine.Numeric.MathContext">
             <summary>
@@ -6123,6 +6371,8 @@
             <summary>
             A set of pre-defined EES encryption parameter sets 
             based on <see href="https://github.com/tbuktu/ntru/blob/master/src/main/java/net/sf/ntru/encrypt/EncryptionParameters.java">EncryptionParameters.java</see>.
+            <para>Note: Sets starting with 'A' (ex. A2011439), are the recommended sets from the original author. Sets pre-fixed with 'F' (ex. FE1087EP2) are the fast polynomial versions. 
+            Sets prefixed with 'Z' (ex. ZCX1931) are experimental!; they use larger N, df, and dm values, and a 1024 bit digest for the IGF and mask.</para>
             </summary>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.FromId(System.Byte[],System.Boolean)">
@@ -6131,20 +6381,38 @@
             </summary>
             
             <param name="OId">The 3 byte parameter set identity code</param>
-            <param name="UseProduct">Uses the product form</param>
+            <param name="UseProduct">Use the product form parameters</param>
             
             <returns>A parameter set</returns>
             
             <exception cref="!:MPKCException">Thrown if an invalid or unknown OId is used.</exception>
         </member>
-        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX2100SK1024">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.FromName(VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames)">
+            <summary>
+            Retrieve a parameter set by its enumeration name
+            </summary>
+            
+            <param name="Name">The enumeration name</param>
+            
+            <returns>A populated parameter set</returns>
+            
+            <exception cref="!:MPKCException">Thrown if an invalid or unknown OId is used.</exception>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1931SK1024">
             <summary>
             Just an experiment, do not use!
+            <para>n:1931, q:2048, df:380, skien1024</para>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1861SK1024">
+            <summary>
+            Just an experiment, do not use!
+            <para>n:1861, q:2048, df:290, skien1024</para>
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1087EP2">
             <summary>
-            A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
+            A conservative parameter set that gives 256 bits of security and is optimized for key size.
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1087EP2FAST">
@@ -6154,7 +6422,7 @@
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1171EP1">
             <summary>
-            A conservative (in terms of security) parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
+            A conservative parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1171EP1FAST">
@@ -6164,7 +6432,7 @@
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1499EP1">
             <summary>
-            A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
+            A conservative parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1499EP1FAST">
@@ -6188,6 +6456,73 @@
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.APR2011743FAST">
+            <summary>
+            Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
+            </summary>
+        </member>
+        <member name="T:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames">
+            <summary>
+            EES set id's for common parameter values
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.ZCX1931">
+            <summary>
+            Just an experiment, use at your own risk!
+            <para>n:1931, q:2048, df:380, skien1024</para>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.ZCX1861">
+            <summary>
+            Just an experiment, use at your own risk!
+            <para>n:1861, q:2048, df:290, skien1024</para>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.E1087EP2">
+            <summary>
+            A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.E1171EP1">
+            <summary>
+            A conservative (in terms of security) parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.E1499EP1">
+            <summary>
+            A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.A2011439">
+            <summary>
+            A parameter set that gives 256 bits of security and uses simple ternary polynomials.
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.A2011743">
+            <summary>
+            Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FE1087EP2">
+            <summary>
+            A product-form version of <c>EES1087EP2</c>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FE1171EP1">
+            <summary>
+            A product-form version of <c>EES1171EP1</c>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FE1499EP1">
+            <summary>
+            A product-form version of <c>EES1499EP1</c>
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FA2011439">
+            <summary>
+            Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FA2011743">
             <summary>
             Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
             </summary>
@@ -6311,7 +6646,7 @@
             </list>
             </remarks>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng.#ctor(VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest,System.Byte[],System.Byte[],System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng.#ctor(VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest,System.Byte[],System.Byte[],System.Int32,System.Boolean)">
             <summary>
             Creates a new PassphrasePrng from a passphrase and salt,
             and seeds it with the output of PKCS5
@@ -6320,7 +6655,8 @@
             <param name="Digest">Digest engine</param>
             <param name="Passphrase">The passphrase</param>
             <param name="Salt">The salt value</param>
-            <param name="DisposeEngine">Dispose of digest engine when <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng.Dispose"/> on this class is called</param>
+            <param name="Iterations">The number of transformation iterations performed by the digest with PKCS5 (default is 10,000)</param>
+            <param name="DisposeEngine">Dispose of digest engine when <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng.Dispose"/> on this class is called (default is true)</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng.Finalize">
             <summary>
@@ -11923,6 +12259,11 @@
             A Modular Exponentiation Generator (MODEXPG) random number generator
             </summary>
         </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Prngs.PSBPrng">
+            <summary>
+            An implementation of a passphrase based PKCS#5 random number generator
+            </summary>
+        </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Prngs.QCG1">
             <summary>
             A Quadratic Congruential Generator I (QCG-I) random number generator
@@ -12389,8 +12730,15 @@
             Constructs a new key pair
             </summary>
             
-            <param name="PrivateKey">The Private Key</param>
             <param name="PublicKey">The Public key</param>
+            <param name="PrivateKey">The Private Key</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyPair.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricKey)">
+            <summary>
+            Constructs a new key pair
+            </summary>
+            
+            <param name="Key">The public or private key</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyPair.#ctor(System.Byte[])">
             <summary>

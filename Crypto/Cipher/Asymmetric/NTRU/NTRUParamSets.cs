@@ -36,6 +36,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// <summary>
     /// A set of pre-defined EES encryption parameter sets 
     /// based on <see href="https://github.com/tbuktu/ntru/blob/master/src/main/java/net/sf/ntru/encrypt/EncryptionParameters.java">EncryptionParameters.java</see>.
+    /// <para>Note: Sets starting with 'A' (ex. A2011439), are the recommended sets from the original author. Sets pre-fixed with 'F' (ex. FE1087EP2) are the fast polynomial versions. 
+    /// Sets prefixed with 'Z' (ex. ZCX1931) are experimental!; they use larger N, df, and dm values, and a 1024 bit digest for the IGF and mask.</para>
     /// </summary>
     public static class NTRUParamSets
     {
@@ -45,6 +47,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         public enum NTRUParamNames : int
         {
+            /// <summary>
+            /// Just an experiment, use at your own risk!
+            /// <para>n:1931, q:2048, df:380, skien1024</para>
+            /// </summary>
+            ZCX1931,
+            /// <summary>
+            /// Just an experiment, use at your own risk!
+            /// <para>n:1861, q:2048, df:290, skien1024</para>
+            /// </summary>
+            ZCX1861,
             /// <summary>
             /// A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
             /// </summary>
@@ -56,7 +68,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             /// <summary>
             /// A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
             /// </summary>
-            E1499EP1,
+            E1499EP1, 
             /// <summary>
             /// A parameter set that gives 256 bits of security and uses simple ternary polynomials.
             /// </summary>
@@ -94,7 +106,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="OId">The 3 byte parameter set identity code</param>
-        /// <param name="UseProduct">Uses the product form</param>
+        /// <param name="UseProduct">Use the product form parameters</param>
         /// 
         /// <returns>A parameter set</returns>
         /// 
@@ -111,28 +123,32 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             if (UseProduct)
             {
                 if (OId[2] == 3)
-                    return EES1087EP2FAST;
+                    return (NTRUParameters)EES1087EP2FAST.Clone();
                 else if (OId[2] == 4)
-                    return EES1171EP1FAST;
+                    return (NTRUParameters)EES1171EP1FAST.Clone();
                 else if (OId[2] == 5)
-                    return EES1499EP1FAST;
+                    return (NTRUParameters)EES1499EP1FAST.Clone();
                 else if (OId[2] == 101)
-                    return APR2011439FAST;
+                    return (NTRUParameters)APR2011439FAST.Clone();
                 else if (OId[2] == 105)
-                    return APR2011743FAST;
+                    return (NTRUParameters)APR2011743FAST.Clone();
             }
             else
             {
                 if (OId[2] == 3)
-                    return EES1087EP2;
+                    return (NTRUParameters)EES1087EP2.Clone();
                 else if (OId[2] == 4)
-                    return EES1171EP1;
+                    return (NTRUParameters)EES1171EP1.Clone();
                 else if (OId[2] == 5)
-                    return EES1499EP1;
+                    return (NTRUParameters)EES1499EP1.Clone();
                 else if (OId[2] == 101)
-                    return APR2011439;
+                    return (NTRUParameters)APR2011439.Clone();
                 else if (OId[2] == 105)
-                    return APR2011743;
+                    return (NTRUParameters)APR2011743.Clone();
+                else if (OId[2] == 7)
+                    return (NTRUParameters)ZCX1861SK1024.Clone();
+                else if (OId[2] == 8)
+                    return (NTRUParameters)ZCX1931SK1024.Clone();
             }
 
             throw new NTRUException("OId does not identify a valid param set!");
@@ -171,6 +187,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                     return (NTRUParameters)EES1171EP1FAST.Clone();
                 case NTRUParamNames.FE1499EP1:
                     return (NTRUParameters)EES1499EP1FAST.Clone();
+                case NTRUParamNames.ZCX1861:
+                    return (NTRUParameters)ZCX1861SK1024.Clone();
+                case NTRUParamNames.ZCX1931:
+                    return (NTRUParameters)ZCX1931SK1024.Clone();
                 default:
                     return (NTRUParameters)APR2011743FAST.Clone();
             }
@@ -181,10 +201,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         // Note: max message size is calculation of N and Db; (N*3/2/8 - Length-Db/8). Max bytes: EES1087EP2:170, EES1171EP1:186, EES1499EP1:248, APR2011439:65, APR2011743:106
         /// <summary>
         /// Just an experiment, do not use!
+        /// <para>n:1931, q:2048, df:380, skien1024</para>
         /// </summary>
-        public static readonly NTRUParameters ZCX2100SK1024 = new NTRUParameters(2100, 3072, 204, 204, 0, 512, 18, 38, 24, true, new byte[] { 0, 8, 1 }, true, false, Digests.Skein1024);
+        public static readonly NTRUParameters ZCX1931SK1024 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.Skein1024);
         /// <summary>
-        /// A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
+        /// Just an experiment, do not use!
+        /// <para>n:1861, q:2048, df:290, skien1024</para>
+        /// </summary>
+        public static readonly NTRUParameters ZCX1861SK1024 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.Skein1024);
+        /// <summary>
+        /// A conservative parameter set that gives 256 bits of security and is optimized for key size.
         /// </summary>
         public static readonly NTRUParameters EES1087EP2 = new NTRUParameters(1087, 2048, 120, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, false, Digests.SHA512);
         /// <summary>
@@ -192,7 +218,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         public static readonly NTRUParameters EES1087EP2FAST = new NTRUParameters(1087, 2048, 8, 8, 11, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, true, Digests.SHA512);
         /// <summary>
-        /// A conservative (in terms of security) parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
+        /// A conservative parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
         /// </summary>
         public static readonly NTRUParameters EES1171EP1 = new NTRUParameters(1171, 2048, 106, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, false, Digests.SHA512);
         /// <summary>
@@ -200,7 +226,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         public static readonly NTRUParameters EES1171EP1FAST = new NTRUParameters(1171, 2048, 8, 7, 11, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, true, Digests.SHA512);
         /// <summary>
-        /// A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
+        /// A conservative parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
         /// </summary>
         public static readonly NTRUParameters EES1499EP1 = new NTRUParameters(1499, 2048, 79, 79, 0, 256, 13, 17, 19, true, new byte[] { 0, 6, 5 }, true, false, Digests.SHA512);
         /// <summary>

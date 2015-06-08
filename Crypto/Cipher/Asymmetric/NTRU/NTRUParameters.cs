@@ -503,6 +503,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             }
         }
 
+        private NTRUParameters()
+        {
+        }
+
         /// <summary>
         /// Finalize objects
         /// </summary>

@@ -70,13 +70,17 @@
         /// </summary>
         MODEXPG,
         /// <summary>
+        /// An implementation of a passphrase based PKCS#5 random number generator
+        /// </summary>
+        PSBPrng,
+        /// <summary>
         /// A Quadratic Congruential Generator I (QCG-I) random number generator
         /// </summary>
         QCG1,
         /// <summary>
         /// A Quadratic Congruential Generator II (QCG-II) random number generator
         /// </summary>
-        QCG2
+        QCG2,
     }
     #endregion
 }

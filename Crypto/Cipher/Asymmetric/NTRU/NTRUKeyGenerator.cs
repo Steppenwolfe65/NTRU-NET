@@ -116,6 +116,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             _rndEngine = GetPrng(_encParams.RandomEngine);
         }
 
+        private NTRUKeyGenerator()
+        {
+        }
+
         /// <summary>
         /// Finalize objects
         /// </summary>
@@ -151,7 +155,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public NTRUKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt, bool Parallel = true)
         {
             _dgtEngine.Reset();
-            using (IRandom rnd = new PBPRng(_dgtEngine, Passphrase, Salt, false))
+            using (IRandom rnd = new PBPRng(_dgtEngine, Passphrase, Salt, 10000, false))
             {
                 IRandom rng2 = ((PBPRng)rnd).CreateBranch(_dgtEngine);
                 return GenerateKeyPair(rnd, rng2, Parallel);
@@ -280,7 +284,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             NTRUPrivateKey priv = new NTRUPrivateKey(t, fp, N, q, sparse, fastFp, polyType);
             NTRUPublicKey pub = new NTRUPublicKey(h, N, q);
 
-            return new NTRUKeyPair(priv, pub);
+            return new NTRUKeyPair(pub, priv);
         }
 
         /// <remarks>

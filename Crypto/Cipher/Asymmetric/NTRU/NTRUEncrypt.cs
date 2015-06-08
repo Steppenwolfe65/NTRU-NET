@@ -141,6 +141,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             _rndEngine = GetPrng(_encParams.RandomEngine);
         }
 
+        private NTRUEncrypt()
+        {
+        }
+
         /// <summary>
         /// Finalize objects
         /// </summary>

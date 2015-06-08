@@ -26,3 +26,13 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\bin\Debug\NTRUEngine.xml
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\obj\x86\Debug\Test.exe
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\obj\x86\Debug\Test.pdb
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\x86\Debug\Test.exe
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\x86\Debug\Test.pdb
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\bin\Debug\Test.exe
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\bin\Debug\Test.pdb
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\bin\Debug\NTRUEngine.dll
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\bin\Debug\NTRUEngine.pdb
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\bin\Debug\NTRUEngine.xml
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\x86\Debug\Test.csprojResolveAssemblyReference.cache
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\x86\Debug\Test.Properties.Resources.resources
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\x86\Debug\Test.csproj.GenerateResource.Cache

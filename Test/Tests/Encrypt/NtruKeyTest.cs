@@ -74,7 +74,7 @@ namespace Test.Tests.Encrypt
             NTRUKeyPair kp = ntru.GenerateKeyPair();
             byte[] priv = ((NTRUPrivateKey)kp.PrivateKey).ToBytes();
             byte[] pub = ((NTRUPublicKey)kp.PublicKey).ToBytes();
-            NTRUKeyPair kp2 = new NTRUKeyPair(new NTRUPrivateKey(priv), new NTRUPublicKey(pub));
+            NTRUKeyPair kp2 = new NTRUKeyPair(new NTRUPublicKey(pub), new NTRUPrivateKey(priv));
             if (!Compare.Equals(kp.PublicKey, kp2.PublicKey))
                 throw new Exception("EncryptionKey: public key comparison test failed!");
             if (!Compare.Equals(kp.PrivateKey, kp2.PrivateKey))
@@ -86,7 +86,7 @@ namespace Test.Tests.Encrypt
             ((NTRUPublicKey)kp.PublicKey).WriteTo(bos2);
             MemoryStream bis1 = new MemoryStream(bos1.ToArray());
             MemoryStream bis2 = new MemoryStream(bos2.ToArray());
-            NTRUKeyPair kp3 = new NTRUKeyPair(new NTRUPrivateKey(bis1), new NTRUPublicKey(bis2));
+            NTRUKeyPair kp3 = new NTRUKeyPair(new NTRUPublicKey(bis2), new NTRUPrivateKey(bis1));
             if (!Compare.Equals(kp.PublicKey, kp3.PublicKey))
                 throw new Exception("EncryptionKey: public key comparison test failed!");
             if (!Compare.Equals(kp.PrivateKey, kp3.PrivateKey))

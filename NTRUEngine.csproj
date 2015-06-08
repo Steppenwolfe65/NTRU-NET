@@ -132,6 +132,7 @@
     <Compile Include="Numeric\Primality.cs" />
     <Compile Include="Numeric\RoundingModes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\ArrayEx.cs" />
     <Compile Include="Utility\ArrayUtils.cs" />
     <Compile Include="Utility\BigIntUtils.cs" />
     <Compile Include="Utility\ByteUtils.cs" />

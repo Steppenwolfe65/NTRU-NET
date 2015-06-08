@@ -46,8 +46,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     {
         #region Fields
         private bool _isDisposed = false;
-        private IAsymmetricKey _privateKey;
-        private IAsymmetricKey _publicKey;
+        private NTRUPrivateKey _privateKey;
+        private NTRUPublicKey _publicKey;
         #endregion
 
         #region Properties
@@ -75,12 +75,32 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Constructs a new key pair
         /// </summary>
         /// 
-        /// <param name="PrivateKey">The Private Key</param>
         /// <param name="PublicKey">The Public key</param>
-        public NTRUKeyPair(IAsymmetricKey PrivateKey, IAsymmetricKey PublicKey)
+        /// <param name="PrivateKey">The Private Key</param>
+        public NTRUKeyPair(IAsymmetricKey PublicKey, IAsymmetricKey PrivateKey)
         {
-            _privateKey = PrivateKey;
-            _publicKey = PublicKey;
+            if (!(PublicKey is NTRUPublicKey))
+                throw new NTRUException("Not a valid NTRU Public key!");
+            if (!(PrivateKey is NTRUPrivateKey))
+                throw new NTRUException("Not a valid NTRU Private key!");
+
+            _publicKey = (NTRUPublicKey)PublicKey;
+            _privateKey = (NTRUPrivateKey)PrivateKey;
+        }
+
+        /// <summary>
+        /// Constructs a new key pair
+        /// </summary>
+        /// 
+        /// <param name="Key">The public or private key</param>
+        public NTRUKeyPair(IAsymmetricKey Key)
+        {
+            if (Key is NTRUPublicKey)
+                _publicKey = (NTRUPublicKey)PublicKey;
+            else if (Key is NTRUPrivateKey)
+                _privateKey = (NTRUPrivateKey)PrivateKey;
+            else
+                throw new NTRUException("Not a valid NTRU key!");
         }
 
         /// <summary>
@@ -106,6 +126,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             _publicKey = new NTRUPublicKey(KeyStream);
             _privateKey = new NTRUPrivateKey(KeyStream);
+        }
+
+        private NTRUKeyPair()
+        {
         }
 
         /// <summary>

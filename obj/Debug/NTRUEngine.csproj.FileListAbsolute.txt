@@ -11,5 +11,5 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\Debug\NTRUEngine.pdb
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\obj\Debug\NTRUEngine.dll
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\obj\Debug\NTRUEngine.pdb
-C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\Debug\NTRUEngine.XML
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\obj\Debug\NTRUEngine.csprojResolveAssemblyReference.cache
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\Debug\NTRUEngine.XML

@@ -179,6 +179,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             Initialize();
         }
 
+        private NTRUPrivateKey()
+        {
+        }
+
         /// <summary>
         /// Finalize objects
         /// </summary>

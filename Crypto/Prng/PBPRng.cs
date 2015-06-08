@@ -103,13 +103,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="Digest">Digest engine</param>
         /// <param name="Passphrase">The passphrase</param>
         /// <param name="Salt">The salt value</param>
-        /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called</param>
-        public PBPRng(IDigest Digest, byte[] Passphrase, byte[] Salt, bool DisposeEngine = true)
+        /// <param name="Iterations">The number of transformation iterations performed by the digest with PKCS5 (default is 10,000)</param>
+        /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called (default is true)</param>
+        public PBPRng(IDigest Digest, byte[] Passphrase, byte[] Salt, int Iterations = PKCS_ITERATIONS, bool DisposeEngine = true)
         {
             try
             {
                 _disposeEngine = DisposeEngine;
-                PKCS5 pkcs = new PKCS5(Digest, PKCS_ITERATIONS, false);
+                PKCS5 pkcs = new PKCS5(Digest, Iterations, false);
                 _digest = Digest;
                 pkcs.Initialize(Salt, Passphrase);
                 _rndData = new byte[_digest.BlockSize];
@@ -117,7 +118,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             }
             catch (Exception e)
             {
-                throw new NTRUException(e.Message);
+                throw new Exception(e.Message);
             }
 
             _position = 0;
