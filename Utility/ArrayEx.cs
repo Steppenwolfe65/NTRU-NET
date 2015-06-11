@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
+using System.Threading.Tasks;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Utility
@@ -225,12 +226,22 @@ namespace VTDev.Libraries.CEXEngine.Utility
         {
             using (SecureRandom rnd = new SecureRandom())
             {
-                for (int i = 0; i < Source.Length - 1; i++)
+                if (ParallelUtils.IsParallel)
                 {
-                    int index = (int)rnd.NextInt32(i, Source.Length - 1);
-
-                    if (i != index)
+                    Parallel.For(0, Source.Length, i =>
                     {
+                        int index = rnd.NextInt32(0, Source.Length - 1);
+                        T temp = Source[i];
+                        Source[i] = Source[index];
+                        lock (temp)
+                            Source[index] = temp;
+                    });
+                }
+                else
+                {
+                    for (int i = 0; i < Source.Length; i++)
+                    {
+                        int index = rnd.NextInt32(0, Source.Length - 1);
                         T temp = Source[i];
                         Source[i] = Source[index];
                         Source[index] = temp;
@@ -248,16 +259,12 @@ namespace VTDev.Libraries.CEXEngine.Utility
         /// <param name="Rng">The pseudo random generator</param>
         public static void Shuffle<T>(this T[] Source, IRandom Rng)
         {
-            for (int i = 0; i < Source.Length - 1; i++)
+            for (int i = 0; i < Source.Length; i++)
             {
-                int index = (int)Rng.Next(i, Source.Length - 1);
-
-                if (i != index)
-                {
-                    T temp = Source[i];
-                    Source[i] = Source[index];
-                    Source[index] = temp;
-                }
+                int index = Rng.Next(0, Source.Length - 1);
+                T temp = Source[i];
+                Source[i] = Source[index];
+                Source[index] = temp;
             }
         }
 

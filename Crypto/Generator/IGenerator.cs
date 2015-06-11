@@ -58,7 +58,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         void Initialize(byte[] Salt, byte[] Ikm, byte[] Nonce);
 
         /// <summary>
-        /// Generate a block of cryptographically secure pseudo random bytes
+        /// Generate a block of pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -67,7 +67,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         int Generate(byte[] Output);
 
         /// <summary>
-        /// Generate cryptographically secure pseudo random bytes
+        /// Generate pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>

@@ -6,6 +6,10 @@ using Test.Tests.Encrypt;
 using Test.Tests.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
+using VTDev.Libraries.CEXEngine.Tools;
+using VTDev.Libraries.CEXEngine.Crypto.Prng;
 #endregion
 
 namespace Test
@@ -21,6 +25,9 @@ namespace Test
     /// </summary>
     static class Program
     {
+        const int CYCLE_COUNT = 1000;
+
+        #region Main
         static void Main(string[] args)
         {
             ConsoleUtils.SizeConsole(80, 60);
@@ -35,6 +42,8 @@ namespace Test
             Console.WriteLine("* Date:      April 05, 2015                  *");
             Console.WriteLine("* Contact:   develop@vtdev.com               *");
             Console.WriteLine("**********************************************");
+            Console.WriteLine("");
+            Console.WriteLine("COMPILE as Any CPU / Release mode, RUN the .exe for real timings");
             Console.WriteLine("");
 
             // math
@@ -71,8 +80,54 @@ namespace Test
             RunTest(new PBPRngTest());
             Console.WriteLine("");/**/
 
-            Console.WriteLine("Completed! Press any key to close..");
-            Console.ReadKey();
+
+            Console.WriteLine("Validity Tests Completed!");
+            Console.WriteLine("");
+            Console.WriteLine("Run Speed Tests? Press 'Y' to run, all other keys close..");
+            ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+            if (keyInfo.Key.Equals(ConsoleKey.Y))
+            {
+                Console.WriteLine("");
+                if (Debugger.IsAttached)
+                {
+                    Console.WriteLine("You are running in Debug mode! Compiled times will be much faster..");
+                    Console.WriteLine("");
+                }
+
+                KeyGenSpeed(CYCLE_COUNT);
+                EncryptionSpeed(CYCLE_COUNT);
+                DecryptionSpeed(CYCLE_COUNT);
+                Console.WriteLine("Speed Tests Completed!");
+                Console.WriteLine("");
+                Console.WriteLine("");
+                Console.WriteLine("Run Looping Full-Cycle Tests? Press 'Y' to run, all other keys close..");
+                keyInfo = Console.ReadKey();
+
+                if (keyInfo.Key.Equals(ConsoleKey.Y))
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("******Looping: Key Generation/Encryption/Decryption and Verify Test******");
+                    Console.WriteLine(string.Format("Testing {0} Full Cycles, throws on all failures..", CYCLE_COUNT));
+                    try
+                    {
+                        CycleTest(CYCLE_COUNT);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Loop test failed! " + ex.Message);
+                        Console.WriteLine("Press any key to close");
+                    }
+                }
+
+                Console.WriteLine("");
+                Console.WriteLine("All tests have completed, press any key to close..");
+                Console.ReadKey();
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
         }
 
         private static void RunTest(ITest Test)
@@ -104,5 +159,157 @@ namespace Test
         {
             Console.WriteLine(e.Message);
         }
+        #endregion
+
+        #region Timing Tests
+        static void CycleTest(int Iterations)
+        {
+            Stopwatch runTimer = new Stopwatch();
+            runTimer.Start();
+            for (int i = 0; i < Iterations; i++)
+                FullCycle();
+            runTimer.Stop();
+
+            double elapsed = runTimer.Elapsed.TotalMilliseconds;
+            Console.WriteLine(string.Format("{0} cycles completed in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Average cycle time: {0} ms", elapsed / Iterations));
+            Console.WriteLine("");
+        }
+
+        static void DecryptionSpeed(int Iterations)
+        {
+            Console.WriteLine(string.Format("******Looping Decryption Test: Testing {0} Iterations******", Iterations));
+            Console.WriteLine("Test decryption times using the APR2011743FAST parameter set.");
+
+            double elapsed = RDecrypt(Iterations);
+            Console.WriteLine(string.Format("{0} decryption cycles completed in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine("");
+        }
+
+        static void EncryptionSpeed(int Iterations)
+        {
+            Console.WriteLine(string.Format("******Looping Encryption Test: Testing {0} Iterations******", Iterations));
+            Console.WriteLine("Test encryption times using the APR2011743FAST parameter set.");
+
+            double elapsed = REncrypt(Iterations);
+            Console.WriteLine(string.Format("{0} encryption cycles completed in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine("");
+        }
+
+        static void FullCycle()
+        {
+            NTRUParameters mpar = NTRUParamSets.APR2011743FAST; //APR2011439FAST
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(mpar);
+            IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
+            byte[] enc;
+
+            using (NTRUEncrypt mpe = new NTRUEncrypt(mpar))
+            {
+                mpe.Initialize(true, akp);
+
+                byte[] data = new byte[mpe.MaxCipherText];
+                enc = mpe.Encrypt(data);
+                mpe.Initialize(false, akp);
+                byte[] dec = mpe.Decrypt(enc);
+
+                if (!Compare.AreEqual(dec, data))
+                    throw new Exception("Encryption test: decryption failure!");
+            }
+        }
+
+        static void KeyGenSpeed(int Iterations = 1000)
+        {
+            Console.WriteLine(string.Format("Key creation average time over {0} passes:", Iterations));
+            Stopwatch runTimer = new Stopwatch();
+
+            double elapsed = APR2011439(Iterations);
+            Console.WriteLine(string.Format("APR2011439FAST: avg. {0} ms", elapsed / Iterations, Iterations));
+            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+
+            elapsed = APR2011743(Iterations);
+            Console.WriteLine(string.Format("APR2011743FAST: avg. {0} ms", elapsed / Iterations, Iterations));
+            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+
+            Console.WriteLine("");
+        }
+
+        static double APR2011439(int Iterations)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011439FAST);
+            IAsymmetricKeyPair akp;
+            Stopwatch runTimer = new Stopwatch();
+
+            runTimer.Start();
+            for (int i = 0; i < Iterations; i++)
+                akp = mkgen.GenerateKeyPair();
+            runTimer.Stop();
+
+            return runTimer.Elapsed.TotalMilliseconds;
+        }
+
+        static double APR2011743(int Iterations)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
+            IAsymmetricKeyPair akp;
+            Stopwatch runTimer = new Stopwatch();
+
+            runTimer.Start();
+            for (int i = 0; i < Iterations; i++)
+                akp = mkgen.GenerateKeyPair();
+            runTimer.Stop();
+
+            return runTimer.Elapsed.TotalMilliseconds;
+        }
+
+        static double RDecrypt(int Iterations)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
+            IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
+            byte[] ptext = new CSPRng().GetBytes(64);
+            byte[] rtext = new byte[64];
+            byte[] ctext;
+            Stopwatch runTimer = new Stopwatch();
+
+            using (NTRUEncrypt mpe = new NTRUEncrypt(NTRUParamSets.APR2011743FAST))
+            {
+                mpe.Initialize(true, akp);
+                ctext = mpe.Encrypt(ptext);
+                mpe.Initialize(false, akp);
+
+                runTimer.Start();
+                for (int i = 0; i < Iterations; i++)
+                    rtext = mpe.Decrypt(ctext);
+                runTimer.Stop();
+            }
+
+            //if (!Compare.AreEqual(ptext, rtext))
+            //    throw new Exception("Encryption test: decryption failure!");
+
+            return runTimer.Elapsed.TotalMilliseconds;
+        }
+
+        static double REncrypt(int Iterations)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
+            IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
+            byte[] ptext = new CSPRng().GetBytes(64);
+            byte[] ctext;
+            Stopwatch runTimer = new Stopwatch();
+
+            using (NTRUEncrypt mpe = new NTRUEncrypt(NTRUParamSets.APR2011743FAST))
+            {
+                mpe.Initialize(true, akp);
+
+                runTimer.Start();
+                for (int i = 0; i < Iterations; i++)
+                    ctext = mpe.Encrypt(ptext);
+                runTimer.Stop();
+            }
+
+            return runTimer.Elapsed.TotalMilliseconds;
+        }
+        #endregion
     }
 }

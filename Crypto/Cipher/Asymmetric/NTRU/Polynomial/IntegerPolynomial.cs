@@ -8,6 +8,7 @@ using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
+using System.Threading.Tasks;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
@@ -151,18 +152,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         /// </summary>
         /// 
         /// <param name="B">Another polynomial</param>
-        public void Add(ITernaryPolynomial B)  //ToDo: check this
+        public void Add(ITernaryPolynomial B)
         {
-            foreach (int i in B.GetOnes())
-                Coeffs[i]++;
-            foreach (int i in B.GetNegOnes())
-                Coeffs[i]--;
+            foreach (int n in B.GetOnes())
+                Coeffs[n]++;
+            foreach (int n in B.GetNegOnes())
+                Coeffs[n]--;
         }
 
         /// <summary>
         /// Adds another polynomial
         /// </summary>
-        /// <param name="B">The polynomial to add</param>
+        /// <param name="B">The polynomial to add</param> //p
         public void Add(IntegerPolynomial B)
         {
             for (int i = 0; i < B.Coeffs.Length; i++)
@@ -353,7 +354,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             return new IntegerPolynomial(ArrayEncoder.DecodeModQ(Data, N, Q));
         }
-
+        //57861
         /// <summary>
         /// Returns a polynomial with N coefficients between <c>0</c> and <c>q-1</c>.
         /// </summary>
@@ -607,6 +608,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         public void ModCenter(int Modulus)
         {
             if (Modulus == 2048)
+            {
                 for (int i = 0; i < Coeffs.Length; i++)
                 {
                     int c = Coeffs[i] & 2047;
@@ -615,6 +617,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 
                     Coeffs[i] = c;
                 }
+            }
             else
             {
                 Mod(Modulus);
@@ -665,9 +668,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         public void Mult3(int Modulus)
         {
             if (Modulus == 2048)
+            {
                 for (int i = 0; i < Coeffs.Length; i++)
                     Coeffs[i] = (Coeffs[i] * 3) & 2047;
-
+            }
             for (int i = 0; i < Coeffs.Length; i++)
             {
                 Coeffs[i] *= 3;
@@ -741,6 +745,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 
         /// <summary>
         /// Resultant of this polynomial with <c>x^n-1</c> using a probabilistic algorithm.
+        /// </summary>
+        /// 
+        /// <remarks>
         /// <para>Unlike EESS, this implementation does not compute all resultants modulo primes
         /// such that their product exceeds the maximum possible resultant, but rather stops
         /// when <c>NUM_EQUAL_RESULTANTS</c> consecutive modular resultants are equal.
@@ -748,7 +755,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         /// about 1 out of 100 cases when <c>N=439</c> and <c>NUM_EQUAL_RESULTANTS=2</c>,
         /// so the likelyhood of leaving the loop too early is <c>(1/100)^(NUM_EQUAL_RESULTANTS-1)</c>.</para>
         /// <para>Because of the above, callers must verify the output and try a different polynomial if necessary.</para>
-        /// </summary>
+        /// </remarks>
         /// 
         /// <returns>Returns <c>(rho, res)</c> satisfying <c>res = rho*this + t*(x^n-1)</c> for some integer <c>t</c>.</returns>
         public Resultant Resultant()
@@ -805,7 +812,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                 }
             }
 
-            // Combine modular rho's to obtain the  rho.
+            // Combine modular rho's to obtain the rho.
             // For efficiency, first combine all pairs of small resultants to bigger resultants,
             // then combine pairs of those, etc. until only one is left.
             while (modResultants.Count > 1)
@@ -1134,8 +1141,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                 {
                     for (int i = 1; i <= N; i++)
                     {
-                        f.Coeffs[i - 1] = f.Coeffs[i];   // f(x) = f(x) / x
-                        c.Coeffs[N + 1 - i] = c.Coeffs[N - i];   // c(x) = c(x) * x
+                        f.Coeffs[i - 1] = f.Coeffs[i];          // f(x) = f(x) / x
+                        c.Coeffs[N + 1 - i] = c.Coeffs[N - i];  // c(x) = c(x) * x
                     }
 
                     f.Coeffs[N] = 0;
@@ -1143,7 +1150,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                     k++;
 
                     if (f.EqualsZero())
-                        return null;   // not invertible
+                        return null;    // not invertible
                 }
 
                 if (f.EqualsOne())
@@ -1316,7 +1323,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         }
 
         /// <summary>
-        /// Optimized version of ModPositive(2)
+        /// Optimized version of ModPositive(2) //p
         /// </summary>
         private void Mod2()
         {

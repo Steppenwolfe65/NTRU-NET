@@ -34,7 +34,7 @@ using System.Security.Cryptography;
 // contact: develop@vtdev.com
 #endregion
 
-namespace VTDev.Libraries.CEXEngine.Crypto.Prng 
+namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 {
     /// <summary>
     /// <h3>An implementation of a Cryptographically Secure PRNG using the RNGCryptoServiceProvider class.</h3>
@@ -42,15 +42,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </summary>
     /// 
     /// <example>
-    /// <c>
+    /// <code>
     /// int x;
     /// using (IRandom rnd = new CSPRng())
     ///     x = rnd.Next();
-    /// </c>
+    /// </code>
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -185,6 +185,42 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         }
 
         /// <summary>
+        /// Get a ranged pseudo random 64bit integer
+        /// </summary>
+        /// 
+        /// <param name="Maximum">Maximum value</param>
+        /// 
+        /// <returns>Random Int64</returns>
+        public Int64 NextLong(long Maximum)
+        {
+            byte[] rand;
+            Int64[] num = new Int64[1];
+
+            do
+            {
+                rand = GetByteRange(Maximum);
+                Buffer.BlockCopy(rand, 0, num, 0, rand.Length);
+            } while (num[0] > Maximum);
+
+            return num[0];
+        }
+
+        /// <summary>
+        /// Get a ranged pseudo random 64bit integer
+        /// </summary>
+        /// 
+        /// <param name="Minimum">Minimum value</param>
+        /// <param name="Maximum">Maximum value</param>
+        /// 
+        /// <returns>Random Int64</returns>
+        public Int64 NextLong(long Minimum, long Maximum)
+        {
+            Int64 num = 0;
+            while ((num = NextLong(Maximum)) < Minimum) { }
+            return num;
+        }
+
+        /// <summary>
         /// Reset the RNGCryptoServiceProvider instance.
         /// </summary>
         public void Reset()
@@ -200,10 +236,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         #endregion
 
         #region Private Methods
-        /// <remarks>
-        /// Returns the number of bytes needed to build 
-        /// an integer existing within a byte range
-        /// </remarks>
         private byte[] GetByteRange(Int64 Maximum)
         {
             byte[] data;
@@ -228,9 +260,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             return GetBits(data, Maximum);
         }
 
-        /// <remarks>
-        /// If you need a dice roll, use the Random class (smaller range = reduced entropy)
-        /// </remarks>
         private byte[] GetBits(byte[] Data, Int64 Maximum)
         {
             UInt64[] val = new UInt64[1];

@@ -68,7 +68,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
             int minCallsR = EncParam.MinIGFHashCalls;
 
             _digestEngine = GetDigest(EncParam.MessageDigest);
-
             _hashLen = _digestEngine.DigestSize;
             _Z = Seed;
             _callCounter = 0;
@@ -313,6 +312,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
                     return new Keccak1024();
                 case Digests.SHA256:
                     return new SHA256();
+                case Digests.SHA512:
+                    return new SHA512();
                 case Digests.Skein256:
                     return new Skein256();
                 case Digests.Skein512:
@@ -320,7 +321,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
                 case Digests.Skein1024:
                     return new Skein1024();
                 default:
-                    return new SHA512();
+                    throw new ArgumentException("The digest type is not supported!");
             }
         }
         #endregion

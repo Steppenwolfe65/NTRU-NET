@@ -34,7 +34,7 @@ using System.Security.Cryptography;
 // contact: develop@vtdev.com
 #endregion
 
-namespace VTDev.Libraries.CEXEngine.Crypto.Prng 
+namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 {
     /// <summary>
     /// <h3>An implementation of a Cryptographically Secure Pseudo Random Number Generator: SecureRandom.</h3> 
@@ -51,18 +51,19 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
-    ///     <revision date="2015/04/28" version="1.4.0.0">Added thread safety</revision>
+    ///     <revision date="2015/01/23" version="1.3.0.0" author="John Underhill">Initial release</revision>
+    ///     <revision date="2015/04/28" version="1.4.0.0" author="John Underhill">Added thread safety</revision>
     /// </revisionHistory>
     public sealed class SecureRandom : IDisposable
     {
         #region Constants
         private const UInt16 MAXD16 = 16368;
+        private const int BUFFER_SIZE = 1024;
         #endregion
 
         #region Fields
         private bool _isDisposed = false;
-        private static RNGCryptoServiceProvider _rngCrypto;
+        private static RNGCryptoServiceProvider _rngEngine;
         private static byte[] _byteBuffer;
         private static int _bufferIndex = 0;
         private static int _bufferSize = 0;
@@ -75,7 +76,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// </summary>
         /// 
         /// <param name="BufferSize">Size of the internal buffer; must be more than zero</param>
-        public SecureRandom(int BufferSize = 1024)
+        public SecureRandom(int BufferSize = BUFFER_SIZE)
         {
             if (BufferSize < 1)
                 throw new ArgumentException("The buffer size must be more than zero!");
@@ -102,14 +103,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         {
             lock (_objLock)
             {
-                if (_rngCrypto != null)
+                if (_rngEngine != null)
                 {
-                    _rngCrypto.Dispose();
-                    _rngCrypto = null;
+                    _rngEngine.Dispose();
+                    _rngEngine = null;
                 }
 
-                _rngCrypto = new RNGCryptoServiceProvider();
-                _rngCrypto.GetBytes(_byteBuffer);
+                _rngEngine = new RNGCryptoServiceProvider();
+                _rngEngine.GetBytes(_byteBuffer);
                 _bufferIndex = 0;
             }
         }
@@ -495,12 +496,33 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                 byte[] data = new byte[Size];
                 if (_byteBuffer.Length - _bufferIndex < data.Length)
                 {
-                    Array.Clear(_byteBuffer, 0, _byteBuffer.Length);
-                    _rngCrypto.GetBytes(_byteBuffer);
-                    _bufferIndex = 0;
+                    int bufSize = _byteBuffer.Length - _bufferIndex;
+                    // copy remaining bytes
+                    Buffer.BlockCopy(_byteBuffer, _bufferIndex, data, 0, bufSize);
+                    int rem = Size - bufSize;
+
+                    while (rem > 0)
+                    {
+                        _rngEngine.GetBytes(_byteBuffer);
+                        if (rem > _byteBuffer.Length)
+                        {
+                            Buffer.BlockCopy(_byteBuffer, 0, data, bufSize, _byteBuffer.Length);
+                            bufSize += _byteBuffer.Length;
+                            rem -= _byteBuffer.Length;
+                        }
+                        else
+                        {
+                            Buffer.BlockCopy(_byteBuffer, 0, data, bufSize, rem);
+                            _bufferIndex = rem;
+                            rem = 0;
+                        }
+                    }
                 }
-                Array.Copy(_byteBuffer, _bufferIndex, data, 0, data.Length);
-                _bufferIndex += data.Length;
+                else
+                {
+                    Buffer.BlockCopy(_byteBuffer, _bufferIndex, data, 0, data.Length);
+                    _bufferIndex += data.Length;
+                }
 
                 return data;
             }
@@ -517,12 +539,33 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             {
                 if (_byteBuffer.Length - _bufferIndex < Data.Length)
                 {
-                    Array.Clear(_byteBuffer, 0, _byteBuffer.Length);
-                    _rngCrypto.GetBytes(_byteBuffer);
-                    _bufferIndex = 0;
+                    int bufSize = _byteBuffer.Length - _bufferIndex;
+                    // copy remaining bytes
+                    Buffer.BlockCopy(_byteBuffer, _bufferIndex, Data, 0, bufSize);
+                    int rem = Data.Length - bufSize;
+
+                    while (rem > 0)
+                    {
+                        _rngEngine.GetBytes(_byteBuffer);
+                        if (rem > _byteBuffer.Length)
+                        {
+                            Buffer.BlockCopy(_byteBuffer, 0, Data, bufSize, _byteBuffer.Length);
+                            bufSize += _byteBuffer.Length;
+                            rem -= _byteBuffer.Length;
+                        }
+                        else
+                        {
+                            Buffer.BlockCopy(_byteBuffer, 0, Data, bufSize, rem);
+                            _bufferIndex = rem;
+                            rem = 0;
+                        }
+                    }
                 }
-                Array.Copy(_byteBuffer, _bufferIndex, Data, 0, Data.Length);
-                _bufferIndex += Data.Length;
+                else
+                {
+                    Buffer.BlockCopy(_byteBuffer, _bufferIndex, Data, 0, Data.Length);
+                    _bufferIndex += Data.Length;
+                }
             }
         }
 
@@ -608,10 +651,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             {
                 try
                 {
-                    if (_rngCrypto != null)
+                    if (_rngEngine != null)
                     {
-                        _rngCrypto.Dispose();
-                        _rngCrypto = null;
+                        _rngEngine.Dispose();
+                        _rngEngine = null;
                     }
                 }
                 catch { }

@@ -1,10 +1,7 @@
-#region Directives
+﻿#region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Exceptions;
-using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
-using VTDev.Libraries.CEXEngine.Crypto.Prng ;
 #endregion
 
 #region License Information
@@ -37,7 +34,7 @@ using VTDev.Libraries.CEXEngine.Crypto.Prng ;
 // contact: develop@vtdev.com
 #endregion
 
-namespace VTDev.Libraries.CEXEngine.Crypto.Prng 
+namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 {
     /// <summary>
     /// <h3>An implementation of a passphrase based PKCS#5 random number generator.</h3>
@@ -45,21 +42,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </summary>
     /// 
     /// <example>
-    /// <c>
+    /// <code>
     /// int x;
     /// using (IRandom rnd = new PBPRng(new SHA512(), PassPhrase, Salt))
     ///     x = rnd.Next();
-    /// </c>
+    /// </code>
     /// </example>
     /// 
     /// <revisionHistory>
     /// <revision date="2015/28/15" version="1.3.2.0">Initial release</revision>
     /// </revisionHistory>
     /// 
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC HMAC</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest">VTDev.Libraries.CEXEngine.Crypto.Digest Namespace</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto">VTDev.Libraries.CEXEngine.Crypto Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac HMAC</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest IDigest Interface</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Guiding Publications:</h4></description>
@@ -82,6 +78,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         private bool _isDisposed = false;
         private int _position;
         private byte[] _rndData;
+        private static readonly object _objLock = new object();
         #endregion
 
         #region Properties
@@ -139,8 +136,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 
         #region Public Methods
         /// <summary>
-        /// Creates a new Passphrase Prng whose output differs but is a
-        /// function of this Passphrase Prng's internal state.
+        /// Creates a new Passphrase rng whose output differs but is a
+        /// function of this rng's internal state.
         /// </summary>
         /// 
         /// <param name="Digest">The digest instance</param>
@@ -148,21 +145,21 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <returns>Returns a PassphrasePrng instance</returns>
         public PBPRng CreateBranch(IDigest Digest)
         {
-            PBPRng newRng = new PBPRng();
+            PBPRng branch = new PBPRng();
 
             try
             {
-                newRng._digest = Digest;
+                branch._digest = Digest;
             }
             catch (Exception e)
             {
-                throw new NTRUException(e.Message);
+                throw new Exception(e.Message);
             }
 
-            newRng._rndData = (byte[])_rndData.Clone();
-            newRng._rndData[0]++;
+            branch._rndData = (byte[])_rndData.Clone();
+            branch._rndData[0]++;
 
-            return newRng;
+            return branch;
         }
 
         /// <summary>
@@ -284,20 +281,53 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         }
 
         /// <summary>
+        /// Get a ranged pseudo random 64bit integer
+        /// </summary>
+        /// 
+        /// <param name="Maximum">Maximum value</param>
+        /// 
+        /// <returns>Random Int64</returns>
+        public Int64 NextLong(long Maximum)
+        {
+            byte[] rand;
+            Int64[] num = new Int64[1];
+
+            do
+            {
+                rand = GetByteRange(Maximum);
+                Buffer.BlockCopy(rand, 0, num, 0, rand.Length);
+            } while (num[0] > Maximum);
+
+            return num[0];
+        }
+
+        /// <summary>
+        /// Get a ranged pseudo random 64bit integer
+        /// </summary>
+        /// 
+        /// <param name="Minimum">Minimum value</param>
+        /// <param name="Maximum">Maximum value</param>
+        /// 
+        /// <returns>Random Int64</returns>
+        public Int64 NextLong(long Minimum, long Maximum)
+        {
+            Int64 num = 0;
+            while ((num = NextLong(Maximum)) < Minimum) { }
+            return num;
+        }
+
+        /// <summary>
         /// Sets or resets the internal state
         /// </summary>
         public void Reset()
         {
             Array.Clear(_rndData, 0, _rndData.Length);
-            _digest.Reset();
+            lock (_objLock)
+                _digest.Reset();
         }
         #endregion
 
         #region Private Methods
-        /// <remarks>
-        /// Returns the number of bytes needed to build 
-        /// an integer existing within a byte range
-        /// </remarks>
         private byte[] GetByteRange(Int64 Maximum)
         {
             byte[] data;
@@ -322,9 +352,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             return GetBits(data, Maximum);
         }
 
-        /// <remarks>
-        /// If you need a dice roll, use the Random class (smaller range = reduced entropy)
-        /// </remarks>
         private byte[] GetBits(byte[] Data, Int64 Maximum)
         {
             UInt64[] val = new UInt64[1];

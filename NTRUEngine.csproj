@@ -31,6 +31,40 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\NTRUEngine.XML</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\NTRUEngine.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Release\NTRUEngine.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,11 +80,25 @@
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricKeyPair.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricParameters.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUParamSets.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\IBlockCipher.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\RDX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\RHX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\RSM.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\RSX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\SHX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\SPX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\TFX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\THX.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\TSM.cs" />
     <Compile Include="Crypto\Digest\Keccak1024.cs" />
     <Compile Include="Crypto\Digest\Keccak256.cs" />
     <Compile Include="Crypto\Digest\Skein1024.cs" />
+    <Compile Include="Crypto\Generator\CTRDrbg.cs" />
+    <Compile Include="Crypto\Generator\KDF2Drbg.cs" />
     <Compile Include="Crypto\Prng\BBSG.cs" />
     <Compile Include="Crypto\Prng\CCG.cs" />
+    <Compile Include="Crypto\Prng\CTRPrng.cs" />
+    <Compile Include="Crypto\Prng\DGCPrng.cs" />
     <Compile Include="Crypto\Prng\MODEXPG.cs" />
     <Compile Include="Crypto\Prng\QCG1.cs" />
     <Compile Include="Crypto\Prng\QCG2.cs" />
@@ -88,6 +136,9 @@
     <Compile Include="Crypto\Prng\PBPRng.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Crypto\Seed\CSPRsg.cs" />
+    <Compile Include="Crypto\Seed\ISeed.cs" />
+    <Compile Include="Crypto\Seed\XSPRsg.cs" />
     <Compile Include="Exceptions\NTRUException.cs" />
     <Compile Include="Crypto\Generator\DGCDRBG.cs" />
     <Compile Include="Crypto\Generator\HKDF.cs" />

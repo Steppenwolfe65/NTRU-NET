@@ -63,19 +63,19 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2014/11/11" version="1.2.0.0">Initial release</revision>
-    ///     <revision date="2015/01/23" version="1.3.0.0">Changes to formatting and documentation</revision>
+    /// <revision date="2014/11/11" version="1.2.0.0">Initial release</revision>
+    /// <revision date="2015/01/23" version="1.3.0.0">Changes to formatting and documentation</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC HMAC</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest">VTDev.Libraries.CEXEngine.Crypto.Digest Namespace</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto">VTDev.Libraries.CEXEngine.Crypto Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto.Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
     /// <list type="bullet">
-    /// <item><description>Can be initialized with a <see cref="Digests">Digest</see> or a Mac.</description></item>
+    /// <item><description>Can be initialized with a <see cref="Digests">Digest</see> or a <see cref="Macs">Mac</see>.</description></item>
     /// <item><description>The <see cref="HKDF(IDigest, bool)">Constructors</see> DisposeEngine parameter determines if Digest engine is destroyed when <see cref="Dispose()"/> is called on this class; default is <c>true</c>.</description></item>
     /// <item><description>Salt size should be multiple of Digest block size.</description></item>
     /// <item><description>Ikm size should be Digest hash return size.</description></item>
@@ -254,7 +254,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate a block of cryptographically secure pseudo random bytes
+        /// Generate a block of pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -266,7 +266,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate cryptographically secure pseudo random bytes
+        /// Generate pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -385,9 +385,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
                         _currentT = null;
                     }
                 }
-                catch { }
-
-                _isDisposed = true;
+                finally
+                {
+                    _isDisposed = true;
+                }
             }
         }
         #endregion

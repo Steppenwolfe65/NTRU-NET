@@ -25,18 +25,17 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// </example>
     /// 
     /// <revisionHistory>
-    /// <revision date="2015/28/15" version="1.3.2.0">Initial release</revision>
+    /// <revision date="2015/28/15" version="1.3.1.1">Initial release</revision>
     /// </revisionHistory>
     /// 
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC HMAC</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest">VTDev.Libraries.CEXEngine.Crypto.Digest Namespace</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto">VTDev.Libraries.CEXEngine.Crypto Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac HMAC</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest IDigest Interface</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
     /// <list type="bullet">
-    /// <item><description>Can be initialized with a <see cref="Digests">Digest</see> or a Mac.</description></item>
+    /// <item><description>Can be initialized with a <see cref="Digests">Digest</see> or a <see cref="Macs">Mac</see>.</description></item>
     /// <item><description>The <see cref="PKCS5(IDigest, int, bool)">Constructors</see> DisposeEngine parameter determines if Digest engine is destroyed when <see cref="Dispose()"/> is called on this class; default is <c>true</c>.</description></item>
     /// <item><description>Salt size should be multiple of Digest block size.</description></item>
     /// <item><description>Ikm size should be Digest hash return size.</description></item>
@@ -53,7 +52,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <item><description>Based on the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see> version.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class PKCS5 : IGenerator, IDisposable
+    public class PKCS5 : IGenerator, IDisposable
     {
         #region Constants
         private const string ALG_NAME = "PKCS5";
@@ -195,7 +194,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
             Buffer.BlockCopy(Salt, _Salt.Length, keyBytes, 0, _digestMac.DigestSize);
 
             _macKey = new KeyParams(keyBytes);
-            
+
             _isInitialized = true;
         }
 
@@ -216,7 +215,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
 
             _Salt = (byte[])Salt.Clone();
             _macKey = new KeyParams(Ikm);
-            
+
             _isInitialized = true;
         }
 
@@ -246,7 +245,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate a block of cryptographically secure pseudo random bytes
+        /// Generate a block of pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -258,7 +257,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate cryptographically secure pseudo random bytes
+        /// Generate pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -284,7 +283,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
         #endregion
 
-        #region Helpers
+        #region Private Methods
         private int GenerateKey(byte[] Output, int OutOffset, int Size)
         {
             int hashLen = _digestMac.DigestSize;
@@ -305,6 +304,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
                 IntToOctet(buffer, ctr + 1);
                 byte[] rem = new byte[hashLen];
                 Process(buffer, rem, 0);
+                Buffer.BlockCopy(rem, 0, outBytes, outBytes.Length - diff, diff);
             }
 
             Buffer.BlockCopy(outBytes, 0, Output, OutOffset, outBytes.Length);
@@ -377,9 +377,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
                         _Salt = null;
                     }
                 }
-                catch { }
-
-                _isDisposed = true;
+                finally
+                {
+                    _isDisposed = true;
+                }
             }
         }
         #endregion

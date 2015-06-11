@@ -1,4 +1,17 @@
-﻿#region License Information
+﻿#region Directives
+using System;
+using System.IO;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Crypto.Digest;
+using VTDev.Libraries.CEXEngine.Crypto.Prng;
+using VTDev.Libraries.CEXEngine.Exceptions;
+using VTDev.Libraries.CEXEngine.Tools;
+using VTDev.Libraries.CEXEngine.Utility;
+#endregion
+
+#region License Information
 // NTRU Encrypt in C# (NTRUSharp)
 // Copyright (C) 2015 John Underhill
 // 
@@ -27,18 +40,6 @@
 // contact: develop@vtdev.com
 #endregion
 
-#region Directives
-using System;
-using System.IO;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
-using VTDev.Libraries.CEXEngine.Crypto.Digest;
-using VTDev.Libraries.CEXEngine.Crypto.Prng;
-using VTDev.Libraries.CEXEngine.Exceptions;
-using VTDev.Libraries.CEXEngine.Tools;
-using VTDev.Libraries.CEXEngine.Utility;
-#endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
 {
@@ -401,13 +402,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Get the digest engine
         /// </summary>
         /// 
-        /// <param name="Engine">Engine type</param>
+        /// <param name="Digest">Engine type</param>
         /// 
         /// <returns>Instance of digest</returns>
-        private IDigest GetDigest(Digests Engine)
+        private IDigest GetDigest(Digests Digest)
         {
-
-            switch (Engine)
+            switch (Digest)
             {
                 case Digests.Blake256:
                     return new Blake256();
@@ -417,14 +417,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                     return new Keccak256();
                 case Digests.Keccak512:
                     return new Keccak512();
+                case Digests.Keccak1024:
+                    return new Keccak1024();
                 case Digests.SHA256:
                     return new SHA256();
+                case Digests.SHA512:
+                    return new SHA512();
                 case Digests.Skein256:
                     return new Skein256();
                 case Digests.Skein512:
                     return new Skein512();
+                case Digests.Skein1024:
+                    return new Skein1024();
                 default:
-                    return new SHA512();
+                    throw new ArgumentException("The digest type is not supported!");
             }
         }
 
@@ -432,19 +438,23 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Get the Prng
         /// </summary>
         /// 
-        /// <param name="Engine">Prng type</param>
+        /// <param name="Prng">Prng type</param>
         /// 
         /// <returns>Instance of Prng</returns>
-        private IRandom GetPrng(Prngs Engine)
+        private IRandom GetPrng(Prngs Prng)
         {
-            switch (Engine)
+            switch (Prng)
             {
+                case Prngs.CSPRng:
+                    return new CSPRng();
+                case Prngs.CTRPrng:
+                    return new CTRPrng();
+                case Prngs.DGCPrng:
+                    return new DGCPrng();
                 case Prngs.BBSG:
                     return new BBSG();
                 case Prngs.CCG:
                     return new CCG();
-                case Prngs.CSPRng:
-                    return new CSPRng();
                 case Prngs.MODEXPG:
                     return new MODEXPG();
                 case Prngs.QCG1:
@@ -452,7 +462,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 case Prngs.QCG2:
                     return new QCG2();
                 default:
-                    return new CSPRng();
+                    throw new ArgumentException("The Prng type is not supported!");
             }
         }
 

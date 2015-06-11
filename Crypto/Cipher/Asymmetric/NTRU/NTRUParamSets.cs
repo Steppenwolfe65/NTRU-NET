@@ -1,4 +1,8 @@
-﻿#region License Information
+﻿#region Directives
+using VTDev.Libraries.CEXEngine.Exceptions;
+#endregion
+
+#region License Information
 // NTRU Encrypt in C# (NTRUSharp)
 // Copyright (C) 2015 John Underhill
 // 
@@ -27,10 +31,6 @@
 // contact: develop@vtdev.com
 #endregion
 
-#region Directives
-using VTDev.Libraries.CEXEngine.Exceptions;
-#endregion
-
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
 {
     /// <summary>
@@ -49,12 +49,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             /// <summary>
             /// Just an experiment, use at your own risk!
-            /// <para>n:1931, q:2048, df:380, skien1024</para>
+            /// <para>n:1931, q:2048, df:380, skein1024</para>
             /// </summary>
             ZCX1931,
             /// <summary>
             /// Just an experiment, use at your own risk!
-            /// <para>n:1861, q:2048, df:290, skien1024</para>
+            /// <para>n:1861, q:2048, df:290, skein1024</para>
             /// </summary>
             ZCX1861,
             /// <summary>
@@ -201,12 +201,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         // Note: max message size is calculation of N and Db; (N*3/2/8 - Length-Db/8). Max bytes: EES1087EP2:170, EES1171EP1:186, EES1499EP1:248, APR2011439:65, APR2011743:106
         /// <summary>
         /// Just an experiment, do not use!
-        /// <para>n:1931, q:2048, df:380, skien1024</para>
+        /// <para>n:1931, q:2048, df:380, skein1024</para>
         /// </summary>
         public static readonly NTRUParameters ZCX1931SK1024 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.Skein1024);
         /// <summary>
         /// Just an experiment, do not use!
-        /// <para>n:1861, q:2048, df:290, skien1024</para>
+        /// <para>n:1861, q:2048, df:290, skein1024</para>
         /// </summary>
         public static readonly NTRUParameters ZCX1861SK1024 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.Skein1024);
         /// <summary>

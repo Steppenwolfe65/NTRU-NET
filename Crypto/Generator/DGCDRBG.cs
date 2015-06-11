@@ -70,8 +70,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <list type="bullet">
     /// <item><description>Can be initialized with any <see cref="Digests">digest</see>.</description></item>
     /// <item><description>Combination of [Salt, Ikm, Nonce] must be at least: digest block size + counter (8 bytes) size in length.</description></item>
-    /// <item><description>The <see cref="DGCDRBG(IDigest, bool)">Constructors</see> DisposeEngine parameter determines if Digest engine is destroyed when <see cref="Dispose()"/> is called on this class; default is <c>true</c>.</description></item>
+    /// <item><description>The <see cref="DGCDrbg(IDigest, bool)">Constructors</see> DisposeEngine parameter determines if Digest engine is destroyed when <see cref="Dispose()"/> is called on this class; default is <c>true</c>.</description></item>
     /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
+    /// <description>Output buffer is 4 * the digest return size.</description></item>
     /// </list>
     /// 
     /// <description><h4>Guiding Publications:</h4></description>
@@ -88,10 +89,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <item><description>Based on the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see> version.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class DGCDRBG : IGenerator, IDisposable
+    public sealed class DGCDrbg : IGenerator, IDisposable
     {
         #region Constants
-        private const string ALG_NAME = "DGCDRBG";
+        private const string ALG_NAME = "DGCDrbg";
         private const int COUNTER_SIZE = 8;
         private const long CYCLE_COUNT = 10;
         #endregion
@@ -106,6 +107,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         private IDigest _msgDigest;
         private long _stateCtr = 1;
         private long _seedCtr = 1;
+        private static readonly object _objLock = new object();
         #endregion
 
         #region Properties
@@ -144,7 +146,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Digest">Hash function</param>
         /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called</param>
-        public DGCDRBG(IDigest Digest, bool DisposeEngine = true)
+        public DGCDrbg(IDigest Digest, bool DisposeEngine = true)
         {
             _disposeEngine = DisposeEngine;
             _msgDigest = Digest;
@@ -156,7 +158,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <summary>
         /// Finalize objects
         /// </summary>
-        ~DGCDRBG()
+        ~DGCDrbg()
         {
             Dispose(false);
         }
@@ -175,18 +177,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         {
             if (Salt == null)
                 throw new ArgumentNullException("Salt can not be null!");
-            //if (Salt.Length < _keySize)
-            //    throw (new ArgumentOutOfRangeException("Minimum key size has not been added. Size must be at least " + _keySize + " bytes!"));
+            if (Salt.Length < COUNTER_SIZE)
+                throw new ArgumentOutOfRangeException("Salt must be at least 8 bytes!");
 
             Int64[] counter = new Int64[1];
-            int keyLen = Salt.Length - COUNTER_SIZE;
+            int keyLen = (Salt.Length - COUNTER_SIZE) < 0 ? 0 : Salt.Length - COUNTER_SIZE;
             byte[] key = new byte[keyLen];
+            int ctrLen = Math.Min(COUNTER_SIZE, Salt.Length);
 
-            Buffer.BlockCopy(Salt, 0, counter, 0, COUNTER_SIZE);
-            Buffer.BlockCopy(Salt, COUNTER_SIZE, key, 0, keyLen);
+            Buffer.BlockCopy(Salt, 0, counter, 0, ctrLen);
+            Buffer.BlockCopy(Salt, ctrLen, key, 0, keyLen);
 
             UpdateSeed(key);
             UpdateCounter(counter[0]);
+
             _isInitialized = true;
         }
 
@@ -229,7 +233,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate a block of cryptographically secure pseudo random bytes
+        /// Generate a block of pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -241,7 +245,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// Generate cryptographically secure pseudo random bytes
+        /// Generate pseudo random bytes
         /// </summary>
         /// 
         /// <param name="Output">Output array filled with random bytes</param>
@@ -312,76 +316,55 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         #endregion
 
         #region Private Methods
-        /// <remarks>
-        /// Docs say class 'should be parallelizable'. 
-        /// Only problem is, digest consumes most of the processing time,
-        /// and setup for a parallel loop will likely cost more than time
-        /// saved in small sized runs..
-        /// </remarks>
-        private void BlockUpdate(byte[] Data)
-        {
-            lock (this)
-            {
-                _msgDigest.BlockUpdate(Data, 0, Data.Length);
-            }
-        }
-
         private void CycleSeed()
         {
-            BlockUpdate(_dgtSeed);
-            DigestAddCounter(_seedCtr++);
-            DoFinal(_dgtSeed);
+            _msgDigest.BlockUpdate(_dgtSeed, 0, _dgtSeed.Length);
+            IncrementCounter(_seedCtr++);
+            _msgDigest.DoFinal(_dgtSeed, 0);
         }
 
-        private void DigestAddCounter(long Counter)
+        private void IncrementCounter(long Counter)
         {
-            for (int i = 0; i != 8; i++)
+            for (int i = 0; i < 8; i++)
             {
-                Update((byte)Counter);
+                _msgDigest.Update((byte)Counter);
                 Counter >>= 8;
-            }
-        }
-
-        private void DoFinal(byte[] Data)
-        {
-            lock (this)
-            {
-                _msgDigest.DoFinal(Data, 0);
             }
         }
 
         private void GenerateState()
         {
-            DigestAddCounter(_stateCtr++);
-
-            BlockUpdate(_dgtState);
-            BlockUpdate(_dgtSeed);
-            DoFinal(_dgtState);
-
-            if ((_stateCtr % CYCLE_COUNT) == 0)
-                CycleSeed();
-        }
-
-        private void Update(byte Data)
-        {
-            lock (this)
+            lock (_objLock)
             {
-                _msgDigest.Update(Data);
+                IncrementCounter(_stateCtr++);
+
+                _msgDigest.BlockUpdate(_dgtState, 0, _dgtState.Length);
+                _msgDigest.BlockUpdate(_dgtSeed, 0, _dgtSeed.Length);
+                _msgDigest.DoFinal(_dgtState, 0);
+
+                if ((_stateCtr % CYCLE_COUNT) == 0)
+                    CycleSeed();
             }
         }
 
         private void UpdateCounter(long Counter)
         {
-            DigestAddCounter(Counter);
-            BlockUpdate(_dgtSeed);
-            DoFinal(_dgtSeed);
+            lock (_objLock)
+            {
+                IncrementCounter(Counter);
+                _msgDigest.BlockUpdate(_dgtSeed, 0, _dgtSeed.Length);
+                _msgDigest.DoFinal(_dgtSeed, 0);
+            }
         }
 
         private void UpdateSeed(byte[] Seed)
         {
-            BlockUpdate(Seed);
-            BlockUpdate(_dgtSeed);
-            DoFinal(_dgtSeed);
+            lock (_objLock)
+            {
+                _msgDigest.BlockUpdate(Seed, 0, Seed.Length);
+                _msgDigest.BlockUpdate(_dgtSeed, 0, _dgtSeed.Length);
+                _msgDigest.DoFinal(_dgtSeed, 0);
+            }
         }
         #endregion
 
@@ -417,9 +400,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
                         _dgtState = null;
                     }
                 }
-                catch { }
-
-                _isDisposed = true;
+                finally
+                {
+                    _isDisposed = true;
+                }
             }
         }
         #endregion

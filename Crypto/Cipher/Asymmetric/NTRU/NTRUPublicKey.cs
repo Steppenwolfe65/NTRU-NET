@@ -1,3 +1,13 @@
+#region Directives
+using System;
+using System.IO;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Exceptions;
+using VTDev.Libraries.CEXEngine.Utility;
+#endregion
+
 #region License Information
 // NTRU Encrypt in C# (NTRUSharp)
 // Copyright (C) 2015 John Underhill
@@ -25,17 +35,6 @@
 // An implementation of NTRU Encrypt in C#.
 // Written by John Underhill, April 09, 2015
 // contact: develop@vtdev.com
-#endregion
-
-#region Directives
-using System;
-using System.IO;
-using VTDev.Libraries.CEXEngine.Exceptions;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
-using VTDev.Libraries.CEXEngine.Numeric;
-using VTDev.Libraries.CEXEngine.Utility;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
