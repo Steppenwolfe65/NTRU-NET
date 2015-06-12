@@ -1,9 +1,11 @@
 #region Directives
 using System;
 using System.IO;
-using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
+using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Utility;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
@@ -62,15 +64,29 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
        /// <returns>A random <c>ProductFormPolynomial</c></returns>
         public static ProductFormPolynomial GenerateRandom(int N, int Df1, int Df2, int Df3Ones, int Df3NegOnes, IRandom Rng)
         {
-            SparseTernaryPolynomial f1 = SparseTernaryPolynomial.GenerateRandom(N, Df1, Df1, Rng);
-            SparseTernaryPolynomial f2 = SparseTernaryPolynomial.GenerateRandom(N, Df2, Df2, Rng);
-            SparseTernaryPolynomial f3 = SparseTernaryPolynomial.GenerateRandom(N, Df3Ones, Df3NegOnes, Rng);
+            SparseTernaryPolynomial f1 = null;
+            SparseTernaryPolynomial f2 = null;
+            SparseTernaryPolynomial f3 = null;
+
+            /*var actionList = new List<Action> { // slower..
+                new Action(()=> f1 = SparseTernaryPolynomial.GenerateRandom(N, Df1, Df1, Rng)), 
+                new Action(()=> f2 = SparseTernaryPolynomial.GenerateRandom(N, Df2, Df2, Rng)), 
+                new Action(()=> f3 = SparseTernaryPolynomial.GenerateRandom(N, Df3Ones, Df3NegOnes, Rng))
+            };
+            //Parallel.Invoke(actionList.ToArray());
+            Parallel.ForEach(actionList, x => x());
+
+            return new ProductFormPolynomial(f1, f2, f3);*/
+
+            f1 = SparseTernaryPolynomial.GenerateRandom(N, Df1, Df1, Rng);
+            f2 = SparseTernaryPolynomial.GenerateRandom(N, Df2, Df2, Rng);
+            f3 = SparseTernaryPolynomial.GenerateRandom(N, Df3Ones, Df3NegOnes, Rng);
 
             return new ProductFormPolynomial(f1, f2, f3);
         }
 
         /// <summary>
-        /// Decodes a byte array encoded with {@link #toBinary()} to a polynomial.
+        /// Decodes a byte array encoded with ToBinary() to a polynomial.
         /// </summary>
         /// 
         /// <param name="Data">An encoded <c>ProductFormPolynomial</c></param>
@@ -173,6 +189,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             BigIntPolynomial c = _f1.Multiply(Factor);
             c = _f2.Multiply(c);
             c.Add(_f3.Multiply(Factor));
+
             return c;
         }
 
@@ -186,6 +203,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             IntegerPolynomial i = _f1.Multiply(_f2.ToIntegerPolynomial());
             i.Add(_f3);
+
             return i;
         }
 
@@ -228,21 +246,27 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                     return false;
             }
             else if (!_f1.Equals(other._f1))
+            {
                 return false;
+            }
             if (_f2 == null)
             {
                 if (other._f2 != null)
                     return false;
             }
             else if (!_f2.Equals(other._f2))
+            {
                 return false;
+            }
             if (_f3 == null)
             {
                 if (other._f3 != null)
                     return false;
             }
             else if (!_f3.Equals(other._f3))
+            {
                 return false;
+            }
 
             return true;
         }

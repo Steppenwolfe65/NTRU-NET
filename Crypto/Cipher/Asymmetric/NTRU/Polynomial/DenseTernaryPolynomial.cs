@@ -97,6 +97,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                 if (c == -1)
                     negOnes[negOnesIdx++] = i;
             }
+
             return negOnes.CopyOf(negOnesIdx);
         }
 
@@ -117,6 +118,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                 if (c == 1)
                     ones[onesIdx++] = i;
             }
+
             return ones.CopyOf(onesIdx);
         }
 

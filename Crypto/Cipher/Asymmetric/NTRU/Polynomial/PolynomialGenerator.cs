@@ -1,4 +1,7 @@
+#region Directives
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
+#endregion
+
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 {
     /// <summary>

@@ -1,7 +1,6 @@
 #region Directives
 using System;
 using VTDev.Libraries.CEXEngine.Exceptions;
-using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Utility;
 #endregion
 
@@ -100,6 +99,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                 {
                     for (int k = N; k < c.Coeffs.Length; k++)
                         c.Coeffs[k - N] = (c.Coeffs[k - N] + c.Coeffs[k]) & 0x7FF0007FFL;
+
                     c.Coeffs = c.Coeffs.CopyOf(N);
                 }
                 else
@@ -110,6 +110,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                         c.Coeffs[k - N] = c.Coeffs[k - N] + ((c.Coeffs[k] & 2047) << 24);
                         c.Coeffs[k - N] &= 0x7FF0007FFL;
                     }
+
                     c.Coeffs = c.Coeffs.CopyOf(N);
                     c.Coeffs[c.Coeffs.Length - 1] &= 2047;
                 }
@@ -165,6 +166,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             for (int i = 0; i < Coeffs.Length; i++)
             {
                 intCoeffs[uIdx++] = (int)(Coeffs[i] & 2047);
+
                 if (uIdx < _numCoeffs)
                     intCoeffs[uIdx++] = (int)((Coeffs[i] >> 24) & 2047);
             }
@@ -235,6 +237,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                     c.Coeffs[n1 + i] = (c.Coeffs[n1 + i] + c3.Coeffs[i]) & 0x7FF0007FFL;
                 for (int i = 0; i < c2.Coeffs.Length; i++)
                     c.Coeffs[2 * n1 + i] = (c.Coeffs[2 * n1 + i] + c2.Coeffs[i]) & 0x7FF0007FFL;
+
                 return c;
             }
         }

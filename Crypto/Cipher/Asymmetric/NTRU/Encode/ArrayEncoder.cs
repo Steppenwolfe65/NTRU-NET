@@ -124,6 +124,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
             int coeffBuf = 0;       // contains (bitIndex) bits
             int coeffBits = 0;      // length of coeffBuf
             int coeffIndex = 0;     // index into coeffs
+
             while (coeffIndex < N)
             {
                 // copy bitsPerCoeff or more into coeffBuf
@@ -161,6 +162,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
             int qBits = 31 - IntUtils.NumberOfLeadingZeros(Q);
             int size = (N * qBits + 7) / 8;
             byte[] arr = ArrayEncoder.ReadFullLength(InputStream, size);
+
             return DecodeModQ(arr, N, Q);
         }
 
@@ -184,6 +186,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
             int start = SkipFirst ? 1 : 0;
             int end = SkipFirst ? (Data.Length - 1) | 1 : Data.Length / 2 * 2;   // if there is an odd number of coeffs, throw away the highest one
             int i = start;
+
             while (i < end)
             {
                 // process 24 bits at a time in the outer loop
@@ -275,6 +278,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
                 {
                     int currentBit = (A[i] >> j) & 1;
                     data[byteIndex] |= (byte)(currentBit << bitIndex);
+
                     if (bitIndex == 7)
                     {
                         bitIndex = 0;
@@ -312,6 +316,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
                 {
                     int currentBit = (Data[i] >> j) & 1;
                     data[byteIndex] |= (byte)(currentBit << bitIndex);
+
                     if (bitIndex == 7)
                     {
                         bitIndex = 0;

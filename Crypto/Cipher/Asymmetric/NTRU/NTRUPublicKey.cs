@@ -257,6 +257,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             {
                 return false;
             }
+
             if (Q != other.Q)
                 return false;
 

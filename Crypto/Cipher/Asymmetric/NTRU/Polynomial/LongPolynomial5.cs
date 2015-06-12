@@ -1,5 +1,4 @@
 #region Directives
-using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Utility;
 #endregion
 
@@ -36,6 +35,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             {
                 _coeffs[cIdx] |= ((long)P.Coeffs[i]) << shift;
                 shift += 12;
+
                 if (shift >= 60)
                 {
                     shift = 0;
@@ -69,6 +69,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             {
                 int cIdx = pIdx[i] / 5;
                 int m = pIdx[i] - cIdx * 5;   // m = pIdx % 5
+
                 for (int j = 0; j < _coeffs.Length; j++)
                 {
                     prod[m][cIdx] = (prod[m][cIdx] + _coeffs[j]) & 0x7FF7FF7FF7FF7FFL;

@@ -627,6 +627,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public void WriteTo(byte[] Output, int Offset)
         {
             byte[] data = ToBytes();
+
             if (Offset + data.Length > Output.Length - Offset)
                 throw new NTRUException("The output array is too small!");
 

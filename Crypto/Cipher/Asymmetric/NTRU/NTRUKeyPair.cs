@@ -158,7 +158,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 return false;
             if (((NTRUPublicKey)PublicKey).Q != q)
                 return false;
-
             if (((NTRUPrivateKey)PrivateKey).T.ToIntegerPolynomial().Coeffs.Length != N)
                 return false;
 

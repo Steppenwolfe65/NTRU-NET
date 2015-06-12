@@ -9,6 +9,8 @@ using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 #endregion
 
 #region License Information
@@ -270,6 +272,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             {
                 // M = b|octL|m|p0
                 byte[] b = new byte[db / 8];
+                // forward padding
                 _rndEngine.GetBytes(b);
                 byte[] p0 = new byte[maxLenBytes + 1 - msgLen];
                 byte[] msgTmp;
@@ -505,7 +508,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             int N = _encParams.N;
             IndexGenerator ig = new IndexGenerator(Seed, _encParams);
 
-            if (_encParams.PolyType == TernaryPolynomialType.PRODUCT)
+            if (_encParams.PolyType == TernaryPolynomialType.PRODUCT) //.8, .6
             {
                 SparseTernaryPolynomial r1 = SparseTernaryPolynomial.GenerateBlindingPoly(ig, N, _encParams.DR1);
                 SparseTernaryPolynomial r2 = SparseTernaryPolynomial.GenerateBlindingPoly(ig, N, _encParams.DR2);
@@ -573,7 +576,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                             O = (O - rem3) / 3;
                         }
 
-                        i.Coeffs[cur] = O == 2 ? -1 : O;   // reduce to [-1..1] 
+                        i.Coeffs[cur] = O == 2 ? -1 : O;            // reduce to [-1..1] 
                         cur++;
                         if (cur == N)
                             return i;

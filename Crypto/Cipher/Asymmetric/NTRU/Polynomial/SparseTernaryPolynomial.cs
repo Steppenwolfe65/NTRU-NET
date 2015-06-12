@@ -39,9 +39,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         /// <param name="NegOnes">Indices of coefficients equal to -1 in ascending order</param>
         public SparseTernaryPolynomial(int N, int[] Ones, int[] NegOnes)
         {
-            this._N = N;
-            this._ones = Ones;
-            this._negOnes = NegOnes;
+            _N = N;
+            _ones = Ones;
+            _negOnes = NegOnes;
         }
 
         /// <summary>
@@ -85,6 +85,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                         throw new NTRUException("Illegal value: " + c + ", must be one of {-1, 0, 1}");
                 }
             }
+
             _ones = _ones.CopyOf(onesIdx);
             _negOnes = _negOnes.CopyOf(negOnesIdx);
         }
@@ -159,6 +160,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 
             int[] negOnes = new int[Dr];
             i = 0;
+
             while (i < Dr)
             {
                 int r = Ig.NextIndex();
@@ -298,6 +300,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             IntegerPolynomial c = Multiply(Factor);
             c.Mod(Modulus);
+
             return c;
         }
 

@@ -98,6 +98,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
                 A[i + NumElements] = sum;
                 i++;
             }
+
             while (carry)
             {
                 A[i + NumElements]++;
@@ -176,11 +177,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
             {
                 int b0 = b[0];
                 b[0] = IntUtils.URShift(b[0], NumBits);
+
                 for (int i = 1; i < b.Length; i++)
                 {
                     b[i - 1] |= b[i] << (32 - NumBits);
                     b[i] = IntUtils.URShift(b[i], NumBits);
                 }
+
                 b[b.Length - 1] |= b0 << (32 - NumBits);
             }
             return b;
@@ -387,8 +390,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
         public static int[] MultKaratsuba(int[] A, int[] B)
         {
             int n = Math.Max(A.Length, B.Length);
+
             if (n <= KARATSUBA_THRESHOLD)
+            {
                 return MultSimple(A, B);
+            }
             else
             {
                 int n1 = (n + 1) / 2;
@@ -465,11 +471,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
             int[] b0 = B.CopyOf(B.Length / 2);
             int[] c = Multiply(a0, b0);
             int n = A.Length / 2;
+
             // special case: if a=Fn-1, add b*2^2^n which is the same as subtracting b
             if (A[n] == 1)
                 SubModFn(c, b0.CopyOf(c.Length), n * 32);
             if (B[n] == 1)
                 SubModFn(c, a0.CopyOf(c.Length), n * 32);
+
             return c;
         }
 
@@ -512,6 +520,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
 
                     if (j >= A.Length)
                         j = 0;
+
                 } while (carry);
             }
         }
@@ -722,12 +731,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
             // find the lowest m such that m>=log2(2M)
             int m = 32 - IntUtils.NumberOfLeadingZeros(2 * M - 1 - 1);
             int n = m / 2 + 1;
-
             // split a and b into pieces 1<<(n-1) bits long; assume n>=6 so pieces start and end at int boundaries
             bool even = m % 2 == 0;
             int numPieces = even ? 1 << n : 1 << (n + 1);
             int pieceSize = 1 << (n - 1 - 5);   // in ints
-
             // build u and v from a and b, allocating 3n+5 bits in u and v per n+2 bits from a and b, resp.
             int numPiecesA = (A.Length + pieceSize) / pieceSize;
             int[] u = new int[(numPiecesA * (3 * n + 5) + 31) / 32];
@@ -847,6 +854,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
                         aBitIdx -= 32;
                         aIntIdx++;
                     }
+
                     bBitIdx += bitsToCopy;
                     if (bBitIdx >= 32)
                     {
@@ -890,7 +898,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Arithmetic
                 if (carry)
                     diff--;
 
-                carry = (IntUtils.URShift(diff, 31) > IntUtils.URShift(A[i], 31) - IntUtils.URShift(B[i], 31));   // carry if signBit(diff) > signBit(a)-signBit(b)
+                // carry if signBit(diff) > signBit(a)-signBit(b)
+                carry = (IntUtils.URShift(diff, 31) > IntUtils.URShift(A[i], 31) - IntUtils.URShift(B[i], 31));
                 c[i] = diff;
                 i++;
             }

@@ -1,6 +1,6 @@
 #region Directives
-using VTDev.Libraries.CEXEngine.Numeric;
 using System;
+using VTDev.Libraries.CEXEngine.Numeric;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
@@ -36,6 +36,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             this.Rho = Rho;
             this.Res = Res;
+        }
+
+        ~Resultant()
+        {
+            Dispose(false);
         }
         #endregion
 

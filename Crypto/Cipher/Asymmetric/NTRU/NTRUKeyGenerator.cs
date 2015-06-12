@@ -1,10 +1,10 @@
 ﻿#region Directives
 using System;
-using System.Threading.Tasks;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Utility;
+using System.Threading.Tasks;
 #endregion
 
 #region License Information
@@ -149,6 +149,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public NTRUKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt, bool Parallel = true)
         {
             _dgtEngine.Reset();
+
             using (IRandom rnd = new PBPRng(_dgtEngine, Passphrase, Salt, 10000, false))
             {
                 IRandom rng2 = ((PBPRng)rnd).CreateBranch(_dgtEngine);

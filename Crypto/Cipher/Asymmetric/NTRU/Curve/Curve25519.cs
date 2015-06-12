@@ -366,6 +366,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 P[i + n] = (byte)w;
                 w >>= 8;
             }
+
             P[i + n] = (byte)(w + (P[i + n] & 0xFF));
 
             return w >> 8;
@@ -405,8 +406,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
 
         private static int NumSize(byte[] X, int N)
         {
-            while (N-- != 0 && X[N] == 0)
-                ;
+            while (N-- != 0 && X[N] == 0);
+
             return N + 1;
         }
 
@@ -733,6 +734,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t1, t3);
                 Sqr(t3, t1);
             }
+
             // t3 
             Mul(t1, t3, t2);	// 2^20  - 2^0	
             Sqr(t3, t1);	    // 2^21  - 2^1	
@@ -742,6 +744,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t3, t4);
                 Sqr(t4, t3);
             }
+
             // t4 	
             Mul(t3, t4, t1);        // 2^40  - 2^0	
             for (i = 0; i < 5; i++) // 2^50  - 2^10	
@@ -749,6 +752,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t1, t3);
                 Sqr(t3, t1);
             } 
+
             // t3 	
             Mul(t1, t3, t2);	// 2^50  - 2^0	
             Sqr(t2, t1);	    // 2^51  - 2^1	
@@ -758,6 +762,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t2, t3);
                 Sqr(t3, t2);
             } 
+
             // t3 
             Mul(t2, t3, t1);	// 2^100 - 2^0	
             Sqr(t3, t2);	    // 2^101 - 2^1	
@@ -767,6 +772,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t3, t4);
                 Sqr(t4, t3);
             } 
+
             // t4 		
             Mul(t3, t4, t2);	// 2^200 - 2^0	
             for (i = 0; i < 25; i++) // 2^250 - 2^50	
@@ -774,6 +780,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Curve
                 Sqr(t4, t3);
                 Sqr(t3, t4);
             } 
+
             // t3 		
             Mul(t2, t3, t1);	// 2^250 - 2^0	
             Sqr(t1, t2);	    // 2^251 - 2^1	

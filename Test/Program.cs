@@ -10,6 +10,7 @@ using System.Diagnostics;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
+using Test.Tests;
 #endregion
 
 namespace Test
@@ -25,7 +26,8 @@ namespace Test
     /// </summary>
     static class Program
     {
-        const int CYCLE_COUNT = 1000;
+        const int CYCLE_COUNT = 100;
+        const string CON_TITLE = "NTRU> ";
 
         #region Main
         static void Main(string[] args)
@@ -43,85 +45,92 @@ namespace Test
             Console.WriteLine("* Contact:   develop@vtdev.com               *");
             Console.WriteLine("**********************************************");
             Console.WriteLine("");
-            Console.WriteLine("COMPILE as Any CPU / Release mode, RUN the .exe for real timings");
+            Console.WriteLine("COMPILE as Any CPU | Release mode, RUN the .exe for real timings");
             Console.WriteLine("");
 
-            // math
-            Console.WriteLine("******TESTING BIGINTEGER MATH FUNCTIONS******");
-            RunTest(new BigIntEuclideanTest());
-            RunTest(new IntEuclideanTest());
-            RunTest(new SchönhageStrassenTest());/**/
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine("You are running in Debug mode! Compiled times will be much faster..");
+                Console.WriteLine("");
+            }
 
-            // polynomials
-            Console.WriteLine("******TESTING POLYNOMINAL FUNCTIONS******");
-            RunTest(new BigDecimalPolynomialTest());
-            RunTest(new BigIntPolynomialTest());
-            RunTest(new DenseTernaryPolynomialTest());
-            RunTest(new IntegerPolynomialTest());
-            RunTest(new LongPolynomial2Test());
-            RunTest(new LongPolynomial5Test());
-            RunTest(new ProductFormPolynomialTest());
-            RunTest(new SparseTernaryPolynomialTest());
-            Console.WriteLine("");/**/
-
-            // utils
-            Console.WriteLine("******TESTING ARRAY ENCODERS******");
-            RunTest(new ArrayEncoderTest());
-            Console.WriteLine("");/**/
-
-            // encrypt
-            Console.WriteLine("******TESTING ENCRYPTION ENGINE******");
-            RunTest(new BitStringTest());
-            RunTest(new NtruKeyPairTest());
-            RunTest(new NtruEncryptTest());
-            RunTest(new NtruKeyTest());
-            RunTest(new NtruParametersTest());
-            RunTest(new IndexGeneratorTest());
-            RunTest(new PBPRngTest());
-            Console.WriteLine("");/**/
-
-
-            Console.WriteLine("Validity Tests Completed!");
-            Console.WriteLine("");
-            Console.WriteLine("Run Speed Tests? Press 'Y' to run, all other keys close..");
+            Console.WriteLine(CON_TITLE + "Run Validation Tests? Press 'Y' to run, any other key to skip..");
             ConsoleKeyInfo keyInfo = Console.ReadKey();
+            Console.WriteLine("");
 
             if (keyInfo.Key.Equals(ConsoleKey.Y))
             {
-                Console.WriteLine("");
-                if (Debugger.IsAttached)
-                {
-                    Console.WriteLine("You are running in Debug mode! Compiled times will be much faster..");
-                    Console.WriteLine("");
-                }
+                // math
+                Console.WriteLine("******TESTING BIGINTEGER MATH FUNCTIONS******");
+                RunTest(new BigIntEuclideanTest());
+                RunTest(new IntEuclideanTest());
+                RunTest(new SchönhageStrassenTest());/**/
 
+                // polynomials
+                Console.WriteLine("******TESTING POLYNOMINAL FUNCTIONS******");
+                RunTest(new BigDecimalPolynomialTest());
+                RunTest(new BigIntPolynomialTest());
+                RunTest(new DenseTernaryPolynomialTest());
+                RunTest(new IntegerPolynomialTest());
+                RunTest(new LongPolynomial2Test());
+                RunTest(new LongPolynomial5Test());
+                RunTest(new ProductFormPolynomialTest());
+                RunTest(new SparseTernaryPolynomialTest());
+                Console.WriteLine("");/**/
+
+                // utils
+                Console.WriteLine("******TESTING ARRAY ENCODERS******");
+                RunTest(new ArrayEncoderTest());
+                Console.WriteLine("");/**/
+
+                // encrypt
+                Console.WriteLine("******TESTING ENCRYPTION ENGINE******");
+                RunTest(new BitStringTest());
+                RunTest(new NtruKeyPairTest());
+                RunTest(new NtruEncryptTest());
+                RunTest(new NtruKeyTest());
+                RunTest(new NtruParametersTest());
+                RunTest(new IndexGeneratorTest());
+                RunTest(new PBPRngTest());
+                Console.WriteLine("");/**/
+
+                Console.WriteLine("Validation Tests Completed!");
+            }
+
+            Console.WriteLine("");
+            Console.WriteLine(CON_TITLE + "Run Speed Tests? Press 'Y' to run, any other key to skip..");
+            keyInfo = Console.ReadKey();
+            Console.WriteLine("");
+
+            if (keyInfo.Key.Equals(ConsoleKey.Y))
+            {
                 KeyGenSpeed(CYCLE_COUNT);
                 EncryptionSpeed(CYCLE_COUNT);
                 DecryptionSpeed(CYCLE_COUNT);
                 Console.WriteLine("Speed Tests Completed!");
                 Console.WriteLine("");
-                Console.WriteLine("");
-                Console.WriteLine("Run Looping Full-Cycle Tests? Press 'Y' to run, all other keys close..");
-                keyInfo = Console.ReadKey();
+            }
 
-                if (keyInfo.Key.Equals(ConsoleKey.Y))
+            Console.WriteLine("");
+            Console.WriteLine(CON_TITLE + "Run Looping Full-Cycle Tests? Press 'Y' to run, all other keys close..");
+            keyInfo = Console.ReadKey();
+            Console.WriteLine("");
+
+            if (keyInfo.Key.Equals(ConsoleKey.Y))
+            {
+                Console.WriteLine("");
+                Console.WriteLine("******Looping: Key Generation/Encryption/Decryption and Verify Test******");
+                Console.WriteLine(string.Format("Testing {0} Full Cycles, throws on all failures..", CYCLE_COUNT));
+                try
                 {
-                    Console.WriteLine("");
-                    Console.WriteLine("******Looping: Key Generation/Encryption/Decryption and Verify Test******");
-                    Console.WriteLine(string.Format("Testing {0} Full Cycles, throws on all failures..", CYCLE_COUNT));
-                    try
-                    {
-                        CycleTest(CYCLE_COUNT);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Loop test failed! " + ex.Message);
-                        Console.WriteLine("Press any key to close");
-                    }
+                    CycleTest(CYCLE_COUNT);
                 }
-
+                catch (Exception ex)
+                {
+                    Console.WriteLine("!Loop test failed! " + ex.Message);
+                }
                 Console.WriteLine("");
-                Console.WriteLine("All tests have completed, press any key to close..");
+                Console.WriteLine(CON_TITLE + "All tests have completed, press any key to close..");
                 Console.ReadKey();
             }
             else
@@ -142,10 +151,10 @@ namespace Test
             }
             catch (Exception Ex)
             {
-                Console.WriteLine("An error has occured!");
+                Console.WriteLine("!An error has occured!");
                 Console.WriteLine(Ex.Message);
                 Console.WriteLine("");
-                Console.WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
+                Console.WriteLine(">Continue Testing? Press 'Y' to continue, all other keys abort..");
                 ConsoleKeyInfo keyInfo = Console.ReadKey();
 
                 if (!keyInfo.Key.Equals(ConsoleKey.Y))
@@ -219,20 +228,50 @@ namespace Test
             }
         }
 
-        static void KeyGenSpeed(int Iterations = 1000)
+        static void KeyGenSpeed(int Iterations)
         {
             Console.WriteLine(string.Format("Key creation average time over {0} passes:", Iterations));
             Stopwatch runTimer = new Stopwatch();
+            double elapsed;
 
-            double elapsed = APR2011439(Iterations);
+            elapsed = TestParameter(Iterations, NTRUParamSets.APR2011439FAST);
             Console.WriteLine(string.Format("APR2011439FAST: avg. {0} ms", elapsed / Iterations, Iterations));
             Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+            Console.WriteLine("");
 
-            elapsed = APR2011743(Iterations);
+            elapsed = TestParameter(Iterations, NTRUParamSets.APR2011743FAST);
             Console.WriteLine(string.Format("APR2011743FAST: avg. {0} ms", elapsed / Iterations, Iterations));
-            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));/**/
+            Console.WriteLine("");
+
+            Iterations = 10;
+            Console.WriteLine(string.Format("Testing each key with {0} passes:", Iterations));
+            Console.WriteLine("");
+
+            foreach (int p in Enum.GetValues(typeof(NTRUParamSets.NTRUParamNames)))
+            {
+                NTRUParameters param = NTRUParamSets.FromName((NTRUParamSets.NTRUParamNames)p);
+                elapsed = TestParameter(Iterations, param);
+                Console.WriteLine(string.Format(Enum.GetName(typeof(NTRUParamSets.NTRUParamNames), p) + ": avg. {0} ms", elapsed / Iterations, Iterations));
+                Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+                Console.WriteLine("");
+            }
 
             Console.WriteLine("");
+        }
+
+        static double TestParameter(int Iterations, NTRUParameters Param)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param);
+            IAsymmetricKeyPair akp;
+            Stopwatch runTimer = new Stopwatch();
+
+            runTimer.Start();
+            for (int i = 0; i < Iterations; i++)
+                akp = mkgen.GenerateKeyPair();
+            runTimer.Stop();
+
+            return runTimer.Elapsed.TotalMilliseconds;
         }
 
         static double APR2011439(int Iterations)

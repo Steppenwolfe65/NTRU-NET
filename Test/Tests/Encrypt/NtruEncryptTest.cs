@@ -131,9 +131,9 @@ namespace Test.Tests.Encrypt
             EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1499EP1FAST.Clone());
             OnProgress(new TestEventArgs("Passed the EES1499EP1 encryption test"));
 
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1861SK1024.Clone());
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1861SH512.Clone());
             OnProgress(new TestEventArgs("Passed the ZCX1861SK1024 encryption test"));
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1931SK1024.Clone());
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1931SH512.Clone());
             OnProgress(new TestEventArgs("Passed the ZCX1931SK1024 encryption test"));
 
             // test the digests //

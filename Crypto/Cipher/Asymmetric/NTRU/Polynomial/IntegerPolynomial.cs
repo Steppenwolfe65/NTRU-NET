@@ -8,7 +8,6 @@ using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
-using System.Threading.Tasks;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
@@ -141,6 +140,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         public IntegerPolynomial(BigIntPolynomial P)
         {
             Coeffs = new int[P.Coeffs.Length];
+
             for (int i = 0; i < P.Coeffs.Length; i++)
                 Coeffs[i] = P.Coeffs[i].ToInt32();
         }
@@ -228,6 +228,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 
             long sum = 0;
             long sqSum = 0;
+
             for (int i = 0; i < p.Coeffs.Length; i++)
             {
                 int c = p.Coeffs[i];
@@ -740,6 +741,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             IntegerPolynomial c = Multiply(Factor);
             c.Mod(Modulus);
+
             return c;
         }
 
@@ -945,6 +947,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         public int SumCoeffs()
         {
             int sum = 0;
+
             for (int i = 0; i < Coeffs.Length; i++)
                 sum += Coeffs[i];
 
@@ -1255,6 +1258,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         private int Pow(int A, int B, int Modulus)
         {
             int p = 1;
+
             for (int i = 0; i < B; i++)
                 p = (p * A) % Modulus;
 
@@ -1278,6 +1282,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         private int Degree()
         {
             int degree = Coeffs.Length - 1;
+
             while (degree > 0 && Coeffs[degree] == 0)
                 degree--;
 
