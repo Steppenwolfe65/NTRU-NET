@@ -1,5 +1,6 @@
 ﻿#region Directives
 using VTDev.Libraries.CEXEngine.Exceptions;
+using System;
 #endregion
 
 #region License Information
@@ -114,11 +115,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public static NTRUParameters FromId(byte[] OId, bool UseProduct = true)
         {
             if (OId == null)
-                throw new NTRUException("OId can not be null!");
+                throw new NTRUException("NTRUParameters:FromId", "OId can not be null!", new ArgumentNullException());
             if (OId.Length != 3)
-                throw new NTRUException("OId must be 3 bytes in length!");
+                throw new NTRUException("NTRUParameters:FromId", "OId must be 3 bytes in length!", new ArgumentOutOfRangeException());
             if (OId[0] != 0)
-                throw new NTRUException("OId is not a valid NTRU parameter id!");
+                throw new NTRUException("NTRUParameters:FromId", "OId is not a valid NTRU parameter id!", new ArgumentException());
 
             if (UseProduct)
             {
@@ -151,7 +152,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                     return (NTRUParameters)ZCX1931SH512.Clone();
             }
 
-            throw new NTRUException("OId does not identify a valid param set!");
+            throw new NTRUException("NTRUParameters:FromId", "OId does not identify a valid param set!", new ArgumentException());
         }
 
         /// <summary>
@@ -203,52 +204,63 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Just an experiment, do not use!
         /// <para>n:1931, q:2048, df:380, SHA512</para>
         /// </summary>
-        public static readonly NTRUParameters ZCX1931SH512 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.SHA512);
+        public static readonly NTRUParameters ZCX1931SH512 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// Just an experiment, do not use!
         /// <para>n:1861, q:2048, df:290, SHA512</para>
         /// </summary>
-        public static readonly NTRUParameters ZCX1861SH512 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.SHA512);
+        public static readonly NTRUParameters ZCX1861SH512 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is optimized for key size.
         /// </summary>
-        public static readonly NTRUParameters EES1087EP2 = new NTRUParameters(1087, 2048, 120, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, false, Digests.SHA512);
+        public static readonly NTRUParameters EES1087EP2 = new NTRUParameters(1087, 2048, 120, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1087EP2</c>
         /// </summary>
-        public static readonly NTRUParameters EES1087EP2FAST = new NTRUParameters(1087, 2048, 8, 8, 11, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, true, Digests.SHA512);
+        public static readonly NTRUParameters EES1087EP2FAST = new NTRUParameters(1087, 2048, 8, 8, 11, 120, 0, 256, 13, 25, 14, true, new byte[] { 0, 6, 3 }, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
         /// </summary>
-        public static readonly NTRUParameters EES1171EP1 = new NTRUParameters(1171, 2048, 106, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, false, Digests.SHA512);
+        public static readonly NTRUParameters EES1171EP1 = new NTRUParameters(1171, 2048, 106, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1171EP1</c>
         /// </summary>
-        public static readonly NTRUParameters EES1171EP1FAST = new NTRUParameters(1171, 2048, 8, 7, 11, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, true, Digests.SHA512);
+        public static readonly NTRUParameters EES1171EP1FAST = new NTRUParameters(1171, 2048, 8, 7, 11, 106, 0, 256, 13, 20, 15, true, new byte[] { 0, 6, 4 }, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
         /// </summary>
-        public static readonly NTRUParameters EES1499EP1 = new NTRUParameters(1499, 2048, 79, 79, 0, 256, 13, 17, 19, true, new byte[] { 0, 6, 5 }, true, false, Digests.SHA512);
+        public static readonly NTRUParameters EES1499EP1 = new NTRUParameters(1499, 2048, 79, 79, 0, 256, 13, 17, 19, true, new byte[] { 0, 6, 5 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1499EP1</c>
         /// </summary>
-        public static readonly NTRUParameters EES1499EP1FAST = new NTRUParameters(1499, 2048, 7, 6, 11, 79, 0, 256, 13, 17, 19, true, new byte[] { 0, 6, 5 }, true, true, Digests.SHA512);
+        public static readonly NTRUParameters EES1499EP1FAST = new NTRUParameters(1499, 2048, 7, 6, 11, 79, 0, 256, 13, 17, 19, true, new byte[] { 0, 6, 5 }, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A parameter set that gives 128 bits of security and uses simple ternary polynomials.
         /// </summary>
-        public static readonly NTRUParameters APR2011439 = new NTRUParameters(439, 2048, 146, 130, 126, 128, 12, 32, 9, true, new byte[] { 0, 7, 101 }, true, false, Digests.SHA256);
+        public static readonly NTRUParameters APR2011439 = new NTRUParameters(439, 2048, 146, 130, 126, 128, 12, 32, 9, true, new byte[] { 0, 7, 101 }, true, false, Digests.SHA256, Prngs.CTRPrng);
         /// <summary>
         /// Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
         /// </summary>
-        public static readonly NTRUParameters APR2011439FAST = new NTRUParameters(439, 2048, 9, 8, 5, 130, 126, 128, 12, 32, 9, true, new byte[] { 0, 7, 101 }, true, true, Digests.SHA256);
+        public static readonly NTRUParameters APR2011439FAST = new NTRUParameters(439, 2048, 9, 8, 5, 130, 126, 128, 12, 32, 9, true, new byte[] { 0, 7, 101 }, true, true, Digests.SHA256, Prngs.CTRPrng);
         /// <summary>
         /// A parameter set that gives 256 bits of security and uses simple ternary polynomials.
         /// </summary>
-        public static readonly NTRUParameters APR2011743 = new NTRUParameters(743, 2048, 248, 220, 60, 256, 12, 27, 14, true, new byte[] { 0, 7, 105 }, false, false, Digests.SHA512);
+        public static readonly NTRUParameters APR2011743 = new NTRUParameters(743, 2048, 248, 220, 60, 256, 12, 27, 14, true, new byte[] { 0, 7, 105 }, false, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
         /// </summary>
-        public static readonly NTRUParameters APR2011743FAST = new NTRUParameters(743, 2048, 11, 11, 15, 220, 60, 256, 12, 27, 14, true, new byte[] { 0, 7, 105 }, false, true, Digests.SHA512);
+        public static readonly NTRUParameters APR2011743FAST = new NTRUParameters(743, 2048, 11, 11, 15, 220, 60, 256, 12, 27, 14, true, new byte[] { 0, 7, 105 }, false, true, Digests.SHA512, Prngs.CTRPrng);
         #endregion
     }
 }
+
+// Encrypt/Decrypt p/s.. with 439 and 743 params
+// Alg      Sec     Enc     Dec
+// blk      128     945     1376
+// blk      256     608     1132
+// kck      128     368     2169
+// kck      256     369     1765
+// sha      128     1240    1943
+// sha      256     1086    1671
+// ske      128     1123    1699
+// ske      256     795     1266

@@ -4,6 +4,7 @@ using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Utility;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 #endregion
 
@@ -103,11 +104,21 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="CipherParams">Encryption parameters</param>
-        public NTRUKeyGenerator(NTRUParameters CipherParams)
+        /// <param name="Prng">A fully initialized IRandom (Prng) instance; a <c>null</c> value will auto generate from CipherParams settings</param>
+        /// <param name="CipherParams">A fully initialized IDigest instance; a <c>null</c> value will auto generate from CipherParams settings</param>
+        public NTRUKeyGenerator(NTRUParameters CipherParams, IRandom Prng = null, IDigest Digest = null)
         {
             _encParams = CipherParams;
-            _dgtEngine = GetDigest(_encParams.MessageDigest);
-            _rndEngine = GetPrng(_encParams.RandomEngine);
+
+            if (Digest == null)
+                _dgtEngine = Digest;
+            else
+                _dgtEngine = GetDigest(_encParams.MessageDigest);
+
+            if (Prng == null)
+                _rndEngine = GetPrng(_encParams.RandomEngine);
+            else
+                _rndEngine = Prng;
         }
 
         private NTRUKeyGenerator()
@@ -128,12 +139,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Generates a new encryption key pair
         /// </summary>
         /// 
-        /// <param name="Parallel">Use parallel processing if available</param>
-        /// 
         /// <returns>A key pair</returns>
-        public NTRUKeyPair GenerateKeyPair(bool Parallel = true)
+        public NTRUKeyPair GenerateKeyPair()
         {
-            return GenerateKeyPair(_rndEngine, Parallel);
+            return GenerateKeyPair(_rndEngine);
         }
 
         /// <summary>
@@ -143,17 +152,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="Passphrase">The passphrase</param>
         /// <param name="Salt">Salt for the passphrase; can be <c>null</c> but this is strongly discouraged</param>
-        /// <param name="Parallel">Use parallel processing if available</param>
         /// 
         /// <returns>A key pair</returns>
-        public NTRUKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt, bool Parallel = true)
+        public NTRUKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt)
         {
             _dgtEngine.Reset();
 
             using (IRandom rnd = new PBPRng(_dgtEngine, Passphrase, Salt, 10000, false))
             {
                 IRandom rng2 = ((PBPRng)rnd).CreateBranch(_dgtEngine);
-                return GenerateKeyPair(rnd, rng2, Parallel);
+                return GenerateKeyPair(rnd, rng2);
             }
         }
 
@@ -177,12 +185,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="Rng">The random number generator to use for generating the secret polynomials f and g</param>
-        /// <param name="MultiThread">Whether to use two threads; only has an effect if more than one virtual processor is available</param>
         /// 
         /// <returns>A key pair</returns>
-        private NTRUKeyPair GenerateKeyPair(IRandom Rng, bool MultiThread)
+        private NTRUKeyPair GenerateKeyPair(IRandom Rng)
         {
-            return GenerateKeyPair(Rng, Rng, MultiThread);
+            return GenerateKeyPair(Rng, Rng);
         }
         
         /// <summary>
@@ -194,7 +201,52 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="MultiThread">Whether to use two threads; only has an effect if more than one virtual processor is available</param>
         /// 
         /// <returns>A key pair</returns>
-        private NTRUKeyPair GenerateKeyPair(IRandom RngF, IRandom RngG, bool MultiThread)
+        private NTRUKeyPair GenerateKeyPair(IRandom RngF, IRandom RngG)
+        {
+            int N = _encParams.N;
+            int q = _encParams.Q;
+            bool fastFp = _encParams.FastFp;
+            bool sparse = _encParams.Sparse;
+            TernaryPolynomialType polyType = _encParams.PolyType;
+            IPolynomial t = null;
+            IntegerPolynomial fq = null;
+            IntegerPolynomial fp = null;
+            IntegerPolynomial g = null;
+
+            if (ParallelUtils.IsParallel)
+            {
+                Action[] gA = new Action[] {
+                    new Action(()=> g = GenerateG(RngG)), 
+                    new Action(()=> GenerateFQ(RngF, out t, out fq))
+                };
+                Parallel.Invoke(gA);
+            }
+            else
+            {
+                // Choose a random g that is invertible mod q. 
+                g = GenerateG(RngG);
+                // choose a random f that is invertible mod 3 and q
+                GenerateFQ(RngF, out t, out fq);
+            }
+
+            // if fastFp=true, fp=1
+            if (fastFp)
+            {
+                fp = new IntegerPolynomial(N);
+                fp.Coeffs[0] = 1;
+            }
+
+            IntegerPolynomial h = g.Multiply(fq, q);
+            h.Mult3(q);
+            h.EnsurePositive(q);
+
+            NTRUPrivateKey priv = new NTRUPrivateKey(t, fp, N, q, sparse, fastFp, polyType);
+            NTRUPublicKey pub = new NTRUPublicKey(h, N, q);
+
+            return new NTRUKeyPair(pub, priv);
+        }
+
+        private void GenerateFQ(IRandom Rng, out IPolynomial t, out IntegerPolynomial fq)
         {
             int N = _encParams.N;
             int q = _encParams.Q;
@@ -205,13 +257,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             bool fastFp = _encParams.FastFp;
             bool sparse = _encParams.Sparse;
             TernaryPolynomialType polyType = _encParams.PolyType;
-            IPolynomial t;
-            IntegerPolynomial fq;
             IntegerPolynomial fp = null;
-            IntegerPolynomial g = null;
-
-            // Choose a random g that is invertible mod q. 
-            g = GenerateG(RngG);
 
             // choose a random f that is invertible mod 3 and q
             while (true)
@@ -223,9 +269,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 {
                     // if fastFp=true, f is always invertible mod 3
                     if (polyType == TernaryPolynomialType.SIMPLE)
-                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df, sparse, RngF);
+                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df, sparse, Rng);
                     else
-                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3, RngF);
+                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3, Rng);
 
                     f = t.ToIntegerPolynomial();
                     f.Multiply(3);
@@ -234,9 +280,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 else
                 {
                     if (polyType == TernaryPolynomialType.SIMPLE)
-                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df - 1, sparse, RngF);
+                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df - 1, sparse, Rng);
                     else
-                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3 - 1, RngF);
+                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3 - 1, Rng);
 
                     f = t.ToIntegerPolynomial();
                     fp = f.InvertF3();
@@ -250,24 +296,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 if (fq != null)
                     break;
             }
-
-            // if fastFp=true, fp=1
-            if (fastFp)
-            {
-                fp = new IntegerPolynomial(N);
-                fp.Coeffs[0] = 1;
-            }
-
-            IntegerPolynomial h = g.Multiply(fq, q);
-            h.Mult3(q);
-            h.EnsurePositive(q);
-            g.Clear();
-            fq.Clear();
-
-            NTRUPrivateKey priv = new NTRUPrivateKey(t, fp, N, q, sparse, fastFp, polyType);
-            NTRUPublicKey pub = new NTRUPublicKey(h, N, q);
-
-            return new NTRUKeyPair(pub, priv);
         }
 
         /// <remarks>
@@ -334,12 +362,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             switch (Prng)
             {
-                case Prngs.CSPRng:
-                    return new CSPRng();
                 case Prngs.CTRPrng:
                     return new CTRPrng();
                 case Prngs.DGCPrng:
                     return new DGCPrng();
+                case Prngs.CSPRng:
+                    return new CSPRng();
                 case Prngs.BBSG:
                     return new BBSG();
                 case Prngs.CCG:

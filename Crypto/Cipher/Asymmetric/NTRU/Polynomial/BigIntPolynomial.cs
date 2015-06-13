@@ -276,7 +276,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             int N = Coeffs.Length;
 
             if (Factor.Coeffs.Length != N)
-                throw new NTRUException("Number of coefficients must be the same");
+                throw new NTRUException("BigIntPolynomial:Multiply", "Number of coefficients must be the same!", new FormatException());
 
             BigIntPolynomial c = MultRecursive(Factor);
 

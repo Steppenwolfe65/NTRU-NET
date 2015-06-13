@@ -336,9 +336,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             private set
             {
                 if (value == null)
-                    throw new NTRUException("OId can not be null!");
+                    throw new NTRUException("NTRUParameters:OId", "OId can not be null!", new ArgumentNullException());
                 if (value.Length != 3)
-                    throw new NTRUException("OId must be 3 bytes in length!");
+                    throw new NTRUException("NTRUParameters:OId", "OId must be 3 bytes in length!", new ArgumentOutOfRangeException());
 
                 _oId = value;
             }
@@ -393,9 +393,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Sparse">Whether to treat ternary polynomials as sparsely populated; SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
         /// <param name="FastFp">Whether <c>f=1+p*F</c> for a ternary <c>F</c> (true) or <c>f</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
-        /// <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
+        /// <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
         public NTRUParameters(int N, int Q, int Df, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
-            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
+            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CTRPrng)
         {
             _N = N;
             _Q = Q;
@@ -437,9 +437,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Sparse">Whether to treat ternary polynomials as sparsely populated SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
         /// <param name="FastFp">Whether <c>F=1+p*F</c> for a ternary <c>F</c> (true) or <c>F</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
-        /// <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
+        /// <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
         public NTRUParameters(int N, int Q, int Df1, int Df2, int Df3, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
-            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CSPRng)
+            bool HashSeed, byte[] OId, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CTRPrng)
         {
             _N = N;
             _Q = Q;
@@ -497,9 +497,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
 
                 Initialize();
             }
-            catch
+            catch (Exception ex)
             {
-                throw new NTRUException("The stream could not be read!");
+                throw new NTRUException("NTRUParameters:CTor", "The stream could not be read!", ex);
             }
         }
 
@@ -629,7 +629,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             byte[] data = ToBytes();
 
             if (Offset + data.Length > Output.Length - Offset)
-                throw new NTRUException("The output array is too small!");
+                throw new NTRUException("NTRUParameters:WriteTo", "The output array is too small!", new ArgumentOutOfRangeException());
 
             Buffer.BlockCopy(data, 0, Output, Offset, data.Length);
         }
@@ -646,9 +646,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 using (MemoryStream stream = ToStream())
                     stream.WriteTo(Output);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUParameters:WriteTo", ex.Message, ex);
             }
         }
         #endregion

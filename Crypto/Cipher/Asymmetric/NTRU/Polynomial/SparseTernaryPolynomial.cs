@@ -82,7 +82,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
                     case 0:
                         break;
                     default:
-                        throw new NTRUException("Illegal value: " + c + ", must be one of {-1, 0, 1}");
+                        throw new NTRUException("SparseTernaryPolynomial:CTor", string.Format("Illegal value: {0}, must be one of {-1, 0, 1}", c), new FormatException());
                 }
             }
 
@@ -257,7 +257,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             int[] b = Factor.Coeffs;
             if (b.Length != _N)
-                throw new NTRUException("Number of coefficients must be the same");
+                throw new NTRUException("SparseTernaryPolynomial:Multiply", "Number of coefficients must be the same!", new FormatException());
 
             int[] c = new int[_N];
             for (int i = 0; i < _ones.Length; i++)
@@ -318,7 +318,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             BigInteger[] b = Factor.Coeffs;
 
             if (b.Length != _N)
-                throw new NTRUException("Number of coefficients must be the same");
+                throw new NTRUException("SparseTernaryPolynomial:Multiply", "Number of coefficients must be the same!", new FormatException());
 
             BigInteger[] c = new BigInteger[_N];
             for (int i = 0; i < _N; i++)

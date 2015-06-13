@@ -68,16 +68,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
             SparseTernaryPolynomial f2 = null;
             SparseTernaryPolynomial f3 = null;
 
-            /*var actionList = new List<Action> { // slower..
-                new Action(()=> f1 = SparseTernaryPolynomial.GenerateRandom(N, Df1, Df1, Rng)), 
-                new Action(()=> f2 = SparseTernaryPolynomial.GenerateRandom(N, Df2, Df2, Rng)), 
-                new Action(()=> f3 = SparseTernaryPolynomial.GenerateRandom(N, Df3Ones, Df3NegOnes, Rng))
-            };
-            //Parallel.Invoke(actionList.ToArray());
-            Parallel.ForEach(actionList, x => x());
-
-            return new ProductFormPolynomial(f1, f2, f3);*/
-
             f1 = SparseTernaryPolynomial.GenerateRandom(N, Df1, Df1, Rng);
             f2 = SparseTernaryPolynomial.GenerateRandom(N, Df2, Df2, Rng);
             f3 = SparseTernaryPolynomial.GenerateRandom(N, Df3Ones, Df3NegOnes, Rng);
@@ -118,9 +108,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
 
                 return new ProductFormPolynomial(f1, f2, f3);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("ProductFormPolynomial:FromBinary", ex.Message, ex);
             }
         }
 

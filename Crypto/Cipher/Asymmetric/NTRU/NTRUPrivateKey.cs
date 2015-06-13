@@ -170,9 +170,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                         _T = new DenseTernaryPolynomial(fInt);
                 }
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUPrivateKey:Ctor", "The Private key could not be loaded!", ex);
             }
 
             Initialize();
@@ -259,9 +259,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 using (MemoryStream stream = ToStream())
                     stream.WriteTo(Output);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUPrivateKey:WriteTo", "The key could not be written!", ex);
             }
         }
 
@@ -287,7 +287,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             byte[] data = ToBytes();
             if (Offset + data.Length > Output.Length - Offset)
-                throw new NTRUException("The output array is too small!");
+                throw new NTRUException("NTRUPrivateKey:WriteTo", "The output array is too small!", new ArgumentOutOfRangeException());
 
             Buffer.BlockCopy(data, 0, Output, Offset, data.Length);
         }

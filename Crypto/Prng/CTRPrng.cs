@@ -67,6 +67,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         private static byte[] _byteBuffer;
         private static int _bufferIndex = 0;
         private static int _bufferSize = 0;
+        private int _keySize = 0;
         private static readonly object _objLock = new object();
         #endregion
 
@@ -88,15 +89,21 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
         /// <param name="SeedEngine">The Seed engine used to create keyng material (default is CSPRsg)</param>
         /// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
-        public CTRPrng(BlockCiphers BlockEngine = BlockCiphers.RDX, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = BUFFER_SIZE)
+        /// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
+        public CTRPrng(BlockCiphers BlockEngine = BlockCiphers.RDX, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int KeySize = 0)
         {
             _engineType = BlockEngine;
             _seedType = SeedEngine;
             _byteBuffer = new byte[BufferSize];
             _bufferSize = BufferSize;
+            if (KeySize > 0)
+                _keySize = KeySize;
+            else
+                _keySize = GetKeySize(BlockEngine);
+
             Reset();
         }
-        
+
         /// <summary>
         /// Initialize the class with a Seed; note: the same seed will produce the same random output
         /// </summary>
@@ -305,10 +312,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 
             _rngEngine = GetCipher(_engineType);
             _seedGenerator = GetSeedGenerator(_seedType);
-            _rngGenerator = new CTRDrbg(_rngEngine);
+            _rngGenerator = new CTRDrbg(_rngEngine, true, _keySize);
 
             if (_seedGenerator != null)
-                _rngGenerator.Initialize(_seedGenerator.GetSeed(_rngEngine.BlockSize + GetKeySize(_engineType)));
+                _rngGenerator.Initialize(_seedGenerator.GetSeed(_rngEngine.BlockSize + _keySize));
             else
                 _rngGenerator.Initialize(_stateSeed);
 

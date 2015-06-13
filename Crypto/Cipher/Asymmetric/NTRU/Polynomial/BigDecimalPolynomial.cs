@@ -2,6 +2,7 @@
 using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Numeric;
 using VTDev.Libraries.CEXEngine.Utility;
+using System;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
@@ -129,7 +130,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         public BigDecimalPolynomial Multiply(BigIntPolynomial Factor)
         {
             if (Factor.Coeffs.Length != Coeffs.Length)
-                throw new NTRUException("Number of coefficients must be the same");
+                throw new NTRUException("BigDecimalPolynomial:Multiply", "Number of coefficients must be the same!", new FormatException());
 
             BigIntPolynomial poly1 = new BigIntPolynomial(Coeffs.Length);
 

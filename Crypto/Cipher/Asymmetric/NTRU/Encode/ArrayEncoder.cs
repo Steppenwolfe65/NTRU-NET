@@ -200,7 +200,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode
                     int coeff2 = Data[i++] + 1;
 
                     if (coeff1 == 0 && coeff2 == 0)
-                        throw new NTRUException("Illegal encoding!");
+                        throw new NTRUException("ArrayEncoder:EncodeMod3Sves", "Illegal encoding!", new InvalidDataException());
 
                     int bitTableIndex = coeff1 * 3 + coeff2;
                     chunk |= BIT1_TABLE[bitTableIndex] << chunkBits++;

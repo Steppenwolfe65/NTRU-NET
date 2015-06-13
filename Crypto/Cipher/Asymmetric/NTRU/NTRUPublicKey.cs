@@ -105,9 +105,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 _Q = IntUtils.ReadShort(KeyStream);
                 _H = IntegerPolynomial.FromBinary(KeyStream, N, Q);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUPublicKey:CTor", "The Public key could not be loaded!", ex);
             }
         }
 
@@ -193,9 +193,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 using (MemoryStream stream = ToStream())
                     stream.WriteTo(Output);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUPublicKey:WriteTo", "The Public key could not be written!", ex);
             }
         }
 

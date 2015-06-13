@@ -80,9 +80,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public NTRUKeyPair(IAsymmetricKey PublicKey, IAsymmetricKey PrivateKey)
         {
             if (!(PublicKey is NTRUPublicKey))
-                throw new NTRUException("Not a valid NTRU Public key!");
+                throw new NTRUException("NTRUKeyPair:CTor", "Not a valid NTRU Public key!", new InvalidDataException());
             if (!(PrivateKey is NTRUPrivateKey))
-                throw new NTRUException("Not a valid NTRU Private key!");
+                throw new NTRUException("NTRUKeyPair:CTor", "Not a valid NTRU Private key!", new InvalidDataException());
 
             _publicKey = (NTRUPublicKey)PublicKey;
             _privateKey = (NTRUPrivateKey)PrivateKey;
@@ -100,7 +100,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             else if (Key is NTRUPrivateKey)
                 _privateKey = (NTRUPrivateKey)PrivateKey;
             else
-                throw new NTRUException("Not a valid NTRU key!");
+                throw new NTRUException("NTRUKeyPair:CTor", "Not a valid NTRU key!", new InvalidDataException());
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             byte[] data = ToBytes();
             if (Offset + data.Length > Output.Length - Offset)
-                throw new NTRUException("The output array is too small!");
+                throw new NTRUException("NTRUKeyPair:WriteTo", "The output array is too small!", new ArgumentOutOfRangeException());
 
             Buffer.BlockCopy(data, 0, Output, Offset, data.Length);
         }
@@ -264,9 +264,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 using (MemoryStream stream = ToStream())
                     stream.WriteTo(Output);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                throw new NTRUException(e.Message);
+                throw new NTRUException("NTRUKeyPair:WriteTo", ex.Message, ex);
             }
         }
         #endregion

@@ -89,7 +89,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial
         {
             int N = Coeffs.Length;
             if (Factor.Coeffs.Length != N || _numCoeffs != Factor._numCoeffs)
-                throw new NTRUException("Number of coefficients must be the same");
+                throw new NTRUException("LongPolynomial2:Multiply", "Number of coefficients must be the same!", new FormatException());
 
             LongPolynomial2 c = MultRecursive(Factor);
 

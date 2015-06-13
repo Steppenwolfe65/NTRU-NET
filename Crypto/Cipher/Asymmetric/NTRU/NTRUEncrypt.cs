@@ -9,8 +9,6 @@ using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 #endregion
 
 #region License Information
@@ -124,7 +122,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             get
             {
                 if (_encParams == null)
-                    throw new NTRUException("The cipher must be initialized before size can be calculated!");
+                    throw new NTRUException("NTRUEncrypt:MaxCipherText", "The cipher must be initialized before size can be calculated!", new InvalidOperationException());
 
                 return _encParams.GetMaxMessageLength();
             }
@@ -170,7 +168,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public byte[] Decrypt(byte[] Input)
         {
             if (!_isInitialized)
-                throw new NTRUException("The cipher has not been initialized!");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "The cipher has not been initialized!", new InvalidOperationException());
 
             IPolynomial priv_t = ((NTRUPrivateKey)_keyPair.PrivateKey).T;
             IntegerPolynomial priv_fp = ((NTRUPrivateKey)_keyPair.PrivateKey).FP;
@@ -188,13 +186,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             IntegerPolynomial ci = Decrypt(e, priv_t, priv_fp);
 
             if (ci.Count(-1) < dm0)
-                throw new NTRUException("Less than dm0 coefficients equal -1");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "Less than dm0 coefficients equal -1", new InvalidDataException());
             if (ci.Count(0) < dm0)
-                throw new NTRUException("Less than dm0 coefficients equal 0");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "Less than dm0 coefficients equal 0", new InvalidDataException());
             if (ci.Count(1) < dm0)
-                throw new NTRUException("Less than dm0 coefficients equal 1");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "Less than dm0 coefficients equal 1", new InvalidDataException());
             //if (maxMsgLenBytes > 255)
-            //    throw new NTRUException("maxMsgLenBytes values bigger than 255 are not supported");
+            //    throw new NTRUException("NTRUEncrypt:Decrypt", "maxMsgLenBytes values bigger than 255 are not supported", new ArgumentOutOfRangeException());
 
             IntegerPolynomial cR = e;
             cR.Subtract(ci);
@@ -215,7 +213,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 int cl = reader.ReadByte() & 0xFF;
 
                 if (cl > maxMsgLenBytes)
-                    throw new NTRUException("Message too long: " + cl + ">" + maxMsgLenBytes);
+                    throw new NTRUException("NTRUEncrypt:Decrypt", string.Format("Message too long: {0} > {1}!", cl, maxMsgLenBytes), new InvalidDataException());
 
                 cm = new byte[cl];
                 reader.Read(cm, 0, cm.Length);
@@ -224,7 +222,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             }
 
             if (!Compare.AreEqual(p0, new byte[p0.Length]))
-                throw new NTRUException("The message is not followed by zeroes");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "The message is not followed by zeroes!", new InvalidDataException());
 
             byte[] sData = GetSeed(cm, pub, cb);
             IPolynomial cr = GenerateBlindingPoly(sData);
@@ -232,7 +230,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             cRPrime.ModPositive(q);
 
             if (!cRPrime.Equals(cR))
-                throw new NTRUException("Invalid message encoding");
+                throw new NTRUException("NTRUEncrypt:Decrypt", "Invalid message encoding!", new InvalidDataException());
 
             return cm;
         }
@@ -249,7 +247,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public byte[] Encrypt(byte[] Input)
         {
             if (!_isInitialized)
-                throw new NTRUException("The cipher has not been initialized!");
+                throw new NTRUException("NTRUEncrypt:Encrypt", "The cipher has not been initialized!", new InvalidOperationException());
 
             IntegerPolynomial pub = ((NTRUPublicKey)_keyPair.PublicKey).H;
             int N = _encParams.N;
@@ -266,7 +264,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             //if (maxLenBytes > 255)
             //    throw new NTRUException("len values bigger than 255 are not supported");
             if (msgLen > maxLenBytes)
-                throw new NTRUException("Message too long: " + msgLen + ">" + maxLenBytes);
+                throw new NTRUException("NTRUEncrypt:Encrypt", string.Format("Message too long: {0} > {1}!", msgLen, maxLenBytes), new InvalidDataException());
 
             while (true)
             {
@@ -346,21 +344,21 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
 
             if (!(KeyPair is NTRUKeyPair))
-                throw new NTRUException("Not a valid NTRU key pair!");
+                throw new NTRUException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
 
             _keyPair = (NTRUKeyPair)KeyPair;
 
             if (_keyPair.PublicKey == null)
-                throw new NTRUException("Not a valid NTRU key pair!");
+                throw new NTRUException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
             if (!(_keyPair.PublicKey is NTRUPublicKey))
-                throw new NTRUException("Not a valid NTRU key pair!");
+                throw new NTRUException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
 
             if (!Encryption)
             {
                 if (_keyPair.PrivateKey == null)
-                    throw new NTRUException("Not a valid NTRU key pair!");
+                    throw new NTRUException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
                 if (!(_keyPair.PrivateKey is NTRUPrivateKey))
-                    throw new NTRUException("Not a valid NTRU key pair!");
+                    throw new NTRUException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
             }
 
             _isInitialized = true;
@@ -448,12 +446,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         {
             switch (Prng)
             {
-                case Prngs.CSPRng:
-                    return new CSPRng();
                 case Prngs.CTRPrng:
                     return new CTRPrng();
                 case Prngs.DGCPrng:
                     return new DGCPrng();
+                case Prngs.CSPRng:
+                    return new CSPRng();
                 case Prngs.BBSG:
                     return new BBSG();
                 case Prngs.CCG:

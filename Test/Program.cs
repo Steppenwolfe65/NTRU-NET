@@ -11,6 +11,7 @@ using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using Test.Tests;
+using VTDev.Libraries.CEXEngine.Crypto;
 #endregion
 
 namespace Test
@@ -188,28 +189,44 @@ namespace Test
         static void DecryptionSpeed(int Iterations)
         {
             Console.WriteLine(string.Format("******Looping Decryption Test: Testing {0} Iterations******", Iterations));
-            Console.WriteLine("Test decryption times using the APR2011743FAST parameter set.");
 
-            double elapsed = RDecrypt(Iterations);
+            Console.WriteLine("Test decryption times using the APR2011439FAST parameter set.");
+            double elapsed = Decrypt(Iterations, NTRUParamSets.APR2011439FAST);
             Console.WriteLine(string.Format("{0} decryption cycles completed in: {1} ms", Iterations, elapsed));
             Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine(string.Format("Decryption Rate is {0} per second", (int)(1000.0 / (elapsed / Iterations))));
+            Console.WriteLine("");
+
+            Console.WriteLine("Test decryption times using the APR2011743FAST parameter set.");
+            elapsed = Decrypt(Iterations, NTRUParamSets.APR2011743FAST);
+            Console.WriteLine(string.Format("{0} decryption cycles completed in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine(string.Format("Decryption Rate is {0} per second", (int)(1000.0 / (elapsed / Iterations))));
             Console.WriteLine("");
         }
 
         static void EncryptionSpeed(int Iterations)
         {
             Console.WriteLine(string.Format("******Looping Encryption Test: Testing {0} Iterations******", Iterations));
-            Console.WriteLine("Test encryption times using the APR2011743FAST parameter set.");
 
-            double elapsed = REncrypt(Iterations);
+            Console.WriteLine("Test encryption times using the APR2011439FAST parameter set.");
+            double elapsed = Encrypt(Iterations, NTRUParamSets.APR2011439FAST);
             Console.WriteLine(string.Format("{0} encryption cycles completed in: {1} ms", Iterations, elapsed));
             Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine(string.Format("Encryption Rate is {0} per second", (int)(1000.0 / (elapsed / Iterations))));
+            Console.WriteLine("");
+
+            Console.WriteLine("Test encryption times using the APR2011743FAST parameter set.");
+            elapsed = Encrypt(Iterations, NTRUParamSets.APR2011743FAST);
+            Console.WriteLine(string.Format("{0} encryption cycles completed in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Ran {0} Iterations in avg. {1} ms.", Iterations, elapsed / Iterations));
+            Console.WriteLine(string.Format("Encryption Rate is {0} per second", (int)(1000.0 / (elapsed / Iterations))));
             Console.WriteLine("");
         }
 
         static void FullCycle()
         {
-            NTRUParameters mpar = NTRUParamSets.APR2011743FAST; //APR2011439FAST
+            NTRUParameters mpar = NTRUParamSets.APR2011439FAST; //APR2011743FAST
             NTRUKeyGenerator mkgen = new NTRUKeyGenerator(mpar);
             IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
             byte[] enc;
@@ -234,24 +251,26 @@ namespace Test
             Stopwatch runTimer = new Stopwatch();
             double elapsed;
 
-            elapsed = TestParameter(Iterations, NTRUParamSets.APR2011439FAST);
+            elapsed = KeyGenerator(Iterations, NTRUParamSets.APR2011439FAST);
             Console.WriteLine(string.Format("APR2011439FAST: avg. {0} ms", elapsed / Iterations, Iterations));
             Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Creation Rate is {0} keys per second", (int)(1000.0 / (elapsed / Iterations))));
             Console.WriteLine("");
 
-            elapsed = TestParameter(Iterations, NTRUParamSets.APR2011743FAST);
+            elapsed = KeyGenerator(Iterations, NTRUParamSets.APR2011743FAST);
             Console.WriteLine(string.Format("APR2011743FAST: avg. {0} ms", elapsed / Iterations, Iterations));
-            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));/**/
+            Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
+            Console.WriteLine(string.Format("Creation Rate is {0} keys per second", (int)(1000.0 / (elapsed / Iterations))));
             Console.WriteLine("");
 
-            Iterations = 10;
+            Iterations = 4;
             Console.WriteLine(string.Format("Testing each key with {0} passes:", Iterations));
             Console.WriteLine("");
 
             foreach (int p in Enum.GetValues(typeof(NTRUParamSets.NTRUParamNames)))
             {
                 NTRUParameters param = NTRUParamSets.FromName((NTRUParamSets.NTRUParamNames)p);
-                elapsed = TestParameter(Iterations, param);
+                elapsed = KeyGenerator(Iterations, param);
                 Console.WriteLine(string.Format(Enum.GetName(typeof(NTRUParamSets.NTRUParamNames), p) + ": avg. {0} ms", elapsed / Iterations, Iterations));
                 Console.WriteLine(string.Format("{0} keys created in: {1} ms", Iterations, elapsed));
                 Console.WriteLine("");
@@ -260,58 +279,30 @@ namespace Test
             Console.WriteLine("");
         }
 
-        static double TestParameter(int Iterations, NTRUParameters Param)
+        static double KeyGenerator(int Iterations, NTRUParameters Param)
+        {
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param, new CTRPrng(BlockCiphers.RDX, SeedGenerators.CSPRsg, 4096, 16)/**/);
+            IAsymmetricKeyPair akp;
+            Stopwatch runTimer = new Stopwatch();
+
+            runTimer.Start();
+            for (int i = 0; i < Iterations; i++)
+                akp = mkgen.GenerateKeyPair();
+            runTimer.Stop();
+
+            return runTimer.Elapsed.TotalMilliseconds;
+        }
+
+        static double Decrypt(int Iterations, NTRUParameters Param)
         {
             NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param);
-            IAsymmetricKeyPair akp;
-            Stopwatch runTimer = new Stopwatch();
-
-            runTimer.Start();
-            for (int i = 0; i < Iterations; i++)
-                akp = mkgen.GenerateKeyPair();
-            runTimer.Stop();
-
-            return runTimer.Elapsed.TotalMilliseconds;
-        }
-
-        static double APR2011439(int Iterations)
-        {
-            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011439FAST);
-            IAsymmetricKeyPair akp;
-            Stopwatch runTimer = new Stopwatch();
-
-            runTimer.Start();
-            for (int i = 0; i < Iterations; i++)
-                akp = mkgen.GenerateKeyPair();
-            runTimer.Stop();
-
-            return runTimer.Elapsed.TotalMilliseconds;
-        }
-
-        static double APR2011743(int Iterations)
-        {
-            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
-            IAsymmetricKeyPair akp;
-            Stopwatch runTimer = new Stopwatch();
-
-            runTimer.Start();
-            for (int i = 0; i < Iterations; i++)
-                akp = mkgen.GenerateKeyPair();
-            runTimer.Stop();
-
-            return runTimer.Elapsed.TotalMilliseconds;
-        }
-
-        static double RDecrypt(int Iterations)
-        {
-            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
             IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
             byte[] ptext = new CSPRng().GetBytes(64);
             byte[] rtext = new byte[64];
             byte[] ctext;
             Stopwatch runTimer = new Stopwatch();
 
-            using (NTRUEncrypt mpe = new NTRUEncrypt(NTRUParamSets.APR2011743FAST))
+            using (NTRUEncrypt mpe = new NTRUEncrypt(Param))
             {
                 mpe.Initialize(true, akp);
                 ctext = mpe.Encrypt(ptext);
@@ -329,15 +320,15 @@ namespace Test
             return runTimer.Elapsed.TotalMilliseconds;
         }
 
-        static double REncrypt(int Iterations)
+        static double Encrypt(int Iterations, NTRUParameters Param)
         {
-            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(NTRUParamSets.APR2011743FAST);
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param);
             IAsymmetricKeyPair akp = mkgen.GenerateKeyPair();
             byte[] ptext = new CSPRng().GetBytes(64);
             byte[] ctext;
             Stopwatch runTimer = new Stopwatch();
 
-            using (NTRUEncrypt mpe = new NTRUEncrypt(NTRUParamSets.APR2011743FAST))
+            using (NTRUEncrypt mpe = new NTRUEncrypt(Param))
             {
                 mpe.Initialize(true, akp);
 

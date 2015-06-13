@@ -108,11 +108,17 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Cipher">The block cipher</param>
         /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called</param>
-        public CTRDrbg(IBlockCipher Cipher, bool DisposeEngine = true)
+        /// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
+        public CTRDrbg(IBlockCipher Cipher, bool DisposeEngine = true, int KeySize = 0)
         {
             _disposeEngine = DisposeEngine;
             _Cipher = Cipher;
-            _keySize = GetKeySize() + COUNTER_SIZE;
+
+            if (KeySize > 0)
+                _keySize = KeySize;
+            else
+                _keySize = GetKeySize();
+
             _blockSize = _Cipher.BlockSize;
 
             ProcessorCount = Environment.ProcessorCount;
@@ -157,8 +163,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         }
 
         /// <summary>
-        /// <para>Minimum initialization key size in bytes; 
-        /// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
+        /// <para>The key size (in bytes) of the symmetric cipher</para>
         /// </summary>
         public int KeySize
         {
@@ -209,8 +214,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         {
             if (Salt == null)
                 throw new ArgumentNullException("Salt can not be null!");
-            if (Salt.Length < _keySize)
-                throw (new ArgumentOutOfRangeException("Minimum key size has not been added. Size must be at least " + _keySize + " bytes!"));
+            if (Salt.Length < _keySize + COUNTER_SIZE)
+                throw (new ArgumentOutOfRangeException(string.Format("Minimum key size has not been added. Size must be at least {0} bytes!", _keySize + COUNTER_SIZE)));
 
             _ctrVector = new byte[_blockSize];
             Buffer.BlockCopy(Salt, 0, _ctrVector, 0, _blockSize);
