@@ -96,6 +96,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         private readonly NTRUParameters _encParams;
         private bool _isDisposed;
         private IRandom _rndEngine;
+        private bool _isParallel = true;
         #endregion
         
         #region Constructor
@@ -104,21 +105,19 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="CipherParams">Encryption parameters</param>
+        /// <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
         /// <param name="Prng">A fully initialized IRandom (Prng) instance; a <c>null</c> value will auto generate from CipherParams settings</param>
         /// <param name="CipherParams">A fully initialized IDigest instance; a <c>null</c> value will auto generate from CipherParams settings</param>
-        public NTRUKeyGenerator(NTRUParameters CipherParams, IRandom Prng = null, IDigest Digest = null)
+        public NTRUKeyGenerator(NTRUParameters CipherParams, bool Parallel = true)
         {
+            if (CipherParams.RandomEngine != Prngs.CTRPrng || CipherParams.RandomEngine != Prngs.CSPRng)
+                _isParallel = false;
+            else
+                _isParallel = Parallel;
+
             _encParams = CipherParams;
-
-            if (Digest == null)
-                _dgtEngine = Digest;
-            else
-                _dgtEngine = GetDigest(_encParams.MessageDigest);
-
-            if (Prng == null)
-                _rndEngine = GetPrng(_encParams.RandomEngine);
-            else
-                _rndEngine = Prng;
+            _dgtEngine = GetDigest(_encParams.MessageDigest);
+            _rndEngine = GetPrng(_encParams.RandomEngine);
         }
 
         private NTRUKeyGenerator()
@@ -213,11 +212,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             IntegerPolynomial fp = null;
             IntegerPolynomial g = null;
 
-            if (ParallelUtils.IsParallel)
+            if (ParallelUtils.IsParallel && _isParallel)
             {
                 Action[] gA = new Action[] {
                     new Action(()=> g = GenerateG(RngG)), 
-                    new Action(()=> GenerateFQ(RngF, out t, out fq))
+                    new Action(()=> GenerateFQ(RngF, out t, out fq, out fp))
                 };
                 Parallel.Invoke(gA);
             }
@@ -226,7 +225,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 // Choose a random g that is invertible mod q. 
                 g = GenerateG(RngG);
                 // choose a random f that is invertible mod 3 and q
-                GenerateFQ(RngF, out t, out fq);
+                GenerateFQ(RngF, out t, out fq, out fp);
             }
 
             // if fastFp=true, fp=1
@@ -246,7 +245,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             return new NTRUKeyPair(pub, priv);
         }
 
-        private void GenerateFQ(IRandom Rng, out IPolynomial t, out IntegerPolynomial fq)
+        private void GenerateFQ(IRandom Rng, out IPolynomial t, out IntegerPolynomial fq, out IntegerPolynomial fp)
         {
             int N = _encParams.N;
             int q = _encParams.Q;
@@ -257,7 +256,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             bool fastFp = _encParams.FastFp;
             bool sparse = _encParams.Sparse;
             TernaryPolynomialType polyType = _encParams.PolyType;
-            IntegerPolynomial fp = null;
+            fp = null;
 
             // choose a random f that is invertible mod 3 and q
             while (true)

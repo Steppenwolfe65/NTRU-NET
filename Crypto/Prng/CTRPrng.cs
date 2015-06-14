@@ -92,6 +92,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
         public CTRPrng(BlockCiphers BlockEngine = BlockCiphers.RDX, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int KeySize = 0)
         {
+            if (BufferSize < 64)
+                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+
             _engineType = BlockEngine;
             _seedType = SeedEngine;
             _byteBuffer = new byte[BufferSize];
@@ -114,8 +117,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// 
         /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
         /// <exception cref="ArgumentException">Thrown if the seed is too small</exception>
-        public CTRPrng(byte[] Seed, BlockCiphers BlockEngine = BlockCiphers.RDX, int BufferSize = BUFFER_SIZE)
+        public CTRPrng(byte[] Seed, BlockCiphers BlockEngine = BlockCiphers.RDX, int BufferSize = 4096)
         {
+            if (BufferSize < 64)
+                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
             if (Seed == null)
                 throw new ArgumentNullException("Seed can not be null!");
             if (GetKeySize(BlockEngine) < Seed.Length)

@@ -281,7 +281,7 @@ namespace Test
 
         static double KeyGenerator(int Iterations, NTRUParameters Param)
         {
-            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param, new CTRPrng(BlockCiphers.RDX, SeedGenerators.CSPRsg, 4096, 16)/**/);
+            NTRUKeyGenerator mkgen = new NTRUKeyGenerator(Param);
             IAsymmetricKeyPair akp;
             Stopwatch runTimer = new Stopwatch();
 

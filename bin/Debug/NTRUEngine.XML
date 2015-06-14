@@ -2568,6 +2568,9 @@
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial.IntegerPolynomial.Resultant">
             <summary>
             Resultant of this polynomial with <c>x^n-1</c> using a probabilistic algorithm.
+            </summary>
+            
+            <remarks>
             <para>Unlike EESS, this implementation does not compute all resultants modulo primes
             such that their product exceeds the maximum possible resultant, but rather stops
             when <c>NUM_EQUAL_RESULTANTS</c> consecutive modular resultants are equal.
@@ -2575,7 +2578,7 @@
             about 1 out of 100 cases when <c>N=439</c> and <c>NUM_EQUAL_RESULTANTS=2</c>,
             so the likelyhood of leaving the loop too early is <c>(1/100)^(NUM_EQUAL_RESULTANTS-1)</c>.</para>
             <para>Because of the above, callers must verify the output and try a different polynomial if necessary.</para>
-            </summary>
+            </remarks>
             
             <returns>Returns <c>(rho, res)</c> satisfying <c>res = rho*this + t*(x^n-1)</c> for some integer <c>t</c>.</returns>
         </member>
@@ -3374,7 +3377,26 @@
         <member name="T:VTDev.Libraries.CEXEngine.Utility.ParallelUtils">
             <summary>
             This class is a utility class for parallel processing
+            <para>http://blogs.msdn.com/b/pfxteam/archive/2009/08/12/9867246.aspx</para>
             </summary>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ParallelUtils.Loop(System.Threading.Tasks.ParallelOptions,System.Func{System.Boolean},System.Action{System.Threading.Tasks.ParallelLoopState})">
+            <summary>
+            An infinite parallel loop function
+            </summary>
+            
+            <param name="Options">The parallel options</param>
+            <param name="Condition">The while conditional</param>
+            <param name="Body">The functions body</param>
+        </member>
+        <member name="M:VTDev.Libraries.CEXEngine.Utility.ParallelUtils.While(System.Threading.Tasks.ParallelOptions,System.Func{System.Boolean},System.Action{System.Threading.Tasks.ParallelLoopState})">
+            <summary>
+            A parallel While function
+            </summary>
+            
+            <param name="Options">The parallel options</param>
+            <param name="Condition">The while conditional</param>
+            <param name="Body">The functions body</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ParallelUtils.While(System.Func{System.Boolean},System.Action)">
             <summary>
@@ -3383,6 +3405,11 @@
             
             <param name="Condition">The while conditional</param>
             <param name="Body">The functions body</param>
+        </member>
+        <member name="P:VTDev.Libraries.CEXEngine.Utility.ParallelUtils.ForceLinear">
+            <summary>
+            Get/Set: Force uni-processing (IsParallel returns false)
+            </summary>
         </member>
         <member name="P:VTDev.Libraries.CEXEngine.Utility.ParallelUtils.IsParallel">
             <summary>
@@ -3679,28 +3706,29 @@
             </list>
             </remarks>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters,System.Boolean)">
             <summary>
             Constructs a new instance with a set of encryption parameters
             </summary>
             
             <param name="CipherParams">Encryption parameters</param>
+            <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
+            <param name="Prng">A fully initialized IRandom (Prng) instance; a <c>null</c> value will auto generate from CipherParams settings</param>
+            <param name="CipherParams">A fully initialized IDigest instance; a <c>null</c> value will auto generate from CipherParams settings</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.Finalize">
             <summary>
             Finalize objects
             </summary>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair">
             <summary>
             Generates a new encryption key pair
             </summary>
             
-            <param name="Parallel">Use parallel processing if available</param>
-            
             <returns>A key pair</returns>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(System.Byte[],System.Byte[],System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(System.Byte[],System.Byte[])">
             <summary>
             Generates an encryption key pair using a passphrase based drbg.
             <para>Invoking this method with the same passphrase and salt will always return the same key pair.</para>
@@ -3708,7 +3736,6 @@
             
             <param name="Passphrase">The passphrase</param>
             <param name="Salt">Salt for the passphrase; can be <c>null</c> but this is strongly discouraged</param>
-            <param name="Parallel">Use parallel processing if available</param>
             
             <returns>A key pair</returns>
         </member>
@@ -3721,17 +3748,16 @@
             
             <returns>A new salt vector</returns>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom,System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom)">
             <summary>
             Generates a new encryption key pair
             </summary>
             
             <param name="Rng">The random number generator to use for generating the secret polynomials f and g</param>
-            <param name="MultiThread">Whether to use two threads; only has an effect if more than one virtual processor is available</param>
             
             <returns>A key pair</returns>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom,VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom,System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyGenerator.GenerateKeyPair(VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom,VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom)">
             <summary>
             Generates a new encryption key pair
             </summary>
@@ -4962,15 +4988,6 @@
             
             <typeparam name="T">Type of array</typeparam>
             <param name="Source">The list instance</param>
-        </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Shuffle``1(``0[],VTDev.Libraries.CEXEngine.Crypto.Prng.PBPRng)">
-            <summary>
-            Shuffle an array with a PBPRng generator
-            </summary>
-            
-            <typeparam name="T">Type of list</typeparam>
-            <param name="Source">The list instance</param>
-            <param name="Rng">The pseudo random generator</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Utility.ArrayEx.Shuffle``1(``0[],VTDev.Libraries.CEXEngine.Crypto.Prng.IRandom)">
             <summary>
@@ -6448,7 +6465,7 @@
             A set of pre-defined EES encryption parameter sets 
             based on <see href="https://github.com/tbuktu/ntru/blob/master/src/main/java/net/sf/ntru/encrypt/EncryptionParameters.java">EncryptionParameters.java</see>.
             <para>Note: Sets starting with 'A' (ex. A2011439), are the recommended sets from the original author. Sets pre-fixed with 'F' (ex. FE1087EP2) are the fast polynomial versions. 
-            Sets prefixed with 'Z' (ex. ZCX1931) are experimental!; they use larger N, df, and dm values, and a 1024 bit digest for the IGF and mask.</para>
+            Sets prefixed with 'Z' (ex. ZCX1931) are experimental!; they use larger N, df, and dm values, and a 512 bit digest for the IGF and mask.</para>
             </summary>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.FromId(System.Byte[],System.Boolean)">
@@ -6474,16 +6491,16 @@
             
             <exception cref="!:MPKCException">Thrown if an invalid or unknown OId is used.</exception>
         </member>
-        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1931SK1024">
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1931SH512">
             <summary>
             Just an experiment, do not use!
-            <para>n:1931, q:2048, df:380, skein1024</para>
+            <para>n:1931, q:2048, df:380, SHA512</para>
             </summary>
         </member>
-        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1861SK1024">
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.ZCX1861SH512">
             <summary>
             Just an experiment, do not use!
-            <para>n:1861, q:2048, df:290, skein1024</para>
+            <para>n:1861, q:2048, df:290, SHA512</para>
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.EES1087EP2">
@@ -6544,13 +6561,13 @@
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.ZCX1931">
             <summary>
             Just an experiment, use at your own risk!
-            <para>n:1931, q:2048, df:380, skein1024</para>
+            <para>n:1931, q:2048, df:380, SHA512</para>
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.ZCX1861">
             <summary>
             Just an experiment, use at your own risk!
-            <para>n:1861, q:2048, df:290, skein1024</para>
+            <para>n:1861, q:2048, df:290, SHA512</para>
             </summary>
         </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.E1087EP2">
@@ -6593,14 +6610,14 @@
             A product-form version of <c>EES1499EP1</c>
             </summary>
         </member>
-        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FA2011439">
-            <summary>
-            Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
-            </summary>
-        </member>
         <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FA2011743">
             <summary>
             Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
+            </summary>
+        </member>
+        <member name="F:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParamSets.NTRUParamNames.FA2011439">
+            <summary>
+            Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
             </summary>
         </member>
         <member name="T:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricParameters">
@@ -7707,7 +7724,7 @@
             <param name="Sparse">Whether to treat ternary polynomials as sparsely populated; SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
             <param name="FastFp">Whether <c>f=1+p*F</c> for a ternary <c>F</c> (true) or <c>f</c> is ternary (false)</param>
             <param name="Digest">The Message Digest engine to use; default is SHA512</param>
-            <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
+            <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean,System.Byte[],System.Boolean,System.Boolean,VTDev.Libraries.CEXEngine.Crypto.Digests,VTDev.Libraries.CEXEngine.Crypto.Prngs)">
             <summary>
@@ -7730,7 +7747,7 @@
             <param name="Sparse">Whether to treat ternary polynomials as sparsely populated SparseTernaryPolynomial vs DenseTernaryPolynomial</param>
             <param name="FastFp">Whether <c>F=1+p*F</c> for a ternary <c>F</c> (true) or <c>F</c> is ternary (false)</param>
             <param name="Digest">The Message Digest engine to use; default is SHA512</param>
-            <param name="Random">The pseudo random generator engine to use; default is CSPRng</param>
+            <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters.#ctor(System.IO.Stream)">
             <summary>
@@ -8679,7 +8696,7 @@
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial.ProductFormPolynomial.FromBinary(System.Byte[],System.Int32)">
             <summary>
-            Decodes a byte array encoded with {@link #toBinary()} to a polynomial.
+            Decodes a byte array encoded with ToBinary() to a polynomial.
             </summary>
             
             <param name="Data">An encoded <c>ProductFormPolynomial</c></param>
@@ -16114,7 +16131,7 @@
             </list>
             </remarks>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.CTRPrng.#ctor(VTDev.Libraries.CEXEngine.Crypto.BlockCiphers,VTDev.Libraries.CEXEngine.Crypto.SeedGenerators,System.Int32)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.CTRPrng.#ctor(VTDev.Libraries.CEXEngine.Crypto.BlockCiphers,VTDev.Libraries.CEXEngine.Crypto.SeedGenerators,System.Int32,System.Int32)">
             <summary>
             Initialize the class
             </summary>
@@ -16122,6 +16139,7 @@
             <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
             <param name="SeedEngine">The Seed engine used to create keyng material (default is CSPRsg)</param>
             <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
+            <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Prng.CTRPrng.#ctor(System.Byte[],VTDev.Libraries.CEXEngine.Crypto.BlockCiphers,System.Int32)">
             <summary>
@@ -16256,7 +16274,7 @@
             <item><description>Can be initialized with any block <see cref="!:VTDev.Libraries.CEXEngine.Crypto.SymmetricEngines">cipher</see>.</description></item>
             <item><description>Parallelized by default on a multi processer system when an input byte array of <see cref="P:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.ParallelMinimumSize"/> bytes or larger is used.</description></item>
             <item><description>Parallelization can be disabled using the <see cref="P:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.IsParallel"/> property.</description></item>
-            <item><description>The <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block.IBlockCipher,System.Boolean)">Constructors</see> DisposeEngine parameter determines if Cipher engine is destroyed when <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.Dispose"/> is called on this class; default is <c>true</c>.</description></item>
+            <item><description>The <see cref="!:CTRDrbg(IBlockCipher, bool)">Constructors</see> DisposeEngine parameter determines if Cipher engine is destroyed when <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.Dispose"/> is called on this class; default is <c>true</c>.</description></item>
             <item><description>Combination of [Salt, Ikm, Nonce] must be: cipher key size +  cipher block size in length.</description></item>
             <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
             </list>
@@ -16270,13 +16288,14 @@
             </list>
             </remarks>
         </member>
-        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block.IBlockCipher,System.Boolean)">
+        <member name="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.#ctor(VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block.IBlockCipher,System.Boolean,System.Int32)">
             <summary>
             Creates a CTR Bytes Generator using a block cipher
             </summary>
             
             <param name="Cipher">The block cipher</param>
             <param name="DisposeEngine">Dispose of digest engine when <see cref="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.Dispose"/> on this class is called</param>
+            <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
         </member>
         <member name="M:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.Finalize">
             <summary>
@@ -16362,8 +16381,7 @@
         </member>
         <member name="P:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.KeySize">
             <summary>
-            <para>Minimum initialization key size in bytes; 
-            combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
+            <para>The key size (in bytes) of the symmetric cipher</para>
             </summary>
         </member>
         <member name="P:VTDev.Libraries.CEXEngine.Crypto.Generator.CTRDrbg.ParallelMaximumSize">

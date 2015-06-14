@@ -85,12 +85,12 @@ namespace Test.Tests.Encrypt
                 else
                     param.MessageDigest = Digests.Skein512;//skein512
 
+                NTRUKeyPair kp;
+                using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+                    kp = kg.GenerateKeyPair();
+
                 using (NTRUEncrypt ntru = new NTRUEncrypt(param))
                 {
-                    NTRUKeyPair kp;
-                    using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                        kp = kg.GenerateKeyPair();
-
                     byte[] plainText = rng.GetBytes(32);
                     ntru.Initialize(true, kp);
                     byte[] encrypted = ntru.Encrypt(plainText);
@@ -183,11 +183,11 @@ namespace Test.Tests.Encrypt
         // params must have df1..df3 and dr1..dr3 set as well as df and dr 
         private void EncryptDecrypt(NTRUParameters param)
         {
-            NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUKeyPair kp;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
                 kp = kg.GenerateKeyPair();
 
+            NTRUEncrypt ntru = new NTRUEncrypt(param);
             TextTest(ntru, kp, param);
             // sparse/dense
             param.Sparse = !param.Sparse;
@@ -198,6 +198,7 @@ namespace Test.Tests.Encrypt
             TooLong(ntru, kp, param);
 
             kp.Dispose();
+            ntru.Dispose();
         }
 
         // encrypts and decrypts text
@@ -318,24 +319,25 @@ namespace Test.Tests.Encrypt
         private void GenerateKeyPair()
         {
             NTRUParameters param = (NTRUParameters)NTRUParamSets.EES1087EP2FAST.Clone();
-            NTRUEncrypt ntru = new NTRUEncrypt(param);
-            NTRUEncrypt ntru2 = new NTRUEncrypt(NTRUParamSets.EES1087EP2FAST);
             byte[] passphrase = Encoding.Unicode.GetBytes("password123");
-            byte[] salt = ntru.GenerateSalt();
+            byte[] salt = new CSPRng().GetBytes(16);
 
             NTRUKeyPair kp1;
-            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false)) // note: parallel must be turned off with passphrase prng
                 kp1 = kg.GenerateKeyPair(passphrase, salt);
             NTRUKeyPair kp2;
-            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
                 kp2 = kg.GenerateKeyPair(passphrase, salt);
+
+            NTRUEncrypt ntru = new NTRUEncrypt(param);
+            NTRUEncrypt ntru2 = new NTRUEncrypt(NTRUParamSets.EES1087EP2FAST);
 
             if (!kp1.Equals(kp2))
                 throw new Exception("NtruEncryptTest: key pair generation test failed!");
 
             salt = ntru.GenerateSalt();
             NTRUKeyPair kp3;
-            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
                 kp3 = kg.GenerateKeyPair(passphrase, salt);
 
             if (!Compare.False(kp1.Equals(kp3)))
@@ -359,11 +361,11 @@ namespace Test.Tests.Encrypt
 
             foreach (NTRUParameters param in paramSets)
             {
-                NTRUEncrypt ntru = new NTRUEncrypt(param);
                 NTRUKeyPair kp;
                 using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
                     kp = kg.GenerateKeyPair();
 
+                NTRUEncrypt ntru = new NTRUEncrypt(param);
                 ntru.Initialize(true, kp);
                 byte[] encrypted = ntru.Encrypt(plainText);
                 if (!Compare.Equals(param.GetOutputLength(), encrypted.Length))

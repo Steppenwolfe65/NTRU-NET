@@ -104,7 +104,7 @@ namespace Test.Tests.Encrypt
         private void Encode(NTRUParameters param)
         {
             NTRUKeyPair kp;
-            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
+            using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
                 kp = kg.GenerateKeyPair();
 
             // encode to byte[] and reconstruct

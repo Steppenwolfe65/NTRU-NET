@@ -805,9 +805,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public object Clone()
         {
             if (_polyType == TernaryPolynomialType.SIMPLE)
-                return new NTRUParameters(N, Q, DF, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _oId, _sparseMode, FastFp, _messageDigest);
+                return new NTRUParameters(N, Q, DF, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _oId, _sparseMode, FastFp, _messageDigest, _randomEngine);
             else
-                return new NTRUParameters(N, Q, DF1, DF2, DF3, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _oId, _sparseMode, FastFp, _messageDigest);
+                return new NTRUParameters(N, Q, DF1, DF2, DF3, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _oId, _sparseMode, FastFp, _messageDigest, _randomEngine);
         }
         #endregion
 
