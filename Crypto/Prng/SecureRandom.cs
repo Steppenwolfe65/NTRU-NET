@@ -63,11 +63,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 
         #region Fields
         private bool _isDisposed = false;
-        private static RNGCryptoServiceProvider _rngEngine;
-        private static byte[] _byteBuffer;
-        private static int _bufferIndex = 0;
-        private static int _bufferSize = 0;
-        private static readonly object _objLock = new object();
+        private RNGCryptoServiceProvider _rngEngine;
+        private byte[] _byteBuffer;
+        private int _bufferIndex = 0;
+        private int _bufferSize = 0;
+        private object _objLock = new object();
         #endregion
 
         #region Constructor

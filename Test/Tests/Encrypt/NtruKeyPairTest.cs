@@ -77,7 +77,7 @@ namespace Test.Tests.Encrypt
             foreach (NTRUParameters ep in paramSets)
             {
                 NTRUKeyGenerator ntru = new NTRUKeyGenerator(ep);
-                NTRUKeyPair kp1 = ntru.GenerateKeyPair();
+                NTRUKeyPair kp1 = (NTRUKeyPair)ntru.GenerateKeyPair();
                 if (!Compare.True(kp1.IsValid()))
                     throw new Exception("NtruKeyPair generated key pair is invalid!");
             }
@@ -105,7 +105,7 @@ namespace Test.Tests.Encrypt
         {
             NTRUKeyPair kp;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
-                kp = kg.GenerateKeyPair();
+                kp = (NTRUKeyPair)kg.GenerateKeyPair();
 
             // encode to byte[] and reconstruct
             byte[] enc = kp.ToBytes();

@@ -67,10 +67,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         private SeedGenerators _seedType;
         private DGCDrbg _rngGenerator;
         private byte[] _stateSeed;
-        private static byte[] _byteBuffer;
-        private static int _bufferIndex = 0;
-        private static int _bufferSize = 0;
-        private static readonly object _objLock = new object();
+        private byte[] _byteBuffer;
+        private int _bufferIndex = 0;
+        private int _bufferSize = 0;
+        private object _objLock = new object();
         #endregion
 
         #region Properties

@@ -6,6 +6,8 @@ using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Utility;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -62,6 +64,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// <revision date="2015/01/23" version="1.0.0.0">Initial release</revision>
     /// </revisionHistory>
     /// 
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyPair">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUKeyPair Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUPublicKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUPublicKey Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUPrivateKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUPrivateKey Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUParameters Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricCipher">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricCipher Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricKeyPair">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricKeyPair Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricKey Class</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto.Digests Enumeration</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Prngs">VTDev.Libraries.CEXEngine.Crypto.Prngs Enumeration</seealso>
     /// 
@@ -89,13 +98,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// the NTRUOpenSourceProject/ntru-crypto project provided by Security Innovation, Inc: <see href="https://github.com/NTRUOpenSourceProject/ntru-crypto">Release 1.2</see>.</description></item>
     /// </list>
     /// </remarks>
-    public sealed class NTRUKeyGenerator : IDisposable
+    public sealed class NTRUKeyGenerator : IAsymmetricGenerator
     {
         #region Fields
         private IDigest _dgtEngine;
         private readonly NTRUParameters _encParams;
         private bool _isDisposed;
-        private IRandom _rndEngine;
+        private IRandom _rngEngine;
         private bool _isParallel = true;
         #endregion
         
@@ -106,8 +115,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="CipherParams">Encryption parameters</param>
         /// <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
-        /// <param name="Prng">A fully initialized IRandom (Prng) instance; a <c>null</c> value will auto generate from CipherParams settings</param>
-        /// <param name="CipherParams">A fully initialized IDigest instance; a <c>null</c> value will auto generate from CipherParams settings</param>
         public NTRUKeyGenerator(NTRUParameters CipherParams, bool Parallel = true)
         {
             if (CipherParams.RandomEngine != Prngs.CTRPrng || CipherParams.RandomEngine != Prngs.CSPRng)
@@ -117,7 +124,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
 
             _encParams = CipherParams;
             _dgtEngine = GetDigest(_encParams.MessageDigest);
-            _rndEngine = GetPrng(_encParams.RandomEngine);
+            _rngEngine = GetPrng(_encParams.RandomEngine);
         }
 
         private NTRUKeyGenerator()
@@ -139,9 +146,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <returns>A key pair</returns>
-        public NTRUKeyPair GenerateKeyPair()
+        public IAsymmetricKeyPair GenerateKeyPair()
         {
-            return GenerateKeyPair(_rndEngine);
+            return GenerateKeyPair(_rngEngine);
         }
 
         /// <summary>
@@ -152,8 +159,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Passphrase">The passphrase</param>
         /// <param name="Salt">Salt for the passphrase; can be <c>null</c> but this is strongly discouraged</param>
         /// 
-        /// <returns>A key pair</returns>
-        public NTRUKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt)
+        /// <returns>A populated IAsymmetricKeyPair</returns>
+        public IAsymmetricKeyPair GenerateKeyPair(byte[] Passphrase, byte[] Salt)
         {
             _dgtEngine.Reset();
 
@@ -186,7 +193,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Rng">The random number generator to use for generating the secret polynomials f and g</param>
         /// 
         /// <returns>A key pair</returns>
-        private NTRUKeyPair GenerateKeyPair(IRandom Rng)
+        private IAsymmetricKeyPair GenerateKeyPair(IRandom Rng)
         {
             return GenerateKeyPair(Rng, Rng);
         }
@@ -197,10 +204,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="RngF">The random number generator to use for generating the secret polynomial f</param>
         /// <param name="RngG">The random number generator to use for generating the secret polynomial g</param>
-        /// <param name="MultiThread">Whether to use two threads; only has an effect if more than one virtual processor is available</param>
         /// 
         /// <returns>A key pair</returns>
-        private NTRUKeyPair GenerateKeyPair(IRandom RngF, IRandom RngG)
+        private IAsymmetricKeyPair GenerateKeyPair(IRandom RngF, IRandom RngG)
         {
             int N = _encParams.N;
             int q = _encParams.Q;
@@ -346,7 +352,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 case Digests.Skein1024:
                     return new Skein1024();
                 default:
-                    throw new ArgumentException("The digest type is not supported!");
+                    throw new NTRUException("NTRUKeyGenerator:GetDigest", "The digest type is not supported!", new ArgumentException());
             }
         }
 
@@ -378,7 +384,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 case Prngs.QCG2:
                     return new QCG2();
                 default:
-                    throw new ArgumentException("The Prng type is not supported!");
+                    throw new NTRUException("NTRUKeyGenerator:GetDigest", "The Prng type is not supported!", new ArgumentException());
             }
         }
         #endregion
@@ -404,10 +410,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                         _dgtEngine.Dispose();
                         _dgtEngine = null;
                     }
-                    if (_rndEngine != null)
+                    if (_rngEngine != null)
                     {
-                        _rndEngine.Dispose();
-                        _rndEngine = null;
+                        _rngEngine.Dispose();
+                        _rngEngine = null;
                     }
                 }
                 catch { }

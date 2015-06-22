@@ -49,15 +49,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         public enum NTRUParamNames : int
         {
             /// <summary>
-            /// Just an experiment, use at your own risk!
+            /// Experimental, use with caution.
             /// <para>n:1931, q:2048, df:380, SHA512</para>
             /// </summary>
-            ZCX1931,
+            CX1931,
             /// <summary>
-            /// Just an experiment, use at your own risk!
+            /// Experimental, use with caution.
             /// <para>n:1861, q:2048, df:290, SHA512</para>
             /// </summary>
-            ZCX1861,
+            CX1861,
             /// <summary>
             /// A conservative (in terms of security) parameter set that gives 256 bits of security and is optimized for key size.
             /// </summary>
@@ -111,7 +111,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <returns>A parameter set</returns>
         /// 
-        /// <exception cref="MPKCException">Thrown if an invalid or unknown OId is used.</exception>
+        /// <exception cref="NTRUException">Thrown if an invalid or unknown OId is used</exception>
         public static NTRUParameters FromId(byte[] OId, bool UseProduct = true)
         {
             if (OId == null)
@@ -147,9 +147,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 else if (OId[2] == 105)
                     return (NTRUParameters)APR2011743.Clone();
                 else if (OId[2] == 7)
-                    return (NTRUParameters)ZCX1861SH512.Clone();
+                    return (NTRUParameters)CX1861SH512.Clone();
                 else if (OId[2] == 8)
-                    return (NTRUParameters)ZCX1931SH512.Clone();
+                    return (NTRUParameters)CX1931SH512.Clone();
             }
 
             throw new NTRUException("NTRUParameters:FromId", "OId does not identify a valid param set!", new ArgumentException());
@@ -163,7 +163,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <returns>A populated parameter set</returns>
         /// 
-        /// <exception cref="MPKCException">Thrown if an invalid or unknown OId is used.</exception>
+        /// <exception cref="NTRUException">Thrown if an invalid or unknown OId is used</exception>
         public static NTRUParameters FromName(NTRUParamNames Name)
         {
             switch (Name)
@@ -188,12 +188,54 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                     return (NTRUParameters)EES1171EP1FAST.Clone();
                 case NTRUParamNames.FE1499EP1:
                     return (NTRUParameters)EES1499EP1FAST.Clone();
-                case NTRUParamNames.ZCX1861:
-                    return (NTRUParameters)ZCX1861SH512.Clone();
-                case NTRUParamNames.ZCX1931:
-                    return (NTRUParameters)ZCX1931SH512.Clone();
+                case NTRUParamNames.CX1861:
+                    return (NTRUParameters)CX1861SH512.Clone();
+                case NTRUParamNames.CX1931:
+                    return (NTRUParameters)CX1931SH512.Clone();
                 default:
-                    return (NTRUParameters)APR2011743FAST.Clone();
+                    throw new NTRUException("NTRUParameters:FromName", "The enumeration name is unknown!", new ArgumentException());
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the OId for a parameter set
+        /// </summary>
+        /// 
+        /// <param name="Name">The enumeration name</param>
+        /// 
+        /// <returns>The parameters 3 byte OId</returns>
+        /// 
+        /// <exception cref="NTRUException">Thrown if an invalid name is used</exception>
+        public static byte[] GetID(NTRUParamNames Name)
+        {
+            switch (Name)
+            {
+                case NTRUParamNames.A2011439:
+                    return new byte[] { 0, 7, 101 };
+                case NTRUParamNames.A2011743:
+                    return new byte[] { 0, 7, 105 };
+                case NTRUParamNames.E1087EP2:
+                    return new byte[] { 0, 6, 3 };
+                case NTRUParamNames.E1171EP1:
+                    return new byte[] { 0, 6, 4 };
+                case NTRUParamNames.E1499EP1:
+                    return new byte[] { 0, 6, 5 };
+                case NTRUParamNames.FA2011439:
+                    return new byte[] { 0, 7, 101 };
+                case NTRUParamNames.FA2011743:
+                    return new byte[] { 0, 7, 105 };
+                case NTRUParamNames.FE1087EP2:
+                    return new byte[] { 0, 6, 3 };
+                case NTRUParamNames.FE1171EP1:
+                    return new byte[] { 0, 6, 4 };
+                case NTRUParamNames.FE1499EP1:
+                    return new byte[] { 0, 6, 5 };
+                case NTRUParamNames.CX1861:
+                    return new byte[] { 0, 7, 7 };
+                case NTRUParamNames.CX1931:
+                    return new byte[] { 0, 8, 8 };
+                default:
+                    throw new NTRUException("NTRUParameters:FromName", "The enumeration name is unknown!", new ArgumentException());
             }
         }
         #endregion
@@ -201,15 +243,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         #region Parameter Sets
         // Note: max message size is calculation of N and Db; (N*3/2/8 - Length-Db/8). Max bytes: EES1087EP2:170, EES1171EP1:186, EES1499EP1:248, APR2011439:65, APR2011743:106
         /// <summary>
-        /// Just an experiment, do not use!
-        /// <para>n:1931, q:2048, df:380, SHA512</para>
+        /// 
+        /// <para>Experimental, use with caution. n:1931, q:2048, df:380, SHA512</para>
         /// </summary>
-        public static readonly NTRUParameters ZCX1931SH512 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.SHA512, Prngs.CTRPrng);
+        public static readonly NTRUParameters CX1931SH512 = new NTRUParameters(1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, new byte[] { 0, 8, 8 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
-        /// Just an experiment, do not use!
-        /// <para>n:1861, q:2048, df:290, SHA512</para>
+        /// 
+        /// <para>Experimental, use with caution. n:1861, q:2048, df:290, SHA512</para>
         /// </summary>
-        public static readonly NTRUParameters ZCX1861SH512 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.SHA512, Prngs.CTRPrng);
+        public static readonly NTRUParameters CX1861SH512 = new NTRUParameters(1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, new byte[] { 0, 7, 7 }, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is optimized for key size.
         /// </summary>
@@ -254,7 +296,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     }
 }
 
-// Encrypt/Decrypt p/s.. with 439 and 743 params
+// Encrypt/Decrypt p/s.. with 439 and 743 params, amd2600
 // Alg      Sec     Enc     Dec
 // blk      128     945     1376
 // blk      256     608     1132

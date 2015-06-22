@@ -40,11 +40,10 @@ using VTDev.Libraries.CEXEngine.Utility;
 // contact: develop@vtdev.com
 #endregion
 
-
 namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
 {
     /// <summary>
-    /// Encrypts and decrypts data.
+    /// Encrypts and decrypts a message.
     /// <para>The parameter "p" is hardcoded to 3.</para>
     /// </summary>
     /// 
@@ -57,7 +56,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// using (NtruEncrypt ntru = new NtruEncrypt(param))
     /// {
     ///     // encrypt
-    ///     byte[] encrypted = ntru.Encrypt(plain-text, kp.PublicKey);
+    ///     byte[] encrypted = ntru.Encrypt(plaintext, kp.PublicKey);
     ///     // decrypt
     ///     byte[] decrypted = ntru.Decrypt(encrypted, kp);
     /// }
@@ -68,6 +67,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// <revision date="2015/01/23" version="1.0.0.0">Initial release</revision>
     /// </revisionHistory>
     /// 
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUKeyPair">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUKeyPair Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUPublicKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUPublicKey Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUPrivateKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUPrivateKey Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.NTRUParameters">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU NTRUParameters Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricCipher">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricCipher Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricKeyPair">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricKeyPair Class</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces.IAsymmetricKey">VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces IAsymmetricKey Class</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto.Digests Enumeration</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Prngs">VTDev.Libraries.CEXEngine.Crypto.Prngs Enumeration</seealso>
     /// 
@@ -102,7 +108,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// the NTRUOpenSourceProject/ntru-crypto project provided by Security Innovation, Inc: <see href="https://github.com/NTRUOpenSourceProject/ntru-crypto">Release 1.2</see>.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class NTRUEncrypt : IAsymmetricCipher, IDisposable
+    public sealed class NTRUEncrypt : IAsymmetricCipher
     {
         #region Fields
         private IDigest _dgtEngine;
@@ -117,7 +123,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <summary>
         /// Get: The maximum number of bytes the cipher can encrypt
         /// </summary>
-        public int MaxCipherText
+        /// 
+        /// <exception cref="NTRUException">Thrown if the cipher is not initialized</exception>
+        public int MaxPlainText
         {
             get
             {
@@ -340,6 +348,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="Encryption">When true cipher is for encryption, if false, decryption</param>
         /// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the NTRU public or private key</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if a key is invalid</exception>
         public void Initialize(bool Encryption, IAsymmetricKeyPair KeyPair)
         {
 
@@ -431,7 +441,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 case Digests.Skein1024:
                     return new Skein1024();
                 default:
-                    throw new ArgumentException("The digest type is not supported!");
+                    throw new NTRUException("NTRUEncrypt:GetDigest", "The digest type is not supported!", new ArgumentException());
             }
         }
 
@@ -463,7 +473,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
                 case Prngs.QCG2:
                     return new QCG2();
                 default:
-                    throw new ArgumentException("The Prng type is not supported!");
+                    throw new NTRUException("NTRUEncrypt:GetPrng", "The prng type is not supported!", new ArgumentException());
             }
         }
 

@@ -78,7 +78,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         private bool _isDisposed = false;
         private int _position;
         private byte[] _rndData;
-        private static readonly object _objLock = new object();
+        private object _objLock = new object();
         #endregion
 
         #region Properties

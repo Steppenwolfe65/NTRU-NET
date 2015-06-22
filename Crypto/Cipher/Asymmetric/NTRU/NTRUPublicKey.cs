@@ -42,7 +42,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// <summary>
     /// A NtruEncrypt public key is essentially a polynomial named <c>h</c>.
     /// </summary>
-    public sealed class NTRUPublicKey : IAsymmetricKey, IDisposable
+    public sealed class NTRUPublicKey : IAsymmetricKey
     {
         #region Fields
         private bool _isDisposed = false;
@@ -71,7 +71,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <summary>
         /// The polynomial <c>H</c> which determines the key
         /// </summary>
-        public IntegerPolynomial H
+        internal IntegerPolynomial H
         {
             get { return _H; }
         }
@@ -85,7 +85,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="H">The polynomial <c>H</c> which determines the key</param>
         /// <param name="N">The number of coefficients in the polynomial <c>H</c></param>
         /// <param name="Q">The "big" NtruEncrypt modulus</param>
-        public NTRUPublicKey(IntegerPolynomial H, int N, int Q)
+        internal NTRUPublicKey(IntegerPolynomial H, int N, int Q)
         {
             _H = H;
             _N = N;
@@ -97,6 +97,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="KeyStream">An input stream containing an encoded key</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the key could not be loaded</exception>
         public NTRUPublicKey(Stream KeyStream)
         {
             try
@@ -135,6 +137,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Read a Public key from a byte array.
         /// <para>The array can contain only the public key.</para>
@@ -143,22 +146,34 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Key">The byte array containing the key</param>
         /// 
         /// <returns>An initialized NTRUPublicKey class</returns>
-        public static NTRUPublicKey Read(byte[] Key)
+        public static NTRUPublicKey From(byte[] Key)
         {
-            return Read(new MemoryStream(Key));
+            return From(new MemoryStream(Key));
         }
 
         /// <summary>
-        /// Read a Public key from a byte array.
-        /// <para>The stream can contain only the public key.</para>
+        /// Read a Public key from a stream
         /// </summary>
         /// 
-        /// <param name="KeyStream">The byte array containing the key</param>
+        /// <param name="KeyStream">The stream containing the key</param>
         /// 
         /// <returns>An initialized NTRUPublicKey class</returns>
-        public static NTRUPublicKey Read(MemoryStream KeyStream)
+        /// 
+        /// <exception cref="NTRUException">Thrown if the stream can not be read</exception>
+        public static NTRUPublicKey From(MemoryStream KeyStream)
         {
-            return new NTRUPublicKey(KeyStream);
+            try
+            {
+                int n = IntUtils.ReadShort(KeyStream);
+                int q = IntUtils.ReadShort(KeyStream);
+                IntegerPolynomial h = IntegerPolynomial.FromBinary(KeyStream, n, q);
+
+                return new NTRUPublicKey(h, n, q);
+            }
+            catch (IOException ex)
+            {
+                throw new NTRUException("NTRUPublicKey:From", ex.Message, ex);
+            }
         }
 
         /// <summary>
@@ -186,6 +201,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="Output">An output stream</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the key could not be written</exception>
         public void WriteTo(Stream Output)
         {
             try
@@ -209,6 +226,23 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             byte[] data = ToBytes();
             Output = new byte[data.Length];
             Buffer.BlockCopy(data, 0, Output, 0, data.Length);
+        }
+
+        /// <summary>
+        /// Writes the key pair to an output byte array
+        /// </summary>
+        /// 
+        /// <param name="Output">KeyPair as a byte array; can be initialized as zero bytes</param>
+        /// <param name="Offset">The starting position within the Output array</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the output array is too small</exception>
+        public void WriteTo(byte[] Output, int Offset)
+        {
+            byte[] data = ToBytes();
+            if (Offset + data.Length > Output.Length - Offset)
+                throw new NTRUException("NTRUPublicKey:WriteTo", "The output array is too small!", new ArgumentOutOfRangeException());
+
+            Buffer.BlockCopy(data, 0, Output, Offset, data.Length);
         }
         #endregion
 
@@ -264,6 +298,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             return true;
         }
         #endregion
+
+
+        #region IClone
+        /// <summary>
+        /// Create a copy of this NTRUPublicKey instance
+        /// </summary>
+        /// 
+        /// <returns>NTRUPublicKey copy</returns>
+        public object Clone()
+        {
+            return new NTRUPublicKey(_H, _N, _Q);
+        }
+        #endregion
+
 
         #region IDispose
         /// <summary>

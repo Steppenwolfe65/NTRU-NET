@@ -235,7 +235,7 @@ namespace Test
             {
                 mpe.Initialize(true, akp);
 
-                byte[] data = new byte[mpe.MaxCipherText];
+                byte[] data = new byte[mpe.MaxPlainText];
                 enc = mpe.Encrypt(data);
                 mpe.Initialize(false, akp);
                 byte[] dec = mpe.Decrypt(enc);

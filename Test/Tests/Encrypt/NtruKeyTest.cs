@@ -71,7 +71,7 @@ namespace Test.Tests.Encrypt
         private void Encode(NTRUParameters param)
         {
             NTRUKeyGenerator ntru = new NTRUKeyGenerator(param);
-            NTRUKeyPair kp = ntru.GenerateKeyPair();
+            NTRUKeyPair kp = (NTRUKeyPair)ntru.GenerateKeyPair();
             byte[] priv = ((NTRUPrivateKey)kp.PrivateKey).ToBytes();
             byte[] pub = ((NTRUPublicKey)kp.PublicKey).ToBytes();
             NTRUKeyPair kp2 = new NTRUKeyPair(new NTRUPublicKey(pub), new NTRUPrivateKey(priv));

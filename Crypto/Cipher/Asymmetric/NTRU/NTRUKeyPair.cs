@@ -42,7 +42,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// <summary>
     /// An Ntru Key-Pair container
     /// </summary>
-    public sealed class NTRUKeyPair : IAsymmetricKeyPair, IDisposable
+    public sealed class NTRUKeyPair : IAsymmetricKeyPair
     {
         #region Fields
         private bool _isDisposed = false;
@@ -77,6 +77,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="PublicKey">The Public key</param>
         /// <param name="PrivateKey">The Private Key</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if an invalid key is used</exception>
         public NTRUKeyPair(IAsymmetricKey PublicKey, IAsymmetricKey PrivateKey)
         {
             if (!(PublicKey is NTRUPublicKey))
@@ -93,6 +95,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="Key">The public or private key</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if an invalid name is used</exception>
         public NTRUKeyPair(IAsymmetricKey Key)
         {
             if (Key is NTRUPublicKey)
@@ -243,6 +247,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="Output">NtruKeyPair as a byte array; can be initialized as zero bytes</param>
         /// <param name="Offset">The starting position within the Output array</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the output array is too small</exception>
         public void WriteTo(byte[] Output, int Offset)
         {
             byte[] data = ToBytes();
@@ -257,6 +263,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="Output">Output Stream</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if an IO exception is raised</exception>
         public void WriteTo(Stream Output)
         {
             try
@@ -323,6 +331,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             }
 
             return true;
+        }
+        #endregion
+
+        #region IClone
+        /// <summary>
+        /// Create a copy of this key pair instance
+        /// </summary>
+        /// 
+        /// <returns>The IAsymmetricKeyPair copy</returns>
+        public object Clone()
+        {
+            return new NTRUKeyPair((IAsymmetricKey)_publicKey.Clone(), (IAsymmetricKey)_privateKey.Clone());
         }
         #endregion
 

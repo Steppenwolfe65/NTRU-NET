@@ -107,7 +107,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         private IDigest _msgDigest;
         private long _stateCtr = 1;
         private long _seedCtr = 1;
-        private static readonly object _objLock = new object();
+        private object _objLock = new object();
         #endregion
 
         #region Properties

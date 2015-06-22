@@ -174,7 +174,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
                             state[1] += (RotateRight(ni.GetIPv4Statistics().BytesReceived, 31) ^ stats.NonUnicastPacketsReceived) + stats.NonUnicastPacketsSent;
                         }
                     }
-                    catch { }
+                    catch { continue; }
                 }
             }
 
@@ -190,6 +190,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         private static byte[] ProcessStats()
         {
             long[] state = new long[3];
+
             try
             {
                 Process localPrc = Process.GetCurrentProcess();
@@ -221,13 +222,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
 
         private static byte[] ThreadStats()
         {
-            try
-            {
-                Process[] processes = Process.GetProcesses();
-                long[] state = new long[processes.Length];
-                int bits = 48;
+            Process[] processes = Process.GetProcesses();
+            long[] state = new long[processes.Length];
+            int bits = 48;
 
-                for (int i = 0; i < processes.Length; i++)
+            for (int i = 0; i < processes.Length; i++)
+            {
+                try
                 {
                     state[i] = processes[i].WorkingSet64 * RotateRight(processes[i].VirtualMemorySize64, 13);
 
@@ -239,16 +240,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
                         bits--;
                     }
                 }
-
-                byte[] data = new byte[state.Length * 8];
-                Buffer.BlockCopy(state, 0, data, 0, data.Length);
-
-                return data;
+                catch { continue; }
             }
-            catch
-            {
-                return new byte[0];
-            }
+
+            byte[] data = new byte[state.Length * 8];
+            Buffer.BlockCopy(state, 0, data, 0, data.Length);
+
+            return data;
         }
 
         private static byte[] TimeStats()

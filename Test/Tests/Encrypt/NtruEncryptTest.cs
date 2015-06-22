@@ -87,7 +87,7 @@ namespace Test.Tests.Encrypt
 
                 NTRUKeyPair kp;
                 using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                    kp = kg.GenerateKeyPair();
+                    kp = (NTRUKeyPair)kg.GenerateKeyPair();
 
                 using (NTRUEncrypt ntru = new NTRUEncrypt(param))
                 {
@@ -131,10 +131,10 @@ namespace Test.Tests.Encrypt
             EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1499EP1FAST.Clone());
             OnProgress(new TestEventArgs("Passed the EES1499EP1 encryption test"));
 
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1861SH512.Clone());
-            OnProgress(new TestEventArgs("Passed the ZCX1861SK1024 encryption test"));
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.ZCX1931SH512.Clone());
-            OnProgress(new TestEventArgs("Passed the ZCX1931SK1024 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1861SH512.Clone());
+            OnProgress(new TestEventArgs("Passed the CX1861SH512 encryption test"));
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1931SH512.Clone());
+            OnProgress(new TestEventArgs("Passed the CX1931SH512 encryption test"));
 
             // test the digests //
             NTRUParameters param = (NTRUParameters)NTRUParamSets.APR2011439.Clone();
@@ -185,7 +185,7 @@ namespace Test.Tests.Encrypt
         {
             NTRUKeyPair kp;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                kp = kg.GenerateKeyPair();
+                kp = (NTRUKeyPair)kg.GenerateKeyPair();
 
             NTRUEncrypt ntru = new NTRUEncrypt(param);
             TextTest(ntru, kp, param);
@@ -324,10 +324,10 @@ namespace Test.Tests.Encrypt
 
             NTRUKeyPair kp1;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false)) // note: parallel must be turned off with passphrase prng
-                kp1 = kg.GenerateKeyPair(passphrase, salt);
+                kp1 = (NTRUKeyPair)kg.GenerateKeyPair(passphrase, salt);
             NTRUKeyPair kp2;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
-                kp2 = kg.GenerateKeyPair(passphrase, salt);
+                kp2 = (NTRUKeyPair)kg.GenerateKeyPair(passphrase, salt);
 
             NTRUEncrypt ntru = new NTRUEncrypt(param);
             NTRUEncrypt ntru2 = new NTRUEncrypt(NTRUParamSets.EES1087EP2FAST);
@@ -338,7 +338,7 @@ namespace Test.Tests.Encrypt
             salt = ntru.GenerateSalt();
             NTRUKeyPair kp3;
             using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param, false))
-                kp3 = kg.GenerateKeyPair(passphrase, salt);
+                kp3 = (NTRUKeyPair)kg.GenerateKeyPair(passphrase, salt);
 
             if (!Compare.False(kp1.Equals(kp3)))
                 throw new Exception("NtruEncryptTest: key pair generation test failed!");
@@ -363,7 +363,7 @@ namespace Test.Tests.Encrypt
             {
                 NTRUKeyPair kp;
                 using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
-                    kp = kg.GenerateKeyPair();
+                    kp = (NTRUKeyPair)kg.GenerateKeyPair();
 
                 NTRUEncrypt ntru = new NTRUEncrypt(param);
                 ntru.Initialize(true, kp);

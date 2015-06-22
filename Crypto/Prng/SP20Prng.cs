@@ -1,9 +1,7 @@
 ﻿#region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
 using VTDev.Libraries.CEXEngine.Crypto.Seed;
-using VTDev.Libraries.CEXEngine.Crypto.Generator.VTDev.Libraries.CEXEngine.Crypto.Generator;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Prng
@@ -17,7 +15,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <description>Example using an <c>IRandom</c> interface:</description>
     /// <code>
     /// int num;
-    /// using (IRandom rnd = new CTRPrng([BlockCiphers], [SeedGenerators]))
+    /// using (IRandom rnd = new SP20Prng([SeedGenerators], [BufferSize], [SeedSize], [RoundsCount]))
     /// {
     ///     // get random int
     ///     num = rnd.Next([Minimum], [Maximum]);
@@ -26,49 +24,44 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </example>
     /// 
     /// <revisionHistory>
-    /// <revision date="2015/06/09" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/06/14" version="1.4.0.0">Initial release</revision>
     /// </revisionHistory>
-    /// 
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block">VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block Namespace</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Seed">VTDev.Libraries.CEXEngine.Crypto.Seed ISeed Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.BlockCiphers">VTDev.Libraries.CEXEngine.Crypto.BlockCiphers Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
     /// <list type="bullet">
-    /// <item><description>Can be initialized with any block <see cref="VTDev.Libraries.CEXEngine.Crypto.BlockCiphers">cipher</see>.</description></item>
-    /// <item><description>Parallelized by default on a multi processer system when an input byte array of <see cref="ParallelMinimumSize"/> bytes or larger is used.</description></item>
-    /// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
-    /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
+    /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
+    /// <item><description>Block size is 64 bytes wide.</description></item>
+    /// <item><description>Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.</description></item>
+    /// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
     /// </list>
     /// 
     /// <description><h4>Guiding Publications:</h4></description>
     /// <list type="number">
-    /// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
-    /// <item><description>NIST Fips 140-2: <see href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</see>.</description></item>
-    /// <item><description>NIST SP800-22 1a: <see href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</see>.</description></item>
-    /// <item><description>Security Bounds for the NIST Codebook-based: <see href="http://eprint.iacr.org/2006/379.pdf">Deterministic Random Bit Generator</see>.</description></item>
+    /// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
+    /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
+    /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
     /// </list>
     /// </remarks>
-    public sealed class CTRPrng : IRandom, IDisposable
+
+    public sealed class SP20Prng : IRandom, IDisposable
     {
         #region Constants
-        private const string ALG_NAME = "CTRPrng";
+        private const string ALG_NAME = "SP20Prng";
         private const int BUFFER_SIZE = 4096;
         #endregion
 
         #region Fields
         private bool _isDisposed = false;
-        private IBlockCipher _rngEngine;
-        private CTRDrbg _rngGenerator;
+        private SP20Drbg _rngGenerator;
         private ISeed _seedGenerator;
-        private BlockCiphers _engineType;
         private SeedGenerators _seedType;
         private byte[] _stateSeed;
         private byte[] _byteBuffer;
         private int _bufferIndex = 0;
         private int _bufferSize = 0;
         private int _keySize = 0;
+        private int _dfnRounds = 20;
         private object _objLock = new object();
         #endregion
 
@@ -87,23 +80,28 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// Initialize the class
         /// </summary>
         /// 
-        /// <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
         /// <param name="SeedEngine">The Seed engine used to create keyng material (default is CSPRsg)</param>
         /// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
-        /// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
-        public CTRPrng(BlockCiphers BlockEngine = BlockCiphers.RDX, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int KeySize = 0)
+        /// <param name="SeedSize">The size of the seed to generate in bytes; can be 32 for a 128 bit key or 48 for a 256 bit key</param>
+        /// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
+        /// 
+        /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
+        /// <exception cref="ArgumentException">Thrown if the seed is an incorrect size; must be 32 or 48 bytes</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the rounds count is invalid; must be an even number between 10 and 30</exception>
+        public SP20Prng(SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int SeedSize = 48, int Rounds = 20)
         {
             if (BufferSize < 64)
                 throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+            if (SeedSize != 32 && SeedSize != 48)
+                throw new ArgumentException("Seed size must be 32 or 48 bytes (key + iv)!");
+            if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
+                throw new ArgumentOutOfRangeException("Rounds must be an even number between 10 and 30!");
 
-            _engineType = BlockEngine;
+            _dfnRounds = Rounds;
             _seedType = SeedEngine;
             _byteBuffer = new byte[BufferSize];
             _bufferSize = BufferSize;
-            if (KeySize > 0)
-                _keySize = KeySize;
-            else
-                _keySize = GetKeySize(BlockEngine);
+            _keySize = SeedSize;
 
             Reset();
         }
@@ -112,32 +110,36 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// Initialize the class with a Seed; note: the same seed will produce the same random output
         /// </summary>
         /// 
-        /// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is key size + counter 16)</param>
+        /// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is key size + iv of 16 bytes)</param>
         /// <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
         /// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
+        /// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
         /// 
         /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
-        /// <exception cref="ArgumentException">Thrown if the seed is too small</exception>
-        public CTRPrng(byte[] Seed, BlockCiphers BlockEngine = BlockCiphers.RDX, int BufferSize = 4096)
+        /// <exception cref="ArgumentException">Thrown if the seed is an incorrect size; must be 32 or 48 bytes</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the rounds count is invalid; must be an even number between 10 and 30</exception>
+        public SP20Prng(byte[] Seed, int BufferSize = 4096, int Rounds = 20)
         {
             if (BufferSize < 64)
                 throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
-            if (Seed == null)
-                throw new ArgumentNullException("Seed can not be null!");
-            if (GetKeySize(BlockEngine) < Seed.Length)
-                throw new ArgumentException(string.Format("The state seed is too small! must be at least {0} bytes", GetKeySize(BlockEngine)));
+            if (Seed.Length != 32 && Seed.Length != 48)
+                throw new ArgumentException("Seed size must be 32 or 48 bytes (key + iv)!");
+            if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
+                throw new ArgumentOutOfRangeException("Rounds must be an even number between 10 and 30!");
 
-            _engineType = BlockEngine;
+            _keySize = Seed.Length;
+            _dfnRounds = Rounds;
             _stateSeed = Seed;
             _byteBuffer = new byte[BufferSize];
             _bufferSize = BufferSize;
+
             Reset();
         }
 
         /// <summary>
         /// Finalize objects
         /// </summary>
-        ~CTRPrng()
+        ~SP20Prng()
         {
             Dispose(false);
         }
@@ -300,11 +302,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// </summary>
         public void Reset()
         {
-            if (_rngEngine != null)
-            {
-                _rngEngine.Dispose();
-                _rngEngine = null;
-            }
             if (_seedGenerator != null)
             {
                 _seedGenerator.Dispose();
@@ -316,12 +313,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                 _rngGenerator = null;
             }
 
-            _rngEngine = GetCipher(_engineType);
             _seedGenerator = GetSeedGenerator(_seedType);
-            _rngGenerator = new CTRDrbg(_rngEngine, true, _keySize);
+            _rngGenerator = new SP20Drbg(_dfnRounds);
 
             if (_seedGenerator != null)
-                _rngGenerator.Initialize(_seedGenerator.GetSeed(_rngEngine.BlockSize + _keySize));
+                _rngGenerator.Initialize(_seedGenerator.GetSeed(_keySize));
             else
                 _rngGenerator.Initialize(_stateSeed);
 
@@ -373,44 +369,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
             return GetBits(data, Maximum);
         }
 
-        private IBlockCipher GetCipher(BlockCiphers RngEngine)
+        private int GetKeySize()
         {
-            switch (RngEngine)
-            {
-                case BlockCiphers.RDX:
-                    return new RDX();
-                case BlockCiphers.RHX:
-                    return new RHX();
-                case BlockCiphers.RSM:
-                    return new RSM();
-                case BlockCiphers.SHX:
-                    return new SHX();
-                case BlockCiphers.SPX:
-                    return new SPX();
-                case BlockCiphers.TFX:
-                    return new TFX();
-                case BlockCiphers.THX:
-                    return new THX();
-                case BlockCiphers.TSM:
-                    return new TSM();
-                default:
-                    return new RDX();
-            }
-        }
-
-        private int GetKeySize(BlockCiphers CipherEngine)
-        {
-            switch (CipherEngine)
-            {
-                case BlockCiphers.RHX:
-                case BlockCiphers.RSM:
-                case BlockCiphers.SHX:
-                case BlockCiphers.THX:
-                case BlockCiphers.TSM:
-                    return 320;
-                default:
-                    return 32;
-            }
+            return 48;
         }
 
         private ISeed GetSeedGenerator(SeedGenerators SeedEngine)
@@ -455,6 +416,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                     {
                         Array.Clear(_byteBuffer, 0, _byteBuffer.Length);
                         _byteBuffer = null;
+                    }
+                    if (_stateSeed != null)
+                    {
+                        Array.Clear(_stateSeed, 0, _stateSeed.Length);
+                        _stateSeed = null;
                     }
                 }
                 catch { }

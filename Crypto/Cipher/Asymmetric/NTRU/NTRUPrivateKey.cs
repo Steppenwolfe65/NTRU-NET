@@ -44,7 +44,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// which takes different forms depending on whether product-form polynomials are used. 
     /// <para>On <c>FastP</c> the inverse of <c>f</c> modulo <c>p</c> is precomputed on initialization.</para>
     /// </summary>
-    public sealed class NTRUPrivateKey : IAsymmetricKey, IDisposable
+    public sealed class NTRUPrivateKey : IAsymmetricKey
     {
         #region Fields
         private bool _fastFp;
@@ -77,7 +77,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <summary>
         /// Get: PolyType type of the polynomial <c>T</c>
         /// </summary>
-        public TernaryPolynomialType PolyType
+        internal TernaryPolynomialType PolyType
         {
             get { return _polyType; }
         }
@@ -86,7 +86,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// Get/Set: The polynomial which determines the key: if <c>FastFp=true</c>, <c>F=1+3T</c>; otherwise, <c>F=T</c>
         /// <para>Set can be readonly in distribution</para>
         /// </summary>
-        public IPolynomial T
+        internal IPolynomial T
         {
             get { return _T; }
             set { _T = value; }
@@ -95,7 +95,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <summary>
         /// Get: Fp the inverse of <c>F</c>
         /// </summary>
-        public IntegerPolynomial FP
+        internal IntegerPolynomial FP
         {
             get { return _FP; }
         }
@@ -113,7 +113,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Sparse">Sparse whether the polynomial <c>T</c> is sparsely or densely populated</param>
         /// <param name="FastFp">FastFp whether <c>FP=1</c></param>
         /// <param name="PolyType">PolyType type of the polynomial <c>T</c></param>
-        public NTRUPrivateKey(IPolynomial T, IntegerPolynomial FP, int N, int Q, bool Sparse, bool FastFp, TernaryPolynomialType PolyType)
+        internal NTRUPrivateKey(IPolynomial T, IntegerPolynomial FP, int N, int Q, bool Sparse, bool FastFp, TernaryPolynomialType PolyType)
         {
             _T = T;
             _FP = FP;
@@ -139,6 +139,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="InputStream">An input stream</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the key could not be loaded</exception>
         public NTRUPrivateKey(MemoryStream InputStream)
         {
             BinaryReader dataStream = new BinaryReader(InputStream);
@@ -200,22 +202,70 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// <param name="Key">The byte array containing the key</param>
         /// 
         /// <returns>An initialized NTRUPrivateKey class</returns>
-        public static NTRUPrivateKey Read(byte[] Key)
+        public static NTRUPrivateKey From(byte[] Key)
         {
-            return Read(new MemoryStream(Key));
+            return From(new MemoryStream(Key));
         }
 
         /// <summary>
-        /// Read a Private key from a byte array.
-        /// <para>The stream can contain only the public key.</para>
+        /// Read a Private key from a stream
         /// </summary>
         /// 
-        /// <param name="KeyStream">The byte array containing the key</param>
+        /// <param name="KeyStream">The stream containing the key</param>
         /// 
         /// <returns>An initialized NTRUPrivateKey class</returns>
-        public static NTRUPrivateKey Read(MemoryStream KeyStream)
+        /// 
+        /// <exception cref="NTRUException">Thrown if the stream can not be read</exception>
+        public static NTRUPrivateKey From(MemoryStream KeyStream)
         {
-            return new NTRUPrivateKey(KeyStream);
+            BinaryReader dataStream = new BinaryReader(KeyStream);
+
+            try
+            {
+                // ins.Position = 0; wrong here, ins pos is wrong
+                int n = IntUtils.ReadShort(KeyStream);
+                int q = IntUtils.ReadShort(KeyStream);
+                byte flags = dataStream.ReadByte();
+                bool sparse = (flags & 1) != 0;
+                bool fastFp = (flags & 2) != 0;
+                IPolynomial t;
+
+                TernaryPolynomialType polyType = (flags & 4) == 0 ?
+                    TernaryPolynomialType.SIMPLE :
+                    TernaryPolynomialType.PRODUCT;
+
+                if (polyType == TernaryPolynomialType.PRODUCT)
+                {
+                    t = ProductFormPolynomial.FromBinary(KeyStream, n);
+                }
+                else
+                {
+                    IntegerPolynomial fInt = IntegerPolynomial.FromBinary3Tight(KeyStream, n);
+
+                    if (sparse)
+                        t = new SparseTernaryPolynomial(fInt);
+                    else
+                        t = new DenseTernaryPolynomial(fInt);
+                }
+
+                // Initializes fp from t
+                IntegerPolynomial fp;
+                if (fastFp)
+                {
+                    fp = new IntegerPolynomial(n);
+                    fp.Coeffs[0] = 1;
+                }
+                else
+                {
+                    fp = t.ToIntegerPolynomial().InvertF3();
+                }
+
+                return new NTRUPrivateKey(t, fp, n, q, sparse, fastFp, polyType);
+            }
+            catch (IOException ex)
+            {
+                throw new NTRUException("NTRUPrivateKey:From", ex.Message, ex);
+            }
         }
 
         /// <summary>
@@ -252,6 +302,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// </summary>
         /// 
         /// <param name="Output">An output stream</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the key could not be written</exception>
         public void WriteTo(Stream Output)
         {
             try 
@@ -283,6 +335,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
         /// 
         /// <param name="Output">NtruPrivateKey as a byte array; array must be initialized and of sufficient length</param>
         /// <param name="Offset">The starting position within the Output array</param>
+        /// 
+        /// <exception cref="NTRUException">Thrown if the output array is too small</exception>
         public void WriteTo(byte[] Output, int Offset)
         {
             byte[] data = ToBytes();
@@ -379,6 +433,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
             }
 
             return true;
+        }
+        #endregion
+
+        #region IClone
+        /// <summary>
+        /// Create a copy of this NTRUPrivateKey instance
+        /// </summary>
+        /// 
+        /// <returns>NTRUPrivateKey copy</returns>
+        public object Clone()
+        {
+            return new NTRUPrivateKey(_T, _FP, _N, _Q, _sparse, _fastFp, _polyType);
         }
         #endregion
 

@@ -1,14 +1,18 @@
-﻿namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces
+﻿#region Directives
+using System;
+#endregion
+
+namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces
 {
     /// <summary>
     /// The Asymmetric cipher interface
     /// </summary>
-    public interface IAsymmetricCipher
+    public interface IAsymmetricCipher : IDisposable
     {
         /// <summary>
         /// Get: The maximum number of bytes the cipher can encrypt
         /// </summary>
-        int MaxCipherText { get; }
+        int MaxPlainText { get; }
 
         /// <summary>
         /// Initialize the cipher

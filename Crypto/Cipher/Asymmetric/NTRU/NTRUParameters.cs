@@ -106,7 +106,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU
     /// the NTRUOpenSourceProject/ntru-crypto project provided by Security Innovation, Inc <see href="https://github.com/NTRUOpenSourceProject/ntru-crypto">NTRU Encrypt</see>.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class NTRUParameters : IAsymmetricParameters, ICloneable, IDisposable
+    public sealed class NTRUParameters : IAsymmetricParameters
     {
         #region Fields
         private int _N;
