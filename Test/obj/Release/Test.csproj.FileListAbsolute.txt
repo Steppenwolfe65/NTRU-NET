@@ -7,3 +7,12 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\obj\Release\Test.csproj.GenerateResource.Cache
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\obj\Release\Test.exe
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\Test\obj\Release\Test.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\bin\Release\Test.exe
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\bin\Release\Test.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\bin\Release\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\bin\Release\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.csprojResolveAssemblyReference.cache
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.Properties.Resources.resources
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.csproj.GenerateResource.Cache
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.exe
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.pdb

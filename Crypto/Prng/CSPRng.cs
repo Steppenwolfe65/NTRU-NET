@@ -1,6 +1,7 @@
 ﻿#region Directives
 using System;
 using System.Security.Cryptography;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -51,6 +52,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// 
     /// <revisionHistory>
     /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -62,7 +64,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <item><description>RFC 4086: <cite>RFC 4086</cite>Randomness Requirements for Security.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class CSPRng : IRandom, IDisposable
+    public sealed class CSPRng : IRandom
     {
         #region Constants
         private const string ALG_NAME = "CSPRng";
@@ -87,9 +89,19 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <summary>
         /// Initialize the class
         /// </summary>
+        /// 
+        /// <exception cref="CryptoRandomException">Thrown if RNGCryptoServiceProvider initialization failed</exception>
         public CSPRng()
         {
-            _rngCrypto = new RNGCryptoServiceProvider();
+            try
+            {
+                _rngCrypto = new RNGCryptoServiceProvider();
+            }
+            catch (Exception ex)
+            {
+                if (_rngCrypto == null)
+                    throw new CryptoRandomException("CSPRng:Ctor", "RNGCrypto could not be initialized!", ex);
+            }
         }
 
         /// <summary>

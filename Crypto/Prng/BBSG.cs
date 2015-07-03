@@ -1,6 +1,7 @@
 ﻿#region Directives
 using System;
 using VTDev.Libraries.CEXEngine.Numeric;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -50,6 +51,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// 
     /// <revisionHistory>
     /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -68,7 +70,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <item><description>This code based on the excellent Java version by Zur Aougav: <see href="http://sourceforge.net/projects/jrandtest/">BBSPrng</see> class.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class BBSG : IRandom, IDisposable
+    public sealed class BBSG : IRandom
     {
         #region Constants
         private const string ALG_NAME = "BBSG";
@@ -131,13 +133,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="Q">Q Random Prime</param>
         /// <param name="N">Random Prime (N = P * Q)</param>
         /// 
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if P or Q is not a valid prime</exception>
+        /// <exception cref="CryptoRandomException">Thrown if P or Q is not a valid prime</exception>
         public BBSG(BigInteger X, BigInteger P, BigInteger Q, BigInteger N)
         {
             if (!P.IsProbablePrime(90))
-                throw new ArgumentOutOfRangeException("P is not a valid prime number!.");
+                throw new CryptoRandomException("BBSG:Ctor", "P is not a valid prime number!", new ArgumentOutOfRangeException());
             if (!Q.IsProbablePrime(90))
-                throw new ArgumentOutOfRangeException("Q is not a valid prime number!.");
+                throw new CryptoRandomException("BBSG:Ctor", "Q is not a valid prime number!", new ArgumentOutOfRangeException());
 
             _secRand = new SecureRandom();
 

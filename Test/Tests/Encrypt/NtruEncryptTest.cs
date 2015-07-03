@@ -1,9 +1,8 @@
 #region Directives
 using System;
 using System.Text;
-using VTDev.Libraries.CEXEngine.Crypto;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
 using VTDev.Libraries.CEXEngine.Crypto.Prng;
 using VTDev.Libraries.CEXEngine.Tools;
 #endregion
@@ -79,11 +78,11 @@ namespace Test.Tests.Encrypt
             for (int i = 0; i < 3; i++)
             {
                 if (i == 0)
-                    param.MessageDigest = Digests.Blake512;//blake512
+                    param.Digest = Digests.Blake512;//blake512
                 else if (i == 1)
-                    param.MessageDigest = Digests.Keccak512;//keccak512
+                    param.Digest = Digests.Keccak512;//keccak512
                 else
-                    param.MessageDigest = Digests.Skein512;//skein512
+                    param.Digest = Digests.Skein512;//skein512
 
                 NTRUKeyPair kp;
                 using (NTRUKeyGenerator kg = new NTRUKeyGenerator(param))
@@ -139,43 +138,43 @@ namespace Test.Tests.Encrypt
             // test the digests //
             NTRUParameters param = (NTRUParameters)NTRUParamSets.APR2011439.Clone();
             // blake 256
-            param.MessageDigest = Digests.Blake256;
+            param.Digest = Digests.Blake256;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the APR2011439/Blake256 encryption test"));
 
             // blake 512
             param = (NTRUParameters)NTRUParamSets.EES1087EP2.Clone();
-            param.MessageDigest = Digests.Blake512;
+            param.Digest = Digests.Blake512;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Blake512 encryption test"));
 
             // keccak 256
-            param.MessageDigest = Digests.Keccak256;
+            param.Digest = Digests.Keccak256;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the APR2011439/Keccak256 encryption test"));
 
             // keccak 512
-            param.MessageDigest = Digests.Keccak512;
+            param.Digest = Digests.Keccak512;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Keccak512 encryption test"));
 
             // keccak 1024
-            param.MessageDigest = Digests.Keccak1024;
+            param.Digest = Digests.Keccak1024;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Keccak1024 encryption test"));
 
             // skein 256 
-            param.MessageDigest = Digests.Skein256;
+            param.Digest = Digests.Skein256;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the APR2011439/Skein256 encryption test"));
 
             // skein 512
-            param.MessageDigest = Digests.Skein512;
+            param.Digest = Digests.Skein512;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Skein512 encryption test"));
 
             // skein 1024
-            param.MessageDigest = Digests.Skein1024;
+            param.Digest = Digests.Skein1024;
             EncryptDecrypt(param);
             OnProgress(new TestEventArgs("Passed the EES1087EP2/Skein1024 encryption test"));
         }

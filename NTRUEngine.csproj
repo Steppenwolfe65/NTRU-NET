@@ -80,12 +80,17 @@
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricKey.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricKeyPair.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricParameters.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUParamSets.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUParamSets.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\IBlockCipher.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\CBC.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\CFB.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\CTR.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\ECB.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\ICipherMode.cs" />
+    <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\OFB.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\RDX.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\RHX.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\RSM.cs" />
-    <Compile Include="Crypto\Cipher\Symmetric\Block\RSX.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\SHX.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\SPX.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\TFX.cs" />
@@ -96,6 +101,20 @@
     <Compile Include="Crypto\Digest\Keccak1024.cs" />
     <Compile Include="Crypto\Digest\Keccak256.cs" />
     <Compile Include="Crypto\Digest\Skein1024.cs" />
+    <Compile Include="Crypto\Enumeration\AsymmetricEngines.cs" />
+    <Compile Include="Crypto\Enumeration\BlockCiphers.cs" />
+    <Compile Include="Crypto\Enumeration\BlockSizes.cs" />
+    <Compile Include="Crypto\Enumeration\Digests.cs" />
+    <Compile Include="Crypto\Enumeration\Generators.cs" />
+    <Compile Include="Crypto\Enumeration\IVSizes.cs" />
+    <Compile Include="Crypto\Enumeration\KdfGenerators.cs" />
+    <Compile Include="Crypto\Enumeration\KeySizes.cs" />
+    <Compile Include="Crypto\Enumeration\Macs.cs" />
+    <Compile Include="Crypto\Enumeration\Prngs.cs" />
+    <Compile Include="Crypto\Enumeration\RoundCounts.cs" />
+    <Compile Include="Crypto\Enumeration\SeedGenerators.cs" />
+    <Compile Include="Crypto\Enumeration\StreamCiphers.cs" />
+    <Compile Include="Crypto\Enumeration\SymmetricEngines.cs" />
     <Compile Include="Crypto\Generator\CTRDrbg.cs" />
     <Compile Include="Crypto\Generator\KDF2Drbg.cs" />
     <Compile Include="Crypto\Generator\SP20Drbg.cs" />
@@ -106,9 +125,9 @@
     <Compile Include="Crypto\Prng\MODEXPG.cs" />
     <Compile Include="Crypto\Prng\QCG1.cs" />
     <Compile Include="Crypto\Prng\QCG2.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Arithmetic\BigIntEuclidean.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Arithmetic\IntEuclidean.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Arithmetic\SchonhageStrassen.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Arithmetic\BigIntEuclidean.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Arithmetic\IntEuclidean.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Arithmetic\SchonhageStrassen.cs" />
     <Compile Include="Crypto\Digest\Blake256.cs" />
     <Compile Include="Crypto\Digest\Blake512.cs" />
     <Compile Include="Crypto\Digest\IDigest.cs" />
@@ -117,62 +136,69 @@
     <Compile Include="Crypto\Digest\SHA512.cs" />
     <Compile Include="Crypto\Digest\Skein256.cs" />
     <Compile Include="Crypto\Digest\Skein512.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Curve\Curve25519.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUKeyGenerator.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUKeyPair.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Curve\Curve25519.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUKeyGenerator.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUKeyPair.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUParameters.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUParameters.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUPrivateKey.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUPrivateKey.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUPublicKey.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUPublicKey.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Encode\IndexGenerator.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Encode\IndexGenerator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\NTRUEncrypt.cs">
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUEncrypt.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Crypto\Prng\PBPRng.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Crypto\Prng\SP20Prng.cs" />
+    <Compile Include="Crypto\Processing\Factory\KeyGenerator.cs" />
+    <Compile Include="Crypto\Processing\Structure\KeyParams.cs" />
     <Compile Include="Crypto\Seed\CSPRsg.cs" />
     <Compile Include="Crypto\Seed\ISeed.cs" />
     <Compile Include="Crypto\Seed\XSPRsg.cs" />
-    <Compile Include="Exceptions\NTRUException.cs" />
     <Compile Include="Crypto\Generator\DGCDRBG.cs" />
     <Compile Include="Crypto\Generator\HKDF.cs" />
     <Compile Include="Crypto\Generator\IGenerator.cs" />
     <Compile Include="Crypto\Generator\PBKDF2.cs" />
     <Compile Include="Crypto\Generator\PKCS5.cs" />
-    <Compile Include="Crypto\Helper\Enums.cs" />
-    <Compile Include="Crypto\Helper\KeyParams.cs" />
     <Compile Include="Crypto\Mac\HMAC.cs" />
     <Compile Include="Crypto\Mac\IMac.cs" />
     <Compile Include="Crypto\Mac\SHA256HMAC.cs" />
     <Compile Include="Crypto\Mac\SHA512HMAC.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\BigDecimalPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\BigIntPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\DenseTernaryPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\IntegerPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\LongPolynomial2.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\LongPolynomial5.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\ModularResultant.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\IPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\PolynomialGenerator.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\ProductFormPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\Resultant.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\SparseTernaryPolynomial.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Polynomial\ITernaryPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\BigDecimalPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\BigIntPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\DenseTernaryPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\IntegerPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\LongPolynomial2.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\LongPolynomial5.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\ModularResultant.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\IPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\PolynomialGenerator.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\ProductFormPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\Resultant.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\SparseTernaryPolynomial.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Polynomial\ITernaryPolynomial.cs" />
     <Compile Include="Crypto\Prng\CSPRng.cs" />
     <Compile Include="Crypto\Prng\IRandom.cs" />
     <Compile Include="Crypto\Prng\SecureRandom.cs" />
-    <Compile Include="Crypto\Cipher\Asymmetric\NTRU\Encode\ArrayEncoder.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\Encode\ArrayEncoder.cs" />
+    <Compile Include="Exceptions\CryptoAsymmetricException.cs" />
+    <Compile Include="Exceptions\CryptoAsymmetricSignException.cs" />
+    <Compile Include="Exceptions\CryptoGeneratorException.cs" />
+    <Compile Include="Exceptions\CryptoHashException.cs" />
+    <Compile Include="Exceptions\CryptoMacException.cs" />
+    <Compile Include="Exceptions\CryptoProcessingException.cs" />
+    <Compile Include="Exceptions\CryptoRandomException.cs" />
+    <Compile Include="Exceptions\CryptoSymmetricException.cs" />
     <Compile Include="Numeric\BigDecimal.cs" />
     <Compile Include="Numeric\BigEndian.cs" />
     <Compile Include="Numeric\BigInteger.cs" />
@@ -209,7 +235,9 @@
     <Content Include="License.txt" />
     <Content Include="Patents.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Crypto\Cipher\Symmetric\Block\Padding\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

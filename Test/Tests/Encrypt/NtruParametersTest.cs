@@ -1,9 +1,9 @@
 #region Directives
 using System;
 using System.IO;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
 using VTDev.Libraries.CEXEngine.Tools;
-using VTDev.Libraries.CEXEngine.Crypto;
 #endregion
 
 namespace Test.Tests.Encrypt
@@ -84,7 +84,7 @@ namespace Test.Tests.Encrypt
             if (!Compare.Equals(param, param2))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
 
-            param2.MessageDigest = Digests.Blake512;
+            param2.Digest = Digests.Blake512;
             if (Compare.Equals(param, param2))
                 throw new Exception("NtruParameters: cloned copy is not equal!");
         }

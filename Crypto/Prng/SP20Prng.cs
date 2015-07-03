@@ -1,14 +1,16 @@
 ﻿#region Directives
 using System;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
 using VTDev.Libraries.CEXEngine.Crypto.Seed;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 {
     /// <summary>
-    /// <h3>CTRPrng: An implementation of a Encryption Counter based Deterministic Random Number Generator.</h3>
-    /// <para>A Block Cipher Counter DRBG as outlined in NIST document: SP800-90A<cite>SP800-90B</cite></para>
+    /// <h3>SP20Prng: An implementation of a Encryption Counter based Deterministic Random Number Generator.</h3>
+    /// <para>Uses the Salsa20 Key stream as a source of random input.</para>
     /// </summary> 
     /// 
     /// <example>
@@ -25,6 +27,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// 
     /// <revisionHistory>
     /// <revision date="2015/06/14" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -43,8 +46,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
     /// </list>
     /// </remarks>
-
-    public sealed class SP20Prng : IRandom, IDisposable
+    public sealed class SP20Prng : IRandom
     {
         #region Constants
         private const string ALG_NAME = "SP20Prng";
@@ -85,17 +87,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="SeedSize">The size of the seed to generate in bytes; can be 32 for a 128 bit key or 48 for a 256 bit key</param>
         /// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
         /// 
-        /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
-        /// <exception cref="ArgumentException">Thrown if the seed is an incorrect size; must be 32 or 48 bytes</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the rounds count is invalid; must be an even number between 10 and 30</exception>
+        /// <exception cref="CryptoRandomException">Thrown if the seed is null or invalid, or rounds count is out of range</exception>
         public SP20Prng(SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int SeedSize = 48, int Rounds = 20)
         {
             if (BufferSize < 64)
-                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!", new ArgumentNullException());
             if (SeedSize != 32 && SeedSize != 48)
-                throw new ArgumentException("Seed size must be 32 or 48 bytes (key + iv)!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Seed size must be 32 or 48 bytes (key + iv)!", new ArgumentException());
             if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
-                throw new ArgumentOutOfRangeException("Rounds must be an even number between 10 and 30!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Rounds must be an even number between 10 and 30!", new ArgumentOutOfRangeException());
 
             _dfnRounds = Rounds;
             _seedType = SeedEngine;
@@ -111,21 +111,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// </summary>
         /// 
         /// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is key size + iv of 16 bytes)</param>
-        /// <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
         /// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
         /// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
         /// 
-        /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
-        /// <exception cref="ArgumentException">Thrown if the seed is an incorrect size; must be 32 or 48 bytes</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the rounds count is invalid; must be an even number between 10 and 30</exception>
+        /// <exception cref="CryptoRandomException">Thrown if the seed is null or invalid, or rounds count is out of range</exception>
         public SP20Prng(byte[] Seed, int BufferSize = 4096, int Rounds = 20)
         {
+            if (Seed == null)
+                throw new CryptoRandomException("SP20Prng:CTor", "The Seed can not be null!", new ArgumentNullException());
             if (BufferSize < 64)
-                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!", new ArgumentNullException());
             if (Seed.Length != 32 && Seed.Length != 48)
-                throw new ArgumentException("Seed size must be 32 or 48 bytes (key + iv)!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Seed size must be 32 or 48 bytes (key + iv)!", new ArgumentException());
             if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
-                throw new ArgumentOutOfRangeException("Rounds must be an even number between 10 and 30!");
+                throw new CryptoRandomException("SP20Prng:CTor", "Rounds must be an even number between 10 and 30!", new ArgumentOutOfRangeException());
 
             _keySize = Seed.Length;
             _dfnRounds = Rounds;

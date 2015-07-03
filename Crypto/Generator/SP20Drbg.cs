@@ -1,5 +1,6 @@
 ﻿#region Directives
 using System;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -32,52 +33,53 @@ using System;
 // contact: develop@vtdev.com
 #endregion
 
-/// <summary>
-/// <h3>SP20Drbg: A parallelized Salsa20 deterministic random byte generator implementation.</h3>
-/// <para>A Salsa20 key stream, parallelized extended to use up to 30 rounds of diffusion.</para>
-/// </summary>
-/// 
-/// <example>
-/// <description>Example using an <c>IGenerator</c> interface:</description>
-/// <code>
-/// using (IGenerator rnd = new SP20Drbg())
-/// {
-///     // initialize
-///     rnd.Initialize(Salt, [Ikm], [Nonce]);
-///     // generate bytes
-///     rnd.Generate(Output, [Offset], [Size]);
-/// }
-/// </code>
-/// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/06/14" version="1.4.0.0">Initial release</revision>
-/// </revisionHistory>
-/// 
-/// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
-/// <list type="bullet">
-/// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
-/// <item><description>Block size is 64 bytes wide.</description></item>
-/// <item><description>Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.</description></item>
-/// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
-/// </list>
-/// 
-/// <description><h4>Guiding Publications:</h4></description>
-/// <list type="number">
-/// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
-/// </list>
-/// 
-/// <description><h4>Code Base Guides:</h4></description>
-/// <list type="table">
-/// <item><description>Inspired in part by the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
-/// </list> 
-/// </remarks>
 namespace VTDev.Libraries.CEXEngine.Crypto.Generator
 {
-    public sealed class SP20Drbg : IGenerator, IDisposable
+    /// <summary>
+    /// <h3>SP20Drbg: A parallelized Salsa20 deterministic random byte generator implementation.</h3>
+    /// <para>A Salsa20 key stream, parallelized and extended to use up to 30 rounds of diffusion.</para>
+    /// </summary>
+    /// 
+    /// <example>
+    /// <description>Example using an <c>IGenerator</c> interface:</description>
+    /// <code>
+    /// using (IGenerator rnd = new SP20Drbg())
+    /// {
+    ///     // initialize
+    ///     rnd.Initialize(Salt, [Ikm], [Nonce]);
+    ///     // generate bytes
+    ///     rnd.Generate(Output, [Offset], [Size]);
+    /// }
+    /// </code>
+    /// </example>
+    /// 
+    /// <revisionHistory>
+    /// <revision date="2015/06/14" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
+    /// </revisionHistory>
+    /// 
+    /// <remarks>
+    /// <description><h4>Implementation Notes:</h4></description>
+    /// <list type="bullet">
+    /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
+    /// <item><description>Block size is 64 bytes wide.</description></item>
+    /// <item><description>Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.</description></item>
+    /// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
+    /// </list>
+    /// 
+    /// <description><h4>Guiding Publications:</h4></description>
+    /// <list type="number">
+    /// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
+    /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
+    /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
+    /// </list>
+    /// 
+    /// <description><h4>Code Base Guides:</h4></description>
+    /// <list type="table">
+    /// <item><description>Inspired in part by the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
+    /// </list> 
+    /// </remarks>
+    public sealed class SP20Drbg : IGenerator
     {
         #region Constants
         private const string ALG_NAME = "SP20Drbg";
@@ -177,9 +179,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
             set
             {
                 if (value % ParallelMinimumSize != 0)
-                    throw new ArgumentException(String.Format("Parallel block size must be evenly divisible by ParallelMinimumSize: {0}", ParallelMinimumSize));
+                    throw new CryptoGeneratorException("SP20Drbg:ParallelBlockSize", String.Format("Parallel block size must be evenly divisible by ParallelMinimumSize: {0}", ParallelMinimumSize), new ArgumentException());
                 if (value > ParallelMaximumSize || value < ParallelMinimumSize)
-                    throw new ArgumentOutOfRangeException(String.Format("Parallel block must be Maximum of ParallelMaximumSize: {0} and evenly divisible by ParallelMinimumSize: {1}", ParallelMaximumSize, ParallelMinimumSize));
+                    throw new CryptoGeneratorException("SP20Drbg:ParallelBlockSize", String.Format("Parallel block must be Maximum of ParallelMaximumSize: {0} and evenly divisible by ParallelMinimumSize: {1}", ParallelMaximumSize, ParallelMinimumSize), new ArgumentOutOfRangeException());
 
                 _parallelBlockSize = value;
             }
@@ -227,9 +229,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         public SP20Drbg(int Rounds = 20)
         {
             if (Rounds <= 0 || (Rounds & 1) != 0)
-                throw new ArgumentOutOfRangeException("Rounds must be a positive, even number!");
+                throw new CryptoGeneratorException("SP20Drbg:Ctor", "Rounds must be a positive, even number!", new ArgumentOutOfRangeException());
             if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
-                throw new ArgumentOutOfRangeException("Rounds must be between " + MIN_ROUNDS + " and " + MAX_ROUNDS + "!");
+                throw new CryptoGeneratorException("SP20Drbg:Ctor", String.Format("Rounds must be between {0} and {1}!", MIN_ROUNDS, MAX_ROUNDS), new ArgumentOutOfRangeException());
 
             _rndCount = Rounds;
 
@@ -238,6 +240,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
                 ProcessorCount--;
 
             IsParallel = ProcessorCount > 1;
+        }
+
+        private SP20Drbg()
+        {
         }
 
         /// <summary>
@@ -256,14 +262,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Salt">Salt value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt is used</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Salt does not contain enough material for Key and Vector creation</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null or invalid salt is used</exception>
         public void Initialize(byte[] Salt)
         {
             if (Salt == null)
-                throw new ArgumentNullException("Salt can not be null!");
+                throw new CryptoGeneratorException("SP20Drbg:Initialize", "Salt can not be null!", new ArgumentNullException());
             if (Salt.Length != LegalSeedSizes[0] && Salt.Length != LegalSeedSizes[1])
-                throw (new ArgumentOutOfRangeException(string.Format("Invalid seed size has not been added. Size must be at least {0} or {1} bytes!", LegalSeedSizes[0], LegalSeedSizes[1])));
+                throw new CryptoGeneratorException("SP20Drbg:Initialize", String.Format("Invalid seed size has been added. Size must be at least {0} or {1} bytes!", LegalSeedSizes[0], LegalSeedSizes[1]), new ArgumentOutOfRangeException());
 
             _keySize = Salt.Length;
             _ctrVector = new int[2];
@@ -285,7 +290,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Salt">Salt value</param>
         /// <param name="Ikm">Key material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt or ikm is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if an invalid or null salt or ikm is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm)
         {
             byte[] seed = new byte[Salt.Length + Ikm.Length];
@@ -304,7 +309,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Ikm">Key material</param>
         /// <param name="Info">Nonce value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt, ikm, or nonce is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if an invalid or null salt or ikm is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm, byte[] Info)
         {
             byte[] seed = new byte[Salt.Length + Ikm.Length + Info.Length];
@@ -339,8 +344,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Size">Number of bytes to generate</param>
         /// 
         /// <returns>Number of bytes generated</returns>
+        /// 
+        /// <exception cref="CryptoGeneratorException">Thrown if the output buffer is too small</exception>
         public int Generate(byte[] Output, int OutOffset, int Size)
         {
+            if ((Output.Length - Size) < OutOffset)
+                throw new CryptoGeneratorException("SP20Drbg:Generate", "Output buffer too small!", new Exception());
+
             ProcessBlock(Output, OutOffset);
 
             return Size;
@@ -354,11 +364,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Seed">Pseudo random seed material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Seed is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Seed is used</exception>
         public void Update(byte[] Seed)
         {
             if (Seed == null)
-                throw new ArgumentNullException("Seed can not be null!");
+                throw new CryptoGeneratorException("SP20Drbg:Update", "Seed can not be null!", new ArgumentNullException());
 
             if (Seed.Length >= 32)
                 Initialize(Seed);

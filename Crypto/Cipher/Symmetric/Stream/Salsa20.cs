@@ -1,5 +1,7 @@
 ﻿#region Directives
 using System;
+using VTDev.Libraries.CEXEngine.Crypto.Processing.Structure;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -33,8 +35,8 @@ using System;
 // Implementation Details:
 // Salsa20+
 // An implementation based on the Salsa20 stream cipher,
-// using an extended key size, and higher variable rounds assignment.
-// Valid Key sizes are 128, 256 and 384 and 448 (16, 32 48 and 56 bytes).
+// using an higher variable rounds assignment.
+// Valid Key sizes are 128, and 256 (16 and 32 bytes).
 // Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.
 // Written by John Underhill, October 17, 2014
 // contact: develop@vtdev.com</para>
@@ -64,6 +66,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
     /// <revision date="2014/11/14" version="1.2.0.0">Initial release</revision>
     /// <revision date="2015/01/23" version="1.3.0.0">Secondary release; updates to layout and documentation</revision>
     /// <revision date="2015/06/14" version="1.4.0.0">Added parallel processing</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -87,11 +90,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
     /// <item><description>Inspired in part by the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class Salsa20 : IStreamCipher, IDisposable
+    public sealed class Salsa20 : IStreamCipher
     {
         #region Constants
         private const string ALG_NAME = "Salsa20";
-        private const int DEFAULT_ROUNDS = 20;
+        private const int ROUNDS20 = 20;
         private const int MAX_ROUNDS = 30;
         private const int MIN_ROUNDS = 8;
         private const int STATE_SIZE = 16;
@@ -110,7 +113,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         private bool _isInitialized = false;
         private bool _isParallel = false;
         private int _parallelBlockSize = PARALLEL_DEFBLOCK;
-        private int _rndCount = DEFAULT_ROUNDS;
+        private int _rndCount = ROUNDS20;
         private int[] _wrkState = new int[14];
         #endregion
 
@@ -175,17 +178,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         /// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
         /// </summary>
         /// 
-        /// <exception cref="System.ArgumentException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if parallel block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
+        /// <exception cref="CryptoSymmetricException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, or  block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
         public int ParallelBlockSize
         {
             get { return _parallelBlockSize; }
             set
             {
                 if (value % ParallelMinimumSize != 0)
-                    throw new ArgumentException(String.Format("Parallel block size must be evenly divisible by ParallelMinimumSize: {0}", ParallelMinimumSize));
+                    throw new CryptoSymmetricException("Salsa20:ParallelBlockSize", String.Format("Parallel block size must be evenly divisible by ParallelMinimumSize: {0}", ParallelMinimumSize), new ArgumentException());
                 if (value > ParallelMaximumSize || value < ParallelMinimumSize)
-                    throw new ArgumentOutOfRangeException(String.Format("Parallel block must be Maximum of ParallelMaximumSize: {0} and evenly divisible by ParallelMinimumSize: {1}", ParallelMaximumSize, ParallelMinimumSize));
+                    throw new CryptoSymmetricException("Salsa20:ParallelBlockSize", String.Format("Parallel block must be Maximum of ParallelMaximumSize: {0} and evenly divisible by ParallelMinimumSize: {1}", ParallelMaximumSize, ParallelMinimumSize), new ArgumentOutOfRangeException());
 
                 _parallelBlockSize = value;
             }
@@ -235,15 +237,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         /// Initialize the class
         /// </summary>
         /// 
-        /// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes</param>
+        /// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 20 rounds.</param>
         /// 
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if an invalid rounds count is chosen</exception>
-        public Salsa20(int Rounds = 20)
+        /// <exception cref="CryptoSymmetricException">Thrown if an invalid rounds count is chosen</exception>
+        public Salsa20(int Rounds = ROUNDS20)
         {
             if (Rounds <= 0 || (Rounds & 1) != 0)
-                throw new ArgumentOutOfRangeException("Rounds must be a positive, even number!");
+                throw new CryptoSymmetricException("Salsa20:Ctor", "Rounds must be a positive even number!", new ArgumentOutOfRangeException());
             if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
-                throw new ArgumentOutOfRangeException("Rounds must be between " + MIN_ROUNDS + " and " + MAX_ROUNDS + "!");
+                throw new CryptoSymmetricException("Salsa20:Ctor", String.Format("Rounds must be between {0} and {1)!", MIN_ROUNDS, MAX_ROUNDS), new ArgumentOutOfRangeException());
 
             _rndCount = Rounds;
 
@@ -279,23 +281,23 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         public void Initialize(KeyParams KeyParam)
         {
             if (KeyParam.IV == null)
-                throw new ArgumentNullException("Init parameters must include an IV!");
+                throw new CryptoSymmetricException("Salsa20:Initialize", "Init parameters must include an IV!", new ArgumentException());
             if (KeyParam.IV.Length != 8)
-                throw new ArgumentOutOfRangeException("Requires exactly 8 bytes of IV!");
+                throw new CryptoSymmetricException("Salsa20:Initialize", "Requires exactly 8 bytes of IV!", new ArgumentOutOfRangeException());
 
             Reset();
 
             if (KeyParam.Key == null)
             {
                 if (!_isInitialized)
-                    throw new ArgumentException("Key can not be null for first initialisation!");
+                    throw new CryptoSymmetricException("ChaCha:Initialize", "Key can not be null for first initialisation!", new ArgumentException());
 
                 SetKey(null, KeyParam.IV);
             }
             else
             {
-                if (KeyParam.Key.Length != 16 && KeyParam.Key.Length != 32 && KeyParam.Key.Length != 48 && KeyParam.Key.Length != 56)
-                    throw new ArgumentOutOfRangeException("Key must be 16, 32, 48, or 56 bytes!");
+                if (KeyParam.Key.Length != 16 && KeyParam.Key.Length != 32)
+                    throw new CryptoSymmetricException("ChaCha:Initialize", "Key must be 16 or 32 bytes!", new ArgumentOutOfRangeException());
 
                 SetKey(KeyParam.Key, KeyParam.IV);
             }
@@ -625,7 +627,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
             }
         }
 
-        public void ProcessBlock(byte[] Input, int InOffset, int Length, byte[] Output, int OutOffset)
+        private void ProcessBlock(byte[] Input, int InOffset, int Length, byte[] Output, int OutOffset)
         {
             int blkSize = Length;
 

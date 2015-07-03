@@ -1,5 +1,6 @@
 ﻿#region Directives
 using System;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -32,7 +33,7 @@ using System;
 // 
 // Implementation Details:
 // An implementation of the Blake digest with a 256 bit digest size.
-// Written by John Underhill, January 12, 2014
+// Written by John Underhill, January 12, 2015
 // contact: develop@vtdev.com
 #endregion
 
@@ -55,11 +56,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto">VTDev.Libraries.CEXEngine.Crypto Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
@@ -83,7 +85,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
     /// <item><description>Inspired by the excellent project by Dominik Reichl: <see href="http://www.codeproject.com/Articles/286937/BlakeSharp-A-Csharp-Implementation-of-the-BLAKE-Ha">Blake Sharp</see>.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class Blake256 : IDigest, IDisposable
+    public sealed class Blake256 : IDigest
     {
         #region Constants
         private const string ALG_NAME = "Blake256";
@@ -100,7 +102,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
         private UInt32[] _hashVal = new UInt32[8];
         private bool _isDisposed = false;
         private bool _isNullT;
-        private byte[] _oneByte = new byte[1];
         private UInt32[] _salt64 = new UInt32[4];
         private static int[] _ftSigma;
         private byte[] _digestState = new byte[64];
@@ -177,8 +178,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
         /// <param name="Input">Input data</param>
         /// <param name="InOffset">Offset within Input</param>
         /// <param name="Length">Amount of data to process in bytes</param>
+        /// 
+        /// <exception cref="CryptoHashException">Thrown if an invalid Input size is chosen</exception>
         public void BlockUpdate(byte[] Input, int InOffset, int Length)
         {
+            if ((InOffset + Length) > Input.Length)
+                throw new CryptoHashException("Blake256:BlockUpdate", "The Input buffer is too short!", new ArgumentOutOfRangeException());
+
             int offset = InOffset;
             int fill = 64 - _dataLen;
 
@@ -214,16 +220,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
         }
 
         /// <summary>
-        /// Creates a shallow copy of the current Object
-        /// </summary>
-        /// 
-        /// <returns>A shallow copy of the current Object</returns>
-        public object Clone()
-        {
-            return (Blake256)this.MemberwiseClone();
-        }
-
-        /// <summary>
         /// Get the Hash value
         /// </summary>
         /// 
@@ -248,8 +244,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
         /// <param name="OutOffset">The starting offset within the Output array</param>
         /// 
         /// <returns>Size of Hash value</returns>
+        /// 
+        /// <exception cref="CryptoHashException">Thrown if Output array is too small</exception>
         public int DoFinal(byte[] Output, int OutOffset)
         {
+            if (Output.Length - OutOffset < DigestSize)
+                throw new CryptoHashException("Blake256:DoFinal", "The Output buffer is too short!", new ArgumentOutOfRangeException());
+
             byte[] msgLen = new byte[8];
             ulong len = _T + ((ulong)_dataLen << 3);
 
@@ -319,8 +320,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
         /// <param name="Input">Input byte</param>
         public void Update(byte Input)
         {
-            _oneByte[0] = Input;
-            BlockUpdate(_oneByte, 0, 1);
+            BlockUpdate(new byte[] { Input }, 0, 1);
         }
         #endregion
 
@@ -473,11 +473,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
                         Array.Clear(_M, 0, _M.Length);
                         _M = null;
                     }
-                    if (_oneByte != null)
-                    {
-                        Array.Clear(_oneByte, 0, _oneByte.Length);
-                        _oneByte = null;
-                    }
                     if (_salt64 != null)
                     {
                         Array.Clear(_salt64, 0, _salt64.Length);
@@ -494,9 +489,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Digest
                         _V = null;
                     }
                 }
-                catch { }
-
-                _isDisposed = true;
+                finally
+                {
+                    _isDisposed = true;
+                }
             }
         }
         #endregion

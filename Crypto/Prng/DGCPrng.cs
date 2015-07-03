@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
-using VTDev.Libraries.CEXEngine.Crypto.Seed;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
+using VTDev.Libraries.CEXEngine.Crypto.Seed;
+using VTDev.Libraries.CEXEngine.Exceptions;
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Prng
 {
@@ -24,11 +23,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// 
     /// <revisionHistory>
     /// <revision date="2015/06/09" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest">VTDev.Libraries.CEXEngine.Crypto.Digest Namespace</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto.Digests Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
@@ -52,7 +52,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <item><description>Based on the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see> version.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class DGCPrng : IRandom, IDisposable
+    public sealed class DGCPrng : IRandom
     {
         #region Constants
         private const string ALG_NAME = "DGCPrng";
@@ -92,11 +92,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="SeedEngine">The Seed engine used to create the salt (default is CSPRsg)</param>
         /// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
         /// 
-        /// <exception cref="ArgumentException">Thrown if the buffer size is too small</exception>
+        /// <exception cref="CryptoRandomException">Thrown if the buffer size is too small</exception>
         public DGCPrng(Digests DigestEngine = Digests.Keccak512, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = BUFFER_SIZE)
         {
             if (BufferSize < 128)
-                throw new ArgumentException("BufferSize must be at least 128 bytes!");
+                throw new CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!", new ArgumentException());
 
             _digestType = DigestEngine;
             _seedType = SeedEngine;
@@ -113,22 +113,25 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="DigestEngine">The digest that powers the rng (default is Keccak512)</param>
         /// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
         /// 
-        /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
-        /// <exception cref="ArgumentException">Thrown if the seed or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
+        /// <exception cref="CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
         public DGCPrng(byte[] Seed, Digests DigestEngine = Digests.Keccak512, int BufferSize = BUFFER_SIZE)
         {
             if (Seed == null)
-                throw new ArgumentNullException("Seed can not be null!");
+                throw new CryptoRandomException("DGCPrng:Ctor", "Seed can not be null!", new ArgumentNullException());
             if (GetMinimumSeedSize(DigestEngine) < Seed.Length)
-                throw new ArgumentException(string.Format("The state seed is too small! must be at least {0} bytes", GetMinimumSeedSize(DigestEngine)));
+                throw new CryptoRandomException("DGCPrng:Ctor", String.Format("The state seed is too small! must be at least {0} bytes", GetMinimumSeedSize(DigestEngine)), new ArgumentException());
             if (BufferSize < 128)
-                throw new ArgumentException("BufferSize must be at least 128 bytes!");
+                throw new CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!", new ArgumentException());
 
             _digestType = DigestEngine;
             _stateSeed = Seed;
             _byteBuffer = new byte[BufferSize];
             _bufferSize = BufferSize;
             Reset();
+        }
+
+        private DGCPrng()
+        {
         }
 
         /// <summary>
@@ -377,22 +380,22 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                     return new Blake256();
                 case Digests.Blake512:
                     return new Blake512();
+                case Digests.Keccak1024:
+                    return new Keccak1024();
                 case Digests.Keccak256:
                     return new Keccak256();
                 case Digests.Keccak512:
                     return new Keccak512();
-                case Digests.Keccak1024:
-                    return new Keccak1024();
                 case Digests.SHA256:
                     return new SHA256();
                 case Digests.SHA512:
                     return new SHA512();
+                case Digests.Skein1024:
+                    return new Skein1024();
                 case Digests.Skein256:
                     return new Skein256();
                 case Digests.Skein512:
                     return new Skein512();
-                case Digests.Skein1024:
-                    return new Skein1024();
                 default:
                     return new SHA512();
             }

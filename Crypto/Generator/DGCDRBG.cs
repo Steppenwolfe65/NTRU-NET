@@ -1,6 +1,7 @@
 ﻿#region Directives
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
 using System;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -59,11 +60,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// 
     /// <revisionHistory>
     /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest">VTDev.Libraries.CEXEngine.Crypto.Digest Namespace</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto.Digests Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
@@ -72,7 +74,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <item><description>Combination of [Salt, Ikm, Nonce] must be at least: digest block size + counter (8 bytes) size in length.</description></item>
     /// <item><description>The <see cref="DGCDrbg(IDigest, bool)">Constructors</see> DisposeEngine parameter determines if Digest engine is destroyed when <see cref="Dispose()"/> is called on this class; default is <c>true</c>.</description></item>
     /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
-    /// <description>Output buffer is 4 * the digest return size.</description></item>
+    /// <item><description>Output buffer is 4 * the digest return size.</description></item>
     /// </list>
     /// 
     /// <description><h4>Guiding Publications:</h4></description>
@@ -89,7 +91,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <item><description>Based on the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see> version.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class DGCDrbg : IGenerator, IDisposable
+    public sealed class DGCDrbg : IGenerator
     {
         #region Constants
         private const string ALG_NAME = "DGCDrbg";
@@ -146,13 +148,22 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Digest">Hash function</param>
         /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called</param>
+        /// 
+        /// <exception cref="CryptoSymmetricException">Thrown if a null digest is used</exception>
         public DGCDrbg(IDigest Digest, bool DisposeEngine = true)
         {
+            if (Digest == null)
+                throw new CryptoGeneratorException("DGCDrbg:Ctor", "Digest can not be null!", new ArgumentNullException());
+
             _disposeEngine = DisposeEngine;
             _msgDigest = Digest;
             _dgtSeed = new byte[Digest.DigestSize];
             _dgtState = new byte[Digest.DigestSize];
             _keySize = _msgDigest.BlockSize + COUNTER_SIZE;
+        }
+
+        private DGCDrbg()
+        {
         }
 
         /// <summary>
@@ -171,14 +182,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Salt">Salt value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt is used</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Salt does not contain enough material for Key and Vector creation</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if an invalid or null salt is used</exception>
         public void Initialize(byte[] Salt)
         {
             if (Salt == null)
-                throw new ArgumentNullException("Salt can not be null!");
+                throw new CryptoGeneratorException("DGCDrbg:Initialize", "Salt can not be null!", new ArgumentNullException());
             if (Salt.Length < COUNTER_SIZE)
-                throw new ArgumentOutOfRangeException("Salt must be at least 8 bytes!");
+                throw new CryptoGeneratorException("DGCDrbg:Initialize", "Salt must be at least 8 bytes!", new ArgumentOutOfRangeException());
 
             Int64[] counter = new Int64[1];
             int keyLen = (Salt.Length - COUNTER_SIZE) < 0 ? 0 : Salt.Length - COUNTER_SIZE;
@@ -201,7 +211,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Salt">Salt value</param>
         /// <param name="Ikm">Key material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt or ikm is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if an invalid or null salt is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm)
         {
             byte[] seed = new byte[Salt.Length + Ikm.Length];
@@ -220,7 +230,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Ikm">Key material</param>
         /// <param name="Info">Info value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null salt or ikm is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if an invalid or null salt is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm, byte[] Info)
         {
             byte[] seed = new byte[Salt.Length + Ikm.Length + Info.Length];
@@ -253,8 +263,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Size">Number of bytes to generate</param>
         /// 
         /// <returns>Number of bytes generated</returns>
+        /// 
+        /// <exception cref="CryptoGeneratorException">Thrown if the output buffer is too small</exception>
         public int Generate(byte[] Output, int OutOffset, int Size)
         {
+            if ((Output.Length - Size) < OutOffset)
+                throw new CryptoGeneratorException("DGCDrbg:Generate", "Output buffer too small!", new Exception());
+
             int offset = 0;
             int len = OutOffset + Size;
 
@@ -283,14 +298,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Seed">Pseudo random seed material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Seed is used</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Seed does not contain enough material for Key and Vector creation</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null or invalid Seed is used</exception>
         public void Update(byte[] Seed)
         {
             if (Seed == null)
-                throw new ArgumentNullException("Seed can not be null!");
+                throw new CryptoGeneratorException("DGCDrbg:Update", "Seed can not be null!", new ArgumentNullException());
             if (Seed.Length < COUNTER_SIZE)
-                throw (new ArgumentOutOfRangeException("Minimum key size has not been added. Size must be at least " + COUNTER_SIZE + " bytes!"));
+                throw new CryptoGeneratorException("DGCDrbg:Update", String.Format("Minimum key size has not been added. Size must be at least {0} bytes!", COUNTER_SIZE), new ArgumentOutOfRangeException());
 
             // update seed and counter
             if (Seed.Length >= _msgDigest.BlockSize + COUNTER_SIZE)

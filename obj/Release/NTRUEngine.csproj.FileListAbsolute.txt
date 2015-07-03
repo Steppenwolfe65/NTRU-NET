@@ -2,3 +2,7 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\bin\Release\NTRUEngine.pdb
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\obj\Release\NTRUEngine.dll
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU Sharp\obj\Release\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\bin\Release\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\bin\Release\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\obj\Release\NTRUEngine.dll
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\obj\Release\NTRUEngine.pdb

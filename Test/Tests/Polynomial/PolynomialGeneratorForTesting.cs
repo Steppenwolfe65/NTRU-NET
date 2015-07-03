@@ -1,6 +1,6 @@
 #region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Polynomial;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polynomial;
 #endregion
 
 namespace Test.Tests.Polynomial

@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using VTDev.Libraries.CEXEngine.Exceptions;
 using VTDev.Libraries.CEXEngine.Utility;
 #endregion
 
@@ -29,24 +30,19 @@ using VTDev.Libraries.CEXEngine.Utility;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-// Principal Algorithms:
-// Cipher implementation based on the Rijndael block cipher designed by Joan Daemen and Vincent Rijmen:
-// Rijndael <see href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Specification</see>.
-// AES specification <see href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">Fips 197</see>.
-// 
 // Implementation Details:
-// An implementation based on the Rijndael block cipher, 
-// using HKDF with a selectable Message Digest for expanded key generation.
-// Rijndael HKDF Extended (RHX)
-// Written by John Underhill, November 11, 2014
+// An implementation of a pseudo random generator.
+// XSPRsg:  XorShift+random seed generator
+// Written by John Underhill, June 1, 2015
 // contact: develop@vtdev.com
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Seed
 {
     /// <summary>
-    /// Generates seed material for a CSPrng using various processed system counters passed through an XorShift+ generator
-    /// <para>An original construct (experimental) meant to provide an alternative to the RNGCryptoServiceProvider as a source of pseudo random seeding material.</para>
+    /// Generates seed material for a CSPrng using various processed system counters passed through an XorShift+ generator.
+    /// <para>An original construct (experimental) meant to provide an alternative to the RNGCryptoServiceProvider as a source of pseudo random seeding material.
+    /// This class is suitable for generating seeds for a Prng or Drbg implementation.</para>
     /// </summary>
     /// 
     /// 
@@ -61,6 +57,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
     /// 
     /// <revisionHistory>
     /// <revision date="2015/06/09" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Prng">VTDev.Libraries.CEXEngine.Crypto Prng Classes</seealso>
@@ -68,7 +65,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
     /// <para>The seed generator uses system counters and state information, that are pre-processed via modular arithmetic, 
-    /// converted to a byte array, and then processed with an XorShift+ random generator.</para>
+    /// converted to a byte array, and then processed with an XorShift+ random generator.
+    /// The maximum allocation size is 1024 bytes.</para>
     /// 
     /// <description>XSPGenerator uses the following state values as initial entropy sources:</description>
     /// <list type="bullet">
@@ -79,7 +77,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
     /// <item><description>.</description></item>
     /// </list>
     /// </remarks>
-    public sealed class XSPRsg : ISeed, IDisposable
+    public sealed class XSPRsg : ISeed
     {
         #region Constants
         private const string ALG_NAME = "XSPRsg";
@@ -89,7 +87,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         private bool _isDisposed = false;
         private byte[] _stateSeed;
         private int _stateOffset = 0;
-        private readonly int MAX = 1024;
+        private readonly int MAX_ALLOC = 1024;
         #endregion
 
         #region Properties
@@ -103,6 +101,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Initialize this class
+        /// </summary>
         public XSPRsg()
         {
             Initialize();
@@ -115,7 +116,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         /// </summary>
         public void Initialize()
         {
-            _stateSeed = XorShift3(ArrayUtils.Concat(NetStats(), ProcessStats(), ThreadStats(), TimeStats()), MAX);
+            _stateSeed = XorShift3(ArrayUtils.Concat(NetStats(), ProcessStats(), ThreadStats(), TimeStats()), MAX_ALLOC);
             _stateOffset = 0;
         }
 
@@ -126,16 +127,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         /// <param name="Size">The size of the seed returned; up to a maximum of 1024 bytes</param>
         /// 
         /// <returns>A pseudo random seed</returns>
+        /// 
+        /// <exception cref="CryptoRandomException">Thrown if the requested size exceeds maximum allowable allocation (1024 bytes)</exception>
         public byte[] GetSeed(int Size)
         {
-            if (Size > MAX)
-                throw new ArgumentException(string.Format("Size requested exceeds maximum seed allocation size of {0} bytes!", MAX));
+            if (Size > MAX_ALLOC)
+                throw new CryptoRandomException("XSPRsg:GetSeed", String.Format("Size requested exceeds maximum seed allocation size of {0} bytes!", MAX_ALLOC), new ArgumentException());
 
             byte[] data = new byte[Size];
 
-            if (Size + _stateOffset > MAX)
+            if (Size + _stateOffset > MAX_ALLOC)
             {
-                int len = MAX - _stateOffset;
+                int len = MAX_ALLOC - _stateOffset;
                 Buffer.BlockCopy(_stateSeed, _stateOffset, data, 0, len);
                 Initialize();
                 int diff = Size - len;

@@ -1,6 +1,7 @@
 ﻿#region Directives
 using System;
 using System.Security.Cryptography;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -51,8 +52,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/01/23" version="1.3.0.0" author="John Underhill">Initial release</revision>
-    ///     <revision date="2015/04/28" version="1.4.0.0" author="John Underhill">Added thread safety</revision>
+    /// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
+    /// <revision date="2015/04/28" version="1.4.0.0">Added thread safety</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     public sealed class SecureRandom : IDisposable
     {
@@ -76,10 +78,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// </summary>
         /// 
         /// <param name="BufferSize">Size of the internal buffer; must be more than zero</param>
+        /// 
+        /// <exception cref="CryptoRandomException">Thrown if a zero size buffer is used</exception>
         public SecureRandom(int BufferSize = BUFFER_SIZE)
         {
             if (BufferSize < 1)
-                throw new ArgumentException("The buffer size must be more than zero!");
+                throw new CryptoRandomException("SecureRandom:Ctor", "The buffer size must be more than zero!", new ArgumentException());
 
             _byteBuffer = new byte[BufferSize];
             _bufferSize = BufferSize;
@@ -99,6 +103,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <summary>
         /// Reset the RNGCryptoServiceProvider instance.
         /// </summary>
+        /// 
+        /// <exception cref="CryptoRandomException">Thrown if RNGCryptoServiceProvider initialization failed</exception>
         public void Reset()
         {
             lock (_objLock)
@@ -109,7 +115,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
                     _rngEngine = null;
                 }
 
-                _rngEngine = new RNGCryptoServiceProvider();
+                try
+                {
+                    _rngEngine = new RNGCryptoServiceProvider();
+                }
+                catch (Exception ex)
+                {
+                    if (_rngEngine == null)
+                        throw new CryptoRandomException("SecureRandom:Reset", "RNGCrypto could not be initialized!", ex);
+                }
+
                 _rngEngine.GetBytes(_byteBuffer);
                 _bufferIndex = 0;
             }

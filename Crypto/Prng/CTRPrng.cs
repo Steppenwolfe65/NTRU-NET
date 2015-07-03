@@ -1,9 +1,10 @@
 ﻿#region Directives
 using System;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
 using VTDev.Libraries.CEXEngine.Crypto.Generator;
 using VTDev.Libraries.CEXEngine.Crypto.Seed;
-using VTDev.Libraries.CEXEngine.Crypto.Generator.VTDev.Libraries.CEXEngine.Crypto.Generator;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Prng
@@ -27,17 +28,17 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// 
     /// <revisionHistory>
     /// <revision date="2015/06/09" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block">VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block Namespace</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Seed">VTDev.Libraries.CEXEngine.Crypto.Seed ISeed Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.BlockCiphers">VTDev.Libraries.CEXEngine.Crypto.BlockCiphers Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockCiphers">VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockCiphers Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
     /// <list type="bullet">
-    /// <item><description>Can be initialized with any block <see cref="VTDev.Libraries.CEXEngine.Crypto.BlockCiphers">cipher</see>.</description></item>
-    /// <item><description>Parallelized by default on a multi processer system when an input byte array of <see cref="ParallelMinimumSize"/> bytes or larger is used.</description></item>
+    /// <item><description>Can be initialized with any block <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockCiphers">cipher</see>.</description></item>
     /// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
     /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
     /// </list>
@@ -50,7 +51,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
     /// <item><description>Security Bounds for the NIST Codebook-based: <see href="http://eprint.iacr.org/2006/379.pdf">Deterministic Random Bit Generator</see>.</description></item>
     /// </list>
     /// </remarks>
-    public sealed class CTRPrng : IRandom, IDisposable
+    public sealed class CTRPrng : IRandom
     {
         #region Constants
         private const string ALG_NAME = "CTRPrng";
@@ -94,7 +95,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         public CTRPrng(BlockCiphers BlockEngine = BlockCiphers.RDX, SeedGenerators SeedEngine = SeedGenerators.CSPRsg, int BufferSize = 4096, int KeySize = 0)
         {
             if (BufferSize < 64)
-                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+                throw new CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!", new ArgumentNullException());
 
             _engineType = BlockEngine;
             _seedType = SeedEngine;
@@ -116,16 +117,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Prng
         /// <param name="BlockEngine">The block cipher that powers the rng (default is RDX)</param>
         /// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
         /// 
-        /// <exception cref="ArgumentNullException">Thrown if the seed is null</exception>
-        /// <exception cref="ArgumentException">Thrown if the seed is too small</exception>
+        /// <exception cref="CryptoRandomException">Thrown if the seed is null or too small</exception>
         public CTRPrng(byte[] Seed, BlockCiphers BlockEngine = BlockCiphers.RDX, int BufferSize = 4096)
         {
             if (BufferSize < 64)
-                throw new ArgumentNullException("Buffer size must be at least 64 bytes!");
+                throw new CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!", new ArgumentNullException());
             if (Seed == null)
-                throw new ArgumentNullException("Seed can not be null!");
+                throw new CryptoRandomException("CTRPrng:Ctor", "Seed can not be null!", new ArgumentNullException());
             if (GetKeySize(BlockEngine) < Seed.Length)
-                throw new ArgumentException(string.Format("The state seed is too small! must be at least {0} bytes", GetKeySize(BlockEngine)));
+                throw new CryptoRandomException("CTRPrng:Ctor", String.Format("The state seed is too small! must be at least {0} bytes", GetKeySize(BlockEngine)), new ArgumentException());
 
             _engineType = BlockEngine;
             _stateSeed = Seed;

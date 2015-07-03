@@ -1,6 +1,7 @@
 ﻿#region Directives
 using System;
 using System.Security.Cryptography;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -27,16 +28,10 @@ using System.Security.Cryptography;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-// Principal Algorithms:
-// Cipher implementation based on the Rijndael block cipher designed by Joan Daemen and Vincent Rijmen:
-// Rijndael <see href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Specification</see>.
-// AES specification <see href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">Fips 197</see>.
-// 
 // Implementation Details:
-// An implementation based on the Rijndael block cipher, 
-// using HKDF with a selectable Message Digest for expanded key generation.
-// Rijndael HKDF Extended (RHX)
-// Written by John Underhill, November 11, 2014
+// An implementation of a pseudo random generator.
+// CSPRsg:  Crypto Service Provider random seed generator
+// Written by John Underhill, June 1, 2015
 // contact: develop@vtdev.com
 #endregion
 
@@ -57,6 +52,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
     /// 
     /// <revisionHistory>
     /// <revision date="2015/06/09" version="1.4.0.0">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <remarks>
@@ -68,7 +64,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
     /// <item><description>RFC 4086: <cite>RFC 4086</cite>Randomness Requirements for Security.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class CSPRsg : ISeed, IDisposable
+    public sealed class CSPRsg : ISeed
     {
         #region Constants
         private const string ALG_NAME = "CSPRsg";
@@ -93,9 +89,19 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Seed
         /// <summary>
         /// Initialize the class
         /// </summary>
+        /// 
+        /// <exception cref="CryptoRandomException">Thrown if RNGCryptoServiceProvider initialization failed</exception>
         public CSPRsg()
         {
-            _rngCrypto = new RNGCryptoServiceProvider();
+            try
+            {
+                _rngCrypto = new RNGCryptoServiceProvider();
+            }
+            catch (Exception ex)
+            {
+                if (_rngCrypto == null)
+                    throw new CryptoRandomException("CSPRsg:Ctor", "RNGCrypto could not be initialized!", ex);
+            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿#region Directives
 using System;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 namespace VTDev.Libraries.CEXEngine.Crypto.Generator
@@ -24,12 +25,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// </example>
     /// 
     /// <revisionHistory>
-    ///     <revision date="2015/28/15" version="1.3.1.1" author="John Underhill">Initial release</revision>
+    /// <revision date="2015/28/15" version="1.3.1.1">Initial release</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mac.HMAC">VTDev.Libraries.CEXEngine.Crypto.Mac HMAC</seealso>
     /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digest.IDigest">VTDev.Libraries.CEXEngine.Crypto.Digest IDigest Interface</seealso>
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Digests">VTDev.Libraries.CEXEngine.Crypto Digests Enumeration</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">VTDev.Libraries.CEXEngine.Crypto.Enumeration Digests Enumeration</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
@@ -47,7 +49,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
     /// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
     /// </list>
     /// </remarks>
-    public class KDF2Drbg : IGenerator, IDisposable
+    public class KDF2Drbg : IGenerator
     {
         #region Constants
         private const string ALG_NAME = "PBKDF2";
@@ -95,7 +97,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
 
         #region Constructors
         /// <summary>
-        /// Creates a PBKDF2 Bytes Generator based on the given HMAC function
+        /// Creates a PBKDF2 Bytes Generator based on the given HMAC function using the default SHA512 engine
         /// </summary>
         public KDF2Drbg()
         {
@@ -112,11 +114,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Digest">The digest used</param>
         /// <param name="DisposeEngine">Dispose of digest engine when <see cref="Dispose()"/> on this class is called</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Digest is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Digest is used</exception>
         public KDF2Drbg(IDigest Digest, bool DisposeEngine = true)
         {
             if (Digest == null)
-                throw new ArgumentNullException("Digest can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Ctor", "Digest can not be null!", new ArgumentNullException());
 
             _disposeEngine = DisposeEngine;
             _digest = Digest;
@@ -140,11 +142,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Salt">Salt or 'password' value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Salt is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Salt is used</exception>
         public void Initialize(byte[] Salt)
         {
             if (Salt == null)
-                throw new ArgumentNullException("Salt can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Salt can not be null!", new ArgumentNullException());
 
             if (Salt.Length < _digest.BlockSize * 2)
             {
@@ -171,15 +173,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Salt">Salt or 'password' value</param>
         /// <param name="Ikm">Key material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Salt or Ikm is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Salt or Ikm is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm)
         {
             if (Salt == null)
-                throw new ArgumentNullException("Salt can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Salt can not be null!", new ArgumentNullException());
             if (Ikm == null)
-                throw new ArgumentNullException("Ikm can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Ikm can not be null!", new ArgumentNullException());
             if (Salt.Length < _digest.BlockSize)
-                throw new ArgumentException("Salt can not be less than digest blocksize!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Salt can not be less than digest blocksize!", new ArgumentException());
 
             _Salt = (byte[])Salt.Clone();
             _IV = (byte[])Ikm.Clone();
@@ -195,15 +197,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Ikm">Key material</param>
         /// <param name="Nonce">Nonce value</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Salt or Ikm is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Salt or Ikm is used</exception>
         public void Initialize(byte[] Salt, byte[] Ikm, byte[] Nonce)
         {
             if (Salt == null)
-                throw new ArgumentNullException("Salt can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Salt can not be null!", new ArgumentNullException());
             if (Ikm == null)
-                throw new ArgumentNullException("Ikm can not be null!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Ikm can not be null!", new ArgumentNullException());
             if (Salt.Length < _digest.BlockSize)
-                throw new ArgumentException("Salt can not be less than digest blocksize!");
+                throw new CryptoGeneratorException("KDF2Drbg:Initialize", "Salt can not be less than digest blocksize!", new ArgumentException());
 
             _IV = (byte[])Ikm.Clone();
             _Salt = new byte[Salt.Length + Nonce.Length];
@@ -234,10 +236,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// <param name="Size">Number of bytes to generate</param>
         /// 
         /// <returns>Number of bytes generated</returns>
+        /// 
+        /// <exception cref="CryptoGeneratorException">Thrown if the output buffer is too small</exception>
         public int Generate(byte[] Output, int OutOffset, int Size)
         {
             if ((Output.Length - Size) < OutOffset)
-                throw new Exception("Output buffer too small");
+                throw new CryptoGeneratorException("KDF2Drbg:Generate", "Output buffer too small!", new Exception());
 
             return GenerateKey(Output, OutOffset, Size);
         }
@@ -248,9 +252,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         /// 
         /// <param name="Seed">Pseudo random seed material</param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null Seed is used</exception>
+        /// <exception cref="CryptoGeneratorException">Thrown if a null Seed is used</exception>
         public void Update(byte[] Seed)
         {
+            if (Seed == null)
+                throw new CryptoGeneratorException("KDF2Drbg:Update", "Seed can not be null!", new ArgumentNullException());
+
             Initialize(Seed);
         }
         #endregion
@@ -260,7 +267,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Generator
         {
             int outLen = _digest.DigestSize;
             int maxCtr = (int)((Size + outLen - 1) / outLen);
-            // only diff between v 1 & 2
+            // only difference between v1 & v2
             int counter = 1;
             byte[] hash = new byte[_digest.DigestSize];
 

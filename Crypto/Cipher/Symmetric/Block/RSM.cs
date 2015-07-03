@@ -1,9 +1,10 @@
 ﻿#region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Crypto.Generator;
-using VTDev.Libraries.CEXEngine.Crypto.Mac;
 using VTDev.Libraries.CEXEngine.Crypto.Digest;
-using System.ComponentModel;
+using VTDev.Libraries.CEXEngine.Crypto.Enumeration;
+using VTDev.Libraries.CEXEngine.Crypto.Generator;
+using VTDev.Libraries.CEXEngine.Crypto.Processing.Structure;
+using VTDev.Libraries.CEXEngine.Exceptions;
 #endregion
 
 #region License Information
@@ -75,9 +76,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
     /// <revision date="2014/09/18" version="1.2.0.0">Initial release using a fixed Digest key schedule generator</revision>
     /// <revision date="2015/01/23" version="1.3.0.0">Secondary release using an assignable Digest in the HKDF engine</revision>
     /// <revision date="2015/03/15" version="1.3.2.0">Added the IkmSize optional parameter to the constructor, and the DistributionCode property</revision>
+    /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
     /// </revisionHistory>
     /// 
-    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Mode.ICipherMode">VTDev.Libraries.CEXEngine.Crypto.Mode.ICipherMode Interface</seealso>
+    /// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block.Mode.ICipherMode">VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block.Mode.ICipherMode Interface</seealso>
     /// 
     /// <remarks>
     /// <description><h4>Implementation Notes:</h4></description>
@@ -129,13 +131,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
     /// and the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
     /// </list> 
     /// </remarks>
-    public sealed class RSM : IBlockCipher, IDisposable
+    public sealed class RSM : IBlockCipher
     {
         #region Constants
         private const string ALG_NAME = "RSM";
         private const Int32 BLOCK16 = 16;
         private const Int32 BLOCK32 = 32;
-        private const Int32 DEFAULT_ROUNDS = 18;
+        private const Int32 ROUNDS18 = 18;
         private const Int32 LEGAL_KEYS = 10;
         private const Int32 MAX_ROUNDS = 42;
         private const Int32 MIN_ROUNDS = 10;
@@ -174,13 +176,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
         /// Changing this code will create a unique distribution of the cipher.
         /// Code can be either a zero byte array, or a multiple of the HKDF digest engines return size.</para>
         /// </summary>
+        /// 
+        /// <exception cref="CryptoSymmetricException">Thrown if an invalid distribution code is used</exception>
         public byte[] DistributionCode
         {
             get { return _hkdfInfo; }
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("Distribution Code can not be null!");
+                    throw new CryptoSymmetricException("RSM:DistributionCode", "Distribution Code can not be null!", new ArgumentNullException());
 
                 _hkdfInfo = value;
             }
@@ -269,17 +273,17 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
         /// Initialize the class
         /// </summary>
         /// 
-        /// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes</param>
-        /// <param name="Block">Cipher input <see cref="BlockSize"/>. The <see cref="LegalBlockSizes"/> property contains available sizes</param>
+        /// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 18 rounds.</param>
+        /// <param name="Block">Cipher input <see cref="BlockSize"/>. The <see cref="LegalBlockSizes"/> property contains available sizes. Default is 16 bytes.</param>
         /// <param name="KeyEngine">The Key Schedule KDF digest engine; can be any one of the <see cref="Digests">Digest</see> implementations. The default engine is <see cref="SHA512"/>.</param>
         /// 
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if an invalid block size or invalid rounds count are chosen</exception>
-        public RSM(int Rounds = DEFAULT_ROUNDS, int Block = BLOCK16, Digests KeyEngine = Digests.SHA512)
+        /// <exception cref="CryptoSymmetricException">Thrown if an invalid block size or invalid rounds count are used</exception>
+        public RSM(int Rounds = ROUNDS18, int Block = BLOCK16, Digests KeyEngine = Digests.SHA512)
         {
             if (Block != BLOCK16 && Block != BLOCK32)
-                throw new ArgumentOutOfRangeException("Invalid block size! Supported block sizes are 16 and 32 bytes.");
+                throw new CryptoSymmetricException("RSM:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.", new ArgumentException());
             if (Rounds != 10 && Rounds != 18 && Rounds != 26 && Rounds != 34 && Rounds != 42)
-                throw new ArgumentOutOfRangeException("Invalid rounds size! Sizes supported are 10, 18, 26, 34 and 42.");
+                throw new CryptoSymmetricException("RSM:CTor", "Invalid rounds size! Sizes supported are even numbers between 10, 18, 26, 34 and 42.", new ArgumentException());
 
             // get the kdf digest engine
             _keyEngine = GetKeyEngine(KeyEngine);
@@ -379,16 +383,15 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
         /// <param name="Encryption">Using Encryption or Decryption mode</param>
         /// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
         /// 
-        /// <exception cref="System.ArgumentNullException">Thrown if a null key is used</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">Thrown if an invalid key size is used</exception>
+        /// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
         public void Initialize(bool Encryption, KeyParams KeyParam)
         {
             if (KeyParam.Key == null)
-                throw new ArgumentNullException("Invalid key! Key can not be null.");
+                throw new CryptoSymmetricException("RSM:Initialize", "Invalid key! Key can not be null.", new ArgumentNullException());
             if (KeyParam.Key.Length < LegalKeySizes[0])
-                throw new ArgumentOutOfRangeException(String.Format("Invalid key size! Key must be at least {0}  bytes ({1} bit).", LegalKeySizes[0], LegalKeySizes[0] * 8));
+                throw new CryptoSymmetricException("RSM:Initialize", String.Format("Invalid key size! Key must be at least {0}  bytes ({1} bit).", LegalKeySizes[0], LegalKeySizes[0] * 8), new ArgumentOutOfRangeException());
             if ((KeyParam.Key.Length - _keyEngine.DigestSize) % _keyEngine.BlockSize != 0)
-                throw new ArgumentOutOfRangeException(String.Format("Invalid key size! Key must be (length - IKm length: {0} bytes) + multiple of {1} block size.", _keyEngine.DigestSize, _keyEngine.BlockSize));
+                throw new CryptoSymmetricException("RSM:Initialize", String.Format("Invalid key size! Key must be (length - IKm length: {0} bytes) + multiple of {1} block size.", _keyEngine.DigestSize, _keyEngine.BlockSize), new ArgumentOutOfRangeException());
 
             _isEncryption = Encryption;
             // expand the key
@@ -523,7 +526,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Block
                 case Digests.Skein1024:
                     return new Skein1024();
                 default:
-                    throw new ArgumentException("The digest type is not supported!");
+                    throw new CryptoSymmetricException("RSM:GetKeyEngine", "The digest type is not supported!", new ArgumentException());
             }
         }
         #endregion

@@ -1,6 +1,6 @@
 #region Directives
 using System;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU.Encode;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Encode;
 using VTDev.Libraries.CEXEngine.Tools;
 using VTDev.Libraries.CEXEngine.Utility;
 #endregion

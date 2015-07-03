@@ -4,7 +4,7 @@ using Test.Tests.Arith;
 using Test.Tests.Encode;
 using Test.Tests.Encrypt;
 using Test.Tests.Polynomial;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces;

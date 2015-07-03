@@ -1,7 +1,7 @@
 #region Directives
 using System;
 using System.IO;
-using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.NTRU;
+using VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU;
 using VTDev.Libraries.CEXEngine.Tools;
 #endregion
 
