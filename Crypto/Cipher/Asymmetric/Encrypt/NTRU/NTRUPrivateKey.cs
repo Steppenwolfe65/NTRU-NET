@@ -44,6 +44,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// </summary>
     public sealed class NTRUPrivateKey : IAsymmetricKey
     {
+        #region Constants
+        private const string ALG_NAME = "NTRUPrivateKey";
+        #endregion
+
         #region Fields
         private bool _fastFp;
         private bool _isDisposed = false;
@@ -56,6 +60,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Get: Private key name
+        /// </summary>
+        public string Name
+        {
+            get { return ALG_NAME; }
+        }
+
         /// <summary>
         /// Get: The number of polynomial coefficients
         /// </summary>
@@ -160,7 +172,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                         _T = new DenseTernaryPolynomial(fInt);
                 }
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 throw new CryptoAsymmetricException("NTRUPrivateKey:Ctor", "The Private key could not be loaded!", ex);
             }
@@ -193,84 +205,36 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region Public Methods
         /// <summary>
-        /// Read a Private key from a byte array.
-        /// <para>The array can contain only the public key.</para>
+        /// Read a Private key from a byte array
         /// </summary>
         /// 
-        /// <param name="KeyArray">The byte array containing the key</param>
+        /// <param name="KeyArray">The byte array containing the encoded key</param>
         /// 
         /// <returns>An initialized NTRUPrivateKey class</returns>
         public static NTRUPrivateKey From(byte[] KeyArray)
         {
-            return From(new MemoryStream(KeyArray));
+            return new NTRUPrivateKey(KeyArray);
         }
 
         /// <summary>
         /// Read a Private key from a stream
         /// </summary>
         /// 
-        /// <param name="KeyStream">The stream containing the key</param>
+        /// <param name="KeyStream">The stream containing the encoded key</param>
         /// 
         /// <returns>An initialized NTRUPrivateKey class</returns>
         /// 
         /// <exception cref="CryptoAsymmetricException">Thrown if the stream can not be read</exception>
         public static NTRUPrivateKey From(MemoryStream KeyStream)
         {
-            BinaryReader dataStream = new BinaryReader(KeyStream);
-
-            try
-            {
-                // ins.Position = 0; wrong here, ins pos is wrong
-                int n = IntUtils.ReadShort(KeyStream);
-                int q = IntUtils.ReadShort(KeyStream);
-                byte flags = dataStream.ReadByte();
-                bool sparse = (flags & 1) != 0;
-                bool fastFp = (flags & 2) != 0;
-                IPolynomial t;
-
-                TernaryPolynomialType polyType = (flags & 4) == 0 ?
-                    TernaryPolynomialType.SIMPLE :
-                    TernaryPolynomialType.PRODUCT;
-
-                if (polyType == TernaryPolynomialType.PRODUCT)
-                {
-                    t = ProductFormPolynomial.FromBinary(KeyStream, n);
-                }
-                else
-                {
-                    IntegerPolynomial fInt = IntegerPolynomial.FromBinary3Tight(KeyStream, n);
-
-                    if (sparse)
-                        t = new SparseTernaryPolynomial(fInt);
-                    else
-                        t = new DenseTernaryPolynomial(fInt);
-                }
-
-                // Initializes fp from t
-                IntegerPolynomial fp;
-                if (fastFp)
-                {
-                    fp = new IntegerPolynomial(n);
-                    fp.Coeffs[0] = 1;
-                }
-                else
-                {
-                    fp = t.ToIntegerPolynomial().InvertF3();
-                }
-
-                return new NTRUPrivateKey(t, fp, n, q, sparse, fastFp, polyType);
-            }
-            catch (IOException ex)
-            {
-                throw new CryptoAsymmetricException("NTRUPrivateKey:From", ex.Message, ex);
-            }
+            return new NTRUPrivateKey(KeyStream);
         }
 
         /// <summary>
-        /// Converts the key to a byte array
+        /// Converts the Private key to an encoded byte array
         /// </summary>
         /// 
-        /// <returns>The encoded key</returns>
+        /// <returns>The encoded NTRUPrivateKey</returns>
         public byte[] ToBytes()
         {
             int flags = (_sparse ? 1 : 0) + (_fastFp ? 2 : 0) + (PolyType == TernaryPolynomialType.PRODUCT ? 4 : 0);
@@ -286,40 +250,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Returns the current private key as a MemoryStream
+        /// Converts the NTRUPrivateKey to an encoded MemoryStream
         /// </summary>
         /// 
-        /// <returns>NtruPrivateKey as a MemoryStream</returns>
+        /// <returns>The Private Key encoded as a MemoryStream</returns>
         public MemoryStream ToStream()
         {
             return new MemoryStream(ToBytes());
         }
 
         /// <summary>
-        /// Writes the key to an output stream
+        /// Writes encoded the NTRUPrivateKey to an output byte array
         /// </summary>
         /// 
-        /// <param name="Output">An output stream</param>
-        /// 
-        /// <exception cref="CryptoAsymmetricException">Thrown if the key could not be written</exception>
-        public void WriteTo(Stream Output)
-        {
-            try 
-            {
-                using (MemoryStream stream = ToStream())
-                    stream.WriteTo(Output);
-            }
-            catch (IOException ex)
-            {
-                throw new CryptoAsymmetricException("NTRUPrivateKey:WriteTo", "The key could not be written!", ex);
-            }
-        }
-
-        /// <summary>
-        /// Writes the private key to an output byte array
-        /// </summary>
-        /// 
-        /// <param name="Output">NtruPrivateKey as a byte array; can be initialized as zero bytes</param>
+        /// <param name="Output">The Private Key encoded as a byte array</param>
         public void WriteTo(byte[] Output)
         {
             byte[] data = ToBytes();
@@ -328,10 +272,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Writes the private key to an output byte array
+        /// Writes the encoded NTRUPrivateKey to an output byte array
         /// </summary>
         /// 
-        /// <param name="Output">NtruPrivateKey as a byte array; array must be initialized and of sufficient length</param>
+        /// <param name="Output">The Private Key encoded to a byte array</param>
         /// <param name="Offset">The starting position within the Output array</param>
         /// 
         /// <exception cref="CryptoAsymmetricException">Thrown if the output array is too small</exception>
@@ -342,6 +286,26 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 throw new CryptoAsymmetricException("NTRUPrivateKey:WriteTo", "The output array is too small!", new ArgumentOutOfRangeException());
 
             Buffer.BlockCopy(data, 0, Output, Offset, data.Length);
+        }
+
+        /// <summary>
+        /// Writes the encoded NTRUPrivateKey to an output stream
+        /// </summary>
+        /// 
+        /// <param name="Output">The Output Stream receiving the encoded Private Key</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if the key could not be written</exception>
+        public void WriteTo(Stream Output)
+        {
+            try 
+            {
+                using (MemoryStream stream = ToStream())
+                    stream.WriteTo(Output);
+            }
+            catch (Exception ex)
+            {
+                throw new CryptoAsymmetricException("NTRUPrivateKey:WriteTo", "The key could not be written!", ex);
+            }
         }
         #endregion
 
@@ -436,13 +400,23 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region IClone
         /// <summary>
-        /// Create a copy of this NTRUPrivateKey instance
+        /// Create a shallow copy of this NTRUPrivateKey instance
         /// </summary>
         /// 
         /// <returns>NTRUPrivateKey copy</returns>
         public object Clone()
         {
             return new NTRUPrivateKey(_T, _FP, _N, _Q, _sparse, _fastFp, _polyType);
+        }
+
+        /// <summary>
+        /// Create a deep copy of this NTRUPrivateKey instance
+        /// </summary>
+        /// 
+        /// <returns>The NTRUPrivateKey copy</returns>
+        public object DeepCopy()
+        {
+            return new NTRUPrivateKey(ToStream());
         }
         #endregion
 

@@ -99,13 +99,27 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// </remarks>
     public sealed class NTRUKeyGenerator : IAsymmetricGenerator
     {
+        #region Constants
+        private const string ALG_NAME = "NTRUEncrypt";
+        #endregion
+
         #region Fields
         private readonly NTRUParameters _ntruParams;
         private bool _isDisposed;
         private IRandom _rndEngine;
         private bool _isParallel = true;
         #endregion
-        
+
+        #region Properties
+        /// <summary>
+        /// Get: Generator name
+        /// </summary>
+        public string Name
+        {
+            get { return ALG_NAME; }
+        }
+        #endregion
+
         #region Constructor
         /// <summary>
         /// Constructs a new instance with a set of encryption parameters

@@ -44,6 +44,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// </summary>
     public sealed class NTRUKeyPair : IAsymmetricKeyPair
     {
+        #region Constants
+        private const string ALG_NAME = "NTRUKeyPair";
+        #endregion
+
         #region Fields
         private bool _isDisposed = false;
         private NTRUPrivateKey _privateKey;
@@ -51,6 +55,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Get: KeyPair name
+        /// </summary>
+        public string Name
+        {
+            get { return ALG_NAME; }
+        }
+
         /// <summary>
         /// Returns the private key
         /// </summary>

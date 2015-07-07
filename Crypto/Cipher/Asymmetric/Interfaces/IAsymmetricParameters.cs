@@ -11,6 +11,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces
     public interface IAsymmetricParameters : ICloneable, IDisposable
     {
         /// <summary>
+        /// Get: The parameters name
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Returns the current parameter set as an ordered byte array
         /// </summary>
         /// 

@@ -105,9 +105,9 @@ namespace Test
 
             if (keyInfo.Key.Equals(ConsoleKey.Y))
             {
-                KeyGenSpeed(CYCLE_COUNT);
                 EncryptionSpeed(CYCLE_COUNT);
                 DecryptionSpeed(CYCLE_COUNT);
+                KeyGenSpeed(CYCLE_COUNT);
                 Console.WriteLine("Speed Tests Completed!");
                 Console.WriteLine("");
             }
@@ -233,11 +233,11 @@ namespace Test
 
             using (NTRUEncrypt mpe = new NTRUEncrypt(mpar))
             {
-                mpe.Initialize(true, akp);
+                mpe.Initialize(akp.PublicKey);
 
                 byte[] data = new byte[mpe.MaxPlainText];
                 enc = mpe.Encrypt(data);
-                mpe.Initialize(false, akp);
+                mpe.Initialize(akp);
                 byte[] dec = mpe.Decrypt(enc);
 
                 if (!Compare.AreEqual(dec, data))
@@ -304,9 +304,9 @@ namespace Test
 
             using (NTRUEncrypt mpe = new NTRUEncrypt(Param))
             {
-                mpe.Initialize(true, akp);
+                mpe.Initialize(akp.PublicKey);
                 ctext = mpe.Encrypt(ptext);
-                mpe.Initialize(false, akp);
+                mpe.Initialize(akp);
 
                 runTimer.Start();
                 for (int i = 0; i < Iterations; i++)
@@ -330,7 +330,7 @@ namespace Test
 
             using (NTRUEncrypt mpe = new NTRUEncrypt(Param))
             {
-                mpe.Initialize(true, akp);
+                mpe.Initialize(akp.PublicKey);
 
                 runTimer.Start();
                 for (int i = 0; i < Iterations; i++)

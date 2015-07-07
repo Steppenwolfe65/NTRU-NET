@@ -136,32 +136,32 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             if (OId[2] == 2)
             {
                 if (OId[3] == 63)
-                    return (NTRUParameters)EES1087EP2FAST.Clone();
+                    return (NTRUParameters)EES1087EP2FAST.DeepCopy();
                 else if (OId[3] == 64)
-                    return (NTRUParameters)EES1171EP1FAST.Clone();
+                    return (NTRUParameters)EES1171EP1FAST.DeepCopy();
                 else if (OId[3] == 65)
-                    return (NTRUParameters)EES1499EP1FAST.Clone();
+                    return (NTRUParameters)EES1499EP1FAST.DeepCopy();
                 else if (OId[3] == 101)
-                    return (NTRUParameters)APR2011439FAST.Clone();
+                    return (NTRUParameters)APR2011439FAST.DeepCopy();
                 else if (OId[3] == 105)
-                    return (NTRUParameters)APR2011743FAST.Clone();
+                    return (NTRUParameters)APR2011743FAST.DeepCopy();
             }
             else if (OId[2] == 1)
             {
                 if (OId[3] == 63)
-                    return (NTRUParameters)EES1087EP2.Clone();
+                    return (NTRUParameters)EES1087EP2.DeepCopy();
                 else if (OId[3] == 64)
-                    return (NTRUParameters)EES1171EP1.Clone();
+                    return (NTRUParameters)EES1171EP1.DeepCopy();
                 else if (OId[3] == 65)
-                    return (NTRUParameters)EES1499EP1.Clone();
+                    return (NTRUParameters)EES1499EP1.DeepCopy();
                 else if (OId[3] == 101)
-                    return (NTRUParameters)APR2011439.Clone();
+                    return (NTRUParameters)APR2011439.DeepCopy();
                 else if (OId[3] == 105)
-                    return (NTRUParameters)APR2011743.Clone();
+                    return (NTRUParameters)APR2011743.DeepCopy();
                 else if (OId[3] == 7)
-                    return (NTRUParameters)CX1861SH512.Clone();
+                    return (NTRUParameters)CX1861SH512.DeepCopy();
                 else if (OId[3] == 8)
-                    return (NTRUParameters)CX1931SH512.Clone();
+                    return (NTRUParameters)CX1931SH512.DeepCopy();
             }
 
             throw new CryptoAsymmetricException("NTRUParameters:FromId", "OId does not identify a valid param set!", new ArgumentException());
@@ -181,29 +181,29 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             switch (Name)
             {
                 case NTRUParamNames.A2011439:
-                    return (NTRUParameters)APR2011439.Clone();
+                    return (NTRUParameters)APR2011439.DeepCopy();
                 case NTRUParamNames.A2011743:
-                    return (NTRUParameters)APR2011743.Clone();
+                    return (NTRUParameters)APR2011743.DeepCopy();
                 case NTRUParamNames.E1087EP2:
-                    return (NTRUParameters)EES1087EP2.Clone();
+                    return (NTRUParameters)EES1087EP2.DeepCopy();
                 case NTRUParamNames.E1171EP1:
-                    return (NTRUParameters)EES1171EP1.Clone();
+                    return (NTRUParameters)EES1171EP1.DeepCopy();
                 case NTRUParamNames.E1499EP1:
-                    return (NTRUParameters)EES1499EP1.Clone();
+                    return (NTRUParameters)EES1499EP1.DeepCopy();
                 case NTRUParamNames.FA2011439:
-                    return (NTRUParameters)APR2011439FAST.Clone();
+                    return (NTRUParameters)APR2011439FAST.DeepCopy();
                 case NTRUParamNames.FA2011743:
-                    return (NTRUParameters)APR2011743FAST.Clone();
+                    return (NTRUParameters)APR2011743FAST.DeepCopy();
                 case NTRUParamNames.FE1087EP2:
-                    return (NTRUParameters)EES1087EP2FAST.Clone();
+                    return (NTRUParameters)EES1087EP2FAST.DeepCopy();
                 case NTRUParamNames.FE1171EP1:
-                    return (NTRUParameters)EES1171EP1FAST.Clone();
+                    return (NTRUParameters)EES1171EP1FAST.DeepCopy();
                 case NTRUParamNames.FE1499EP1:
-                    return (NTRUParameters)EES1499EP1FAST.Clone();
+                    return (NTRUParameters)EES1499EP1FAST.DeepCopy();
                 case NTRUParamNames.CX1861:
-                    return (NTRUParameters)CX1861SH512.Clone();
+                    return (NTRUParameters)CX1861SH512.DeepCopy();
                 case NTRUParamNames.CX1931:
-                    return (NTRUParameters)CX1931SH512.Clone();
+                    return (NTRUParameters)CX1931SH512.DeepCopy();
                 default:
                     throw new CryptoAsymmetricException("NTRUParameters:FromName", "The enumeration name is unknown!", new ArgumentException());
             }

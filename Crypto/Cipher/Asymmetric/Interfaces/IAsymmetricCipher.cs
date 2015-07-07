@@ -15,12 +15,18 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces
         int MaxPlainText { get; }
 
         /// <summary>
-        /// Initialize the cipher
+        /// Get: The ciphers name
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// Initialize the Key for Encrypt (Public) or Decrypt (Private)
         /// </summary>
         /// 
-        /// <param name="Encryption">When true cipher is for encryption, if false, decryption</param>
-        /// <param name="KeyPair">The public and private key pair</param>
-        void Initialize(bool Encryption, IAsymmetricKeyPair KeyPair);
+        /// <param name="AsmKey">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) or Private (decryption) key</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricSignException">Thrown if an invalid key is used</exception>
+        void Initialize(IAsymmetricKey AsmKey);
 
         /// <summary>
         /// Decrypt a cipher text

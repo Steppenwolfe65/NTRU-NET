@@ -112,6 +112,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     {
         #region Constants
         private const int OID_SIZE = 4;
+        private const string ALG_NAME = "NTRUParameters";
         #endregion
 
         #region Fields
@@ -148,6 +149,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         #endregion
 
         #region Properties
+        /// <summary>
+        /// Get: Parameters name
+        /// </summary>
+        public string Name
+        {
+            get { return ALG_NAME; }
+        }
+
         /// <summary>
         /// Get: The ring dimension; the number of polynomial coefficients
         /// </summary>
@@ -392,6 +401,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// <param name="FastFp">Whether <c>f=1+p*F</c> for a ternary <c>F</c> (true) or <c>f</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
         /// <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if the Oid format is invalid</exception>
         public NTRUParameters(byte[] OId, int N, int Q, int Df, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
             bool HashSeed, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CTRPrng)
         {
@@ -441,6 +452,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// <param name="FastFp">Whether <c>F=1+p*F</c> for a ternary <c>F</c> (true) or <c>F</c> is ternary (false)</param>
         /// <param name="Digest">The Message Digest engine to use; default is SHA512</param>
         /// <param name="Random">The pseudo random generator engine to use; default is CTRPrng</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if the Oid format is invalid</exception>
         public NTRUParameters(byte[] OId, int N, int Q, int Df1, int Df2, int Df3, int Dm0, int MaxM1, int Db, int CBits, int MinIGFHashCalls, int MinMGFHashCalls,
             bool HashSeed, bool Sparse, bool FastFp, Digests Digest = Digests.SHA512, Prngs Random = Prngs.CTRPrng)
         {
@@ -472,10 +485,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Reads a parameter set from an input stream
+        /// Builds a parameter set from an encoded input stream
         /// </summary>
         /// 
         /// <param name="ParamStream">Stream containing a parameter set</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if the Stream is unreadable</exception>
         public NTRUParameters(Stream ParamStream)
         {
             try
@@ -512,7 +527,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
         
         /// <summary>
-        /// Reads a parameter set from a byte array
+        /// Builds a parameter set from an encoded byte array
         /// </summary>
         /// 
         /// <param name="ParamArray">Byte array containing a parameter set</param>
@@ -536,7 +551,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region Public Methods
         /// <summary>
-        /// Read a Public key from a byte array.
+        /// Read an encoded Parameter set from a byte array
         /// </summary>
         /// 
         /// <param name="ParamArray">The byte array containing the parameters</param>
@@ -544,14 +559,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// <returns>An initialized NTRUParameters class</returns>
         public static NTRUParameters From(byte[] ParamArray)
         {
-            return From(new MemoryStream(ParamArray));
+            return new NTRUParameters(ParamArray);
         }
 
         /// <summary>
-        /// Read a Parameters file from a byte array.
+        /// Read an encoded Parameters set from a Stream
         /// </summary>
         /// 
-        /// <param name="ParamStream">The byte array containing the params</param>
+        /// <param name="ParamStream">The Stream containing the encoded Parameter set</param>
         /// 
         /// <returns>An initialized NTRUParameters class</returns>
         public static NTRUParameters From(Stream ParamStream)
@@ -583,7 +598,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Returns the current parameter set as an ordered byte array
+        /// Converts the current Parameter set to an encoded byte array
         /// </summary>
         /// 
         /// <returns>NtruParameters as a byte array</returns>
@@ -593,7 +608,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Returns the current parameter set as a MemoryStream
+        /// Converts the current Parameter set to an encoded Stream
         /// </summary>
         /// 
         /// <returns>NtruParameters as a MemoryStream</returns>
@@ -625,10 +640,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Writes the parameter set to an output byte array
+        /// Writes the NTRUParameters to a byte array
         /// </summary>
         /// 
-        /// <param name="Output">NtruParameters as a byte array; can be initialized as zero bytes</param>
+        /// <param name="Output">Output array receiving the encoded Parameters</param>
         public void WriteTo(byte[] Output)
         {
             byte[] data = ToBytes();
@@ -637,11 +652,13 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Writes the parameter set to an output byte array
+        /// Writes the NTRUParameters to a byte array
         /// </summary>
         /// 
-        /// <param name="Output">NtruParameters as a byte array; array must be initialized and of sufficient length</param>
+        /// <param name="Output">Output array receiving the encoded Parameters</param>
         /// <param name="Offset">The starting position within the Output array</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if The output array is too small</exception>
         public void WriteTo(byte[] Output, int Offset)
         {
             byte[] data = ToBytes();
@@ -653,10 +670,10 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Writes the parameter set to an output stream
+        /// Writes the NTRUParameters to a Stream
         /// </summary>
         /// 
-        /// <param name="Output">Output Stream</param>
+        /// <param name="Output">The Output stream receiving the encoded Parameters</param>
         public void WriteTo(Stream Output)
         {
             try
@@ -664,7 +681,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 using (MemoryStream stream = ToStream())
                     stream.WriteTo(Output);
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 throw new CryptoAsymmetricException("NTRUParameters:WriteTo", ex.Message, ex);
             }
@@ -816,16 +833,26 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region IClone
         /// <summary>
-        /// Create a copy of this EncryptionParameters instance
+        /// Create a shallow copy of this NTRUParameters instance
         /// </summary>
         /// 
-        /// <returns>EncryptionParameters copy</returns>
+        /// <returns>The NTRUParameters copy</returns>
         public object Clone()
         {
             if (_polyType == TernaryPolynomialType.SIMPLE)
-                return new NTRUParameters(_oId, N, Q, DF, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _sparseMode, FastFp, _dgtEngineType, _rndEngineType);
+                return new NTRUParameters(_oId, _N, _Q, _DF, _Dm0, _maxM1, _Db, _cBits, _minIGFHashCalls, _minMGFHashCalls, _hashSeed, _sparseMode, _fastFp, _dgtEngineType, _rndEngineType);
             else
-                return new NTRUParameters(_oId, N, Q, DF1, DF2, DF3, Dm0, MaxM1, Db, CBits, _minIGFHashCalls, _minMGFHashCalls, HashSeed, _sparseMode, FastFp, _dgtEngineType, _rndEngineType);
+                return new NTRUParameters(_oId, _N, _Q, _DF1, _DF2, _DF3, _Dm0, _maxM1, _Db, _cBits, _minIGFHashCalls, _minMGFHashCalls, _hashSeed, _sparseMode, _fastFp, _dgtEngineType, _rndEngineType);
+        }
+
+        /// <summary>
+        /// Create a deep copy of this NTRUParameters instance
+        /// </summary>
+        /// 
+        /// <returns>The NTRUParameters copy</returns>
+        public object DeepCopy()
+        {
+            return new NTRUParameters(ToStream());
         }
         #endregion
 
@@ -857,6 +884,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                     _cBits = 0;
                     _minIGFHashCalls = 0;
                     _minMGFHashCalls = 0;
+                    _hashSeed = false;
+                    _fastFp = false;
+                    _sparseMode = false;
+                    _dgtEngineType = Digests.SHA512;
+                    _rndEngineType = Prngs.CTRPrng;
 
                     if (_oId != null)
                     {

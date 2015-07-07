@@ -51,19 +51,20 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// <description>Example of encryption/decryption of plain text:</description>
     /// <code>
     /// // use a predefined parameter set
-    /// NtruParameters ps = NTRUParamSets.APR2011743FAST;
-    /// NtruKeyPair kp;
+    /// NtruParameters prm = NTRUParamSets.APR2011743FAST;
+    /// NtruKeyPair keyPair;
     /// byte[] enc, dec;
     /// byte[] data = new byte[64];
     /// 
     /// // generate a key pair
-    /// using (NTRUKeyGenerator kg = new NTRUKeyGenerator(ps))
-    ///     NtruKeyPair kp = kg.GenerateKeyPair();
+    /// using (NTRUKeyGenerator gen = new NTRUKeyGenerator(prm))
+    ///     NtruKeyPair keyPair = gen.GenerateKeyPair();
     /// 
     /// // encrypt a message
     /// using (NtruEncrypt ntru = new NtruEncrypt(ps))
     /// {
-    ///     ntru.Initialize(true, new NTRUKeyPair(kp.PublicKey));
+    ///     // initialize with public key for encryption
+    ///     ntru.Initialize(keyPair.PublicKey);
     ///     // encrypt using public key
     ///     enc = ntru.Encrypt(data);
     /// }
@@ -71,7 +72,8 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// // decrypt a message
     /// using (NtruEncrypt ntru = new NtruEncrypt(ps))
     /// {
-    ///     ntru.Initialize(false, kp);
+    ///     // initialize with both keys for decryption
+    ///     ntru.Initialize(keyPair);
     ///     // decrypt using key pair
     ///     dec = ntru.Decrypt(enc);
     /// }
@@ -125,11 +127,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// </remarks>
     public sealed class NTRUEncrypt : IAsymmetricCipher
     {
+        #region Constants
+        private const string ALG_NAME = "NTRUEncrypt";
+        #endregion
+
         #region Fields
         private IDigest _dgtEngine;
         private readonly NTRUParameters _encParams;
         private NTRUKeyPair _keyPair;
         private bool _isDisposed = false;
+        private bool _isEncryption = false;
         private bool _isInitialized = false;
         private IRandom _rndEngine;
         #endregion
@@ -149,6 +156,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
                 return _encParams.GetMaxMessageLength();
             }
+        }
+
+        /// <summary>
+        /// Get: Cipher name
+        /// </summary>
+        public string Name
+        {
+            get { return ALG_NAME; }
         }
         #endregion
 
@@ -357,35 +372,54 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Initialize the cipher.
-        /// <para>Requires a <see cref="NTRUPublicKey"/> for encryption, or a <see cref="NTRUPrivateKey"/> for decryption</para>
+        /// Initialize the cipher for Encryption; This Initialize() method is only for Encryption.
+        /// <para>Requires a <see cref="NTRUPublicKey"/> for encryption operations.
+        /// For Decryption use the se the <see cref="Initialize(IAsymmetricKeyPair)"/> method and pass a KeyPair with both Public and Private keys.
+        /// </para>
         /// </summary>
         /// 
-        /// <param name="Encryption">When true cipher is for encryption, if false, decryption</param>
+        /// <param name="AsmKey">The <see cref="IAsymmetricKey"/> containing the NTRU Public key</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if a key is invalid</exception>
+        public void Initialize(IAsymmetricKey AsmKey)
+        {
+            if (AsmKey == null)
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU public key!", new InvalidDataException());
+            if (!(AsmKey is NTRUPublicKey))
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU public key!", new InvalidDataException());
+
+            _keyPair = new NTRUKeyPair(AsmKey);
+            _isEncryption = true;
+            _isInitialized = true;
+        }
+
+        /// <summary>
+        /// Initialize the cipher for Decryption; This Initialize() method is only for Decryption.
+        /// <para>Requires a <see cref="NTRUPublicKey"/> for encryption, or a <see cref="NTRUPrivateKey"/> for decryption contained in an <see cref="NTRUKeyPair"/> class.
+        /// NTRU requires both Public and Private keys to decrypt a message.
+        /// Use the <see cref="Initialize(IAsymmetricKey)"/> method and pass the NTRUPublicKey for Encryption.
+        /// </para>
+        /// </summary>
+        /// 
         /// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the NTRU public or private key</param>
         /// 
         /// <exception cref="CryptoAsymmetricException">Thrown if a key is invalid</exception>
-        public void Initialize(bool Encryption, IAsymmetricKeyPair KeyPair)
+        public void Initialize(IAsymmetricKeyPair KeyPair)
         {
 
             if (!(KeyPair is NTRUKeyPair))
                 throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
+            if (KeyPair.PublicKey == null)
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
+            if (!(KeyPair.PublicKey is NTRUPublicKey))
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
+            if (KeyPair.PrivateKey == null)
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
+            if (!(KeyPair.PrivateKey is NTRUPrivateKey))
+                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
 
             _keyPair = (NTRUKeyPair)KeyPair;
-
-            if (_keyPair.PublicKey == null)
-                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
-            if (!(_keyPair.PublicKey is NTRUPublicKey))
-                throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
-
-            if (!Encryption)
-            {
-                if (_keyPair.PrivateKey == null)
-                    throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
-                if (!(_keyPair.PrivateKey is NTRUPrivateKey))
-                    throw new CryptoAsymmetricException("NTRUEncrypt:Initialize", "Not a valid NTRU key pair!", new InvalidDataException());
-            }
-
+            _isEncryption = false;
             _isInitialized = true;
         }
         #endregion

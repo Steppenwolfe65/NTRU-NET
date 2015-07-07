@@ -81,6 +81,7 @@
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricKeyPair.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricParameters.cs" />
     <Compile Include="Crypto\Cipher\Asymmetric\Encrypt\NTRU\NTRUParamSets.cs" />
+    <Compile Include="Crypto\Cipher\Asymmetric\Interfaces\IAsymmetricSign.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\IBlockCipher.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\CBC.cs" />
     <Compile Include="Crypto\Cipher\Symmetric\Block\Mode\CFB.cs" />

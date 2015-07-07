@@ -10,6 +10,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Interfaces
     public interface IAsymmetricGenerator : IDisposable
     {
         /// <summary>
+        /// Get: The generators name
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// Generate an asymmetric Key pair
         /// </summary>
         /// 
