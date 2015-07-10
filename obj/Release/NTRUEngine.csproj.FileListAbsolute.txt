@@ -6,3 +6,4 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\bin\Releas
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\bin\Release\NTRUEngine.pdb
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\obj\Release\NTRUEngine.dll
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\obj\Release\NTRUEngine.pdb
+C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\obj\Release\NTRUEngine.csprojResolveAssemblyReference.cache

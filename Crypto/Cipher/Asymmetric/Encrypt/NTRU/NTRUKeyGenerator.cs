@@ -107,7 +107,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         private readonly NTRUParameters _ntruParams;
         private bool _isDisposed;
         private IRandom _rndEngine;
-        private bool _isParallel = true;
         #endregion
 
         #region Properties
@@ -127,15 +126,36 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// 
         /// <param name="CipherParams">Encryption parameters</param>
         /// <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
+        /// 
+        /// <exception cref="CryptoAsymmetricException">Thrown if a Prng that requires pre-initialization is specified; (wrong constructor)</exception>
         public NTRUKeyGenerator(NTRUParameters CipherParams, bool Parallel = true)
         {
-            if (CipherParams.RandomEngine != Prngs.CTRPrng || CipherParams.RandomEngine != Prngs.CSPRng)
-                _isParallel = false;
-            else
-                _isParallel = Parallel;
+            if (CipherParams.RandomEngine == Prngs.PBPrng)
+                throw new CryptoAsymmetricException("MPKCKeyGenerator:Ctor", "Passphrase based digest and CTR generators must be pre-initialized, use the other constructor!", new ArgumentException());
 
+            ParallelUtils.ForceLinear = !Parallel;
             _ntruParams = CipherParams;
             _rndEngine = GetPrng(_ntruParams.RandomEngine);
+        }
+
+        /// <summary>
+        /// Use an initialized prng to generate the key; use this constructor with an Rng that requires pre-initialization, i.e. PBPrng
+        /// </summary>
+        /// 
+        /// <param name="CipherParams">The NTRUParameters instance containing the cipher settings</param>
+        /// <param name="RngEngine">An initialized Prng instance</param>
+        /// <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
+        public NTRUKeyGenerator(NTRUParameters CipherParams, IRandom RngEngine, bool Parallel = true)
+        {
+            // passphrase gens must be linear processed
+            if (RngEngine.GetType().Equals(typeof(PBPRng)))
+                ParallelUtils.ForceLinear = true;
+            else
+                ParallelUtils.ForceLinear = !Parallel;
+
+            _ntruParams = CipherParams;
+            // set source of randomness
+            _rndEngine = RngEngine;
         }
 
         private NTRUKeyGenerator()
@@ -202,12 +222,12 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// Generates a new encryption key pair
         /// </summary>
         /// 
-        /// <param name="Rng">The random number generator to use for generating the secret polynomials f and g</param>
+        /// <param name="RngEngine">The random number generator to use for generating the secret polynomials f and g</param>
         /// 
         /// <returns>A key pair</returns>
-        private IAsymmetricKeyPair GenerateKeyPair(IRandom Rng)
+        private IAsymmetricKeyPair GenerateKeyPair(IRandom RngEngine)
         {
-            return GenerateKeyPair(Rng, Rng);
+            return GenerateKeyPair(RngEngine, RngEngine);
         }
         
         /// <summary>
@@ -230,7 +250,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             IntegerPolynomial fp = null;
             IntegerPolynomial g = null;
 
-            if (ParallelUtils.IsParallel && _isParallel)
+            if (ParallelUtils.IsParallel)
             {
                 Action[] gA = new Action[] {
                     new Action(()=> g = GenerateG(RngG)), 
@@ -263,7 +283,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             return new NTRUKeyPair(pub, priv);
         }
 
-        private void GenerateFQ(IRandom Rng, out IPolynomial t, out IntegerPolynomial fq, out IntegerPolynomial fp)
+        private void GenerateFQ(IRandom Rng, out IPolynomial T, out IntegerPolynomial Fq, out IntegerPolynomial Fp)
         {
             int N = _ntruParams.N;
             int q = _ntruParams.Q;
@@ -274,7 +294,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             bool fastFp = _ntruParams.FastFp;
             bool sparse = _ntruParams.Sparse;
             TernaryPolynomialType polyType = _ntruParams.PolyType;
-            fp = null;
+            Fp = null;
 
             // choose a random f that is invertible mod 3 and q
             while (true)
@@ -286,31 +306,31 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 {
                     // if fastFp=true, f is always invertible mod 3
                     if (polyType == TernaryPolynomialType.SIMPLE)
-                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df, sparse, Rng);
+                        T = PolynomialGenerator.GenerateRandomTernary(N, df, df, sparse, Rng);
                     else
-                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3, Rng);
+                        T = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3, Rng);
 
-                    f = t.ToIntegerPolynomial();
+                    f = T.ToIntegerPolynomial();
                     f.Multiply(3);
                     f.Coeffs[0] += 1;
                 }
                 else
                 {
                     if (polyType == TernaryPolynomialType.SIMPLE)
-                        t = PolynomialGenerator.GenerateRandomTernary(N, df, df - 1, sparse, Rng);
+                        T = PolynomialGenerator.GenerateRandomTernary(N, df, df - 1, sparse, Rng);
                     else
-                        t = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3 - 1, Rng);
+                        T = ProductFormPolynomial.GenerateRandom(N, df1, df2, df3, df3 - 1, Rng);
 
-                    f = t.ToIntegerPolynomial();
-                    fp = f.InvertF3();
+                    f = T.ToIntegerPolynomial();
+                    Fp = f.InvertF3();
 
-                    if (fp == null)
+                    if (Fp == null)
                         continue;
                 }
 
-                fq = f.InvertFq(q);
+                Fq = f.InvertFq(q);
 
-                if (fq != null)
+                if (Fq != null)
                     break;
             }
         }
@@ -318,14 +338,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// <remarks>
         /// Generates the ephemeral secret polynomial 'g'.
         /// </remarks>
-        private IntegerPolynomial GenerateG(IRandom Rng)
+        private IntegerPolynomial GenerateG(IRandom RngEngine)
         {
             int N = _ntruParams.N;
             int dg = _ntruParams.Dg;
 
             while (true)
             {
-                DenseTernaryPolynomial g = DenseTernaryPolynomial.GenerateRandom(N, dg, dg - 1, Rng);
+                DenseTernaryPolynomial g = DenseTernaryPolynomial.GenerateRandom(N, dg, dg - 1, RngEngine);
 
                 if (g.IsInvertiblePow2())
                     return g;
@@ -407,6 +427,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// </summary>
         public void Dispose()
         {
+            ParallelUtils.ForceLinear = false;
             Dispose(true);
             GC.SuppressFinalize(this);
         }
