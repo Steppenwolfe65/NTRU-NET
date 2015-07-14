@@ -130,9 +130,9 @@ namespace Test.Tests.Encrypt
             EncryptDecrypt((NTRUParameters)NTRUParamSets.EES1499EP1FAST.DeepCopy());
             OnProgress(new TestEventArgs("Passed the EES1499EP1 encryption test"));
 
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1861SH512.DeepCopy());
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1861SK512.DeepCopy());
             OnProgress(new TestEventArgs("Passed the CX1861SH512 encryption test"));
-            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1931SH512.DeepCopy());
+            EncryptDecrypt((NTRUParameters)NTRUParamSets.CX1931SK512.DeepCopy());
             OnProgress(new TestEventArgs("Passed the CX1931SH512 encryption test"));
 
             // test the digests //
@@ -229,7 +229,7 @@ namespace Test.Tests.Encrypt
         // tests a message of the maximum allowed length
         private void MaxLength(NTRUEncrypt ntru, NTRUKeyPair kp, NTRUParameters param)
         {
-            byte[] plainText = new byte[param.MaxMsgLenBytes];
+            byte[] plainText = new byte[param.MessageMax];
             Array.Copy(ByteUtils.GetBytes("secret encrypted text"), 0, plainText, 0, 21);
             ntru.Initialize(kp.PublicKey);
             byte[] encrypted = ntru.Encrypt(plainText);
@@ -243,7 +243,7 @@ namespace Test.Tests.Encrypt
         // tests a message that is too long
         private void TooLong(NTRUEncrypt ntru, NTRUKeyPair kp, NTRUParameters param)
         {
-            byte[] plainText = new byte[param.MaxMsgLenBytes + 1];
+            byte[] plainText = new byte[param.MessageMax + 1];
             try
             {
                 Array.Copy(ByteUtils.GetBytes("secret encrypted text"), 0, plainText, 0, 21);

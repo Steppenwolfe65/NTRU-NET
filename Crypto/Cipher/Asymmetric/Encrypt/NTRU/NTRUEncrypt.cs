@@ -143,6 +143,28 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region Properties
         /// <summary>
+        /// Get: The cipher is initialized for encryption
+        /// </summary>
+        public bool IsEncryption
+        {
+            get
+            {
+                if (!_isInitialized)
+                    throw new CryptoAsymmetricException("NTRUEncrypt:IsEncryption", "The cipher must be initialized before state can be determined!", new InvalidOperationException());
+
+                return _isEncryption;
+            }
+        }
+
+        /// <summary>
+        /// Get: The cipher has been initialized with a key
+        /// </summary>
+        public bool IsInitialized
+        {
+            get { return _isInitialized; }
+        }
+
+        /// <summary>
         /// Get: The maximum number of bytes the cipher can encrypt
         /// </summary>
         /// 
@@ -154,7 +176,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 if (_encParams == null)
                     throw new CryptoAsymmetricException("NTRUEncrypt:MaxCipherText", "The cipher must be initialized before size can be calculated!", new InvalidOperationException());
 
-                return _encParams.GetMaxMessageLength();
+                return _encParams.MessageMax;
             }
         }
 
@@ -214,7 +236,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             int N = _encParams.N;
             int q = _encParams.Q;
             int db = _encParams.Db;
-            int maxMsgLenBytes = _encParams.MaxMsgLenBytes;
+            int maxMsgLenBytes = _encParams.MessageMax;
             int dm0 = _encParams.Dm0;
             int maxM1 = _encParams.MaxM1;
             int minCallsMask = _encParams.MinMGFHashCalls;
@@ -290,7 +312,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             IntegerPolynomial pub = ((NTRUPublicKey)_keyPair.PublicKey).H;
             int N = _encParams.N;
             int q = _encParams.Q;
-            int maxLenBytes = _encParams.MaxMsgLenBytes;
+            int maxLenBytes = _encParams.MessageMax;
             int db = _encParams.Db;
             int bufferLenBits = _encParams.BufferLenBits;
             int dm0 = _encParams.Dm0;

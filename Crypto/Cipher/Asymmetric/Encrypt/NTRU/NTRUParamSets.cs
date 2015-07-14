@@ -48,7 +48,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     /// <item><description>A Parameter Set OId (uniquely identifies the parameter set), is always the first four bytes of a serialized parameter set.</description></item>
     /// <item><description>The OId format is ordered as: <c>Family</c>, <c>Set</c>, <c>SubSet</c>, and <c>Unique</c>.</description></item>
     /// <item><description>An NTRU parameters <c>Family</c> designator (first byte) is always the value <c>2</c>, and corresponds to its entry in the <see cref="AsymmetricEngines"/> enumeration.</description></item>
-    /// <item><description>The second byte: <c>Set</c>, defines the parameter origin: ESS is the value <c>1</c>, APR is <c>2</c>, and CEX is <c>3</c>.</para>
+    /// <item><description>The second byte: <c>Set</c>, defines the parameter origin: ESS is the value <c>1</c>, APR is <c>2</c>, and CEX is <c>3</c>.</description></item>
     /// <item><description>The third byte: <c>SubSet</c>, defines the PolyType; simple <c>1</c> or product form <c>2</c>.</description></item>
     /// <item><description>The fourth byte can be a unique designator.</description></item>
     /// </list>
@@ -62,63 +62,63 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         public enum NTRUParamNames : int
         {
             /// <summary>
-            /// Experimental, use with caution.
-            /// <para>MaxText:, N:1931 Q:2048, Df:380, PublicKey Size: 2660, PrivateKey Size: 388</para>
+            /// Experimental, use with caution. Uses a larger ring and Skein512.
+            /// <para>MaxText: 233, N:1931 Q:2048, Df:380, PublicKey Size: 2660, PrivateKey Size: 388</para>
             /// </summary>
             CX1931,
             /// <summary>
-            /// Experimental, use with caution.
-            /// <para>MaxText:, N:1861 Q:2048, Df:290, PublicKey Size: 2563, PrivateKey Size: 374</para>
+            /// Experimental, use with caution. Uses a larger ring and Skein512.
+            /// <para>MaxText: 219, N:1861 Q:2048, Df:290, PublicKey Size: 2563, PrivateKey Size: 374</para>
             /// </summary>
             CX1861,
             /// <summary>
             /// A conservative parameter set that gives 256 bits of security and is optimized for key size.
-            /// <para>MaxText:, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 221</para>
+            /// <para>MaxText: 170, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 221</para>
             /// </summary>
             E1087EP2,
             /// <summary>
             /// A conservative parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
-            /// <para>MaxText:, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
+            /// <para>MaxText: 186, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
             /// </summary>
             E1171EP1,
             /// <summary>
             /// A conservative parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
-            /// <para>MaxText:, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
+            /// <para>MaxText: 248, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
             /// </summary>
             E1499EP1,
             /// <summary>
             /// A parameter set that gives 128 bits of security and uses simple ternary polynomials.
-            /// <para>MaxText:, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 92</para>
+            /// <para>MaxText: 65, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 92</para>
             /// </summary>
             A2011439,
             /// <summary>
             /// A parameter set that gives 256 bits of security and uses simple ternary polynomials.
-            /// <para>MaxText:, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 153</para>
+            /// <para>MaxText: 106, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 153</para>
             /// </summary>
             A2011743,
             /// <summary>
             /// A product-form version of <c>EES1087EP2</c>
-            /// <para>MaxText:, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 93</para>
+            /// <para>MaxText: 170, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 93</para>
             /// </summary>
             FE1087EP2,
             /// <summary>
             /// A product-form version of <c>EES1171EP1</c>
-            /// <para>MaxText:, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
+            /// <para>MaxText: 186, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
             /// </summary>
             FE1171EP1,
             /// <summary>
             /// A product-form version of <c>EES1499EP1</c>
-            /// <para>MaxText:, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
+            /// <para>MaxText: 248, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
             /// </summary>
             FE1499EP1,
             /// <summary>
-            /// Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
-            /// <para>MaxText:, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 123</para>
+            /// Like <c>APR2011743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
+            /// <para>MaxText: 106, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 123</para>
             /// </summary>
             FA2011743,
             /// <summary>
             /// Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
-            /// <para>MaxText:, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 79</para>
+            /// <para>MaxText: 65, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 79</para>
             /// </summary>
             FA2011439,
         }
@@ -169,9 +169,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 else if (OId[3] == 105)
                     return (NTRUParameters)APR2011743.DeepCopy();
                 else if (OId[3] == 7)
-                    return (NTRUParameters)CX1861SH512.DeepCopy();
+                    return (NTRUParameters)CX1861SK512.DeepCopy();
                 else if (OId[3] == 8)
-                    return (NTRUParameters)CX1931SH512.DeepCopy();
+                    return (NTRUParameters)CX1931SK512.DeepCopy();
             }
 
             throw new CryptoAsymmetricException("NTRUParameters:FromId", "OId does not identify a valid param set!", new ArgumentException());
@@ -211,9 +211,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 case NTRUParamNames.FE1499EP1:
                     return (NTRUParameters)EES1499EP1FAST.DeepCopy();
                 case NTRUParamNames.CX1861:
-                    return (NTRUParameters)CX1861SH512.DeepCopy();
+                    return (NTRUParameters)CX1861SK512.DeepCopy();
                 case NTRUParamNames.CX1931:
-                    return (NTRUParameters)CX1931SH512.DeepCopy();
+                    return (NTRUParameters)CX1931SK512.DeepCopy();
                 default:
                     throw new CryptoAsymmetricException("NTRUParameters:FromName", "The enumeration name is unknown!", new ArgumentException());
             }
@@ -233,29 +233,29 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             switch (Name)
             {
                 case NTRUParamNames.A2011439:
-                    return new byte[] { 0, 7, 101 };
+                    return new byte[] { 2, 2, 1, 101 };
                 case NTRUParamNames.A2011743:
-                    return new byte[] { 0, 7, 105 };
+                    return new byte[] { 2, 2, 1, 105 };
                 case NTRUParamNames.E1087EP2:
-                    return new byte[] { 0, 6, 3 };
+                    return new byte[] { 2, 1, 1, 63 };
                 case NTRUParamNames.E1171EP1:
-                    return new byte[] { 0, 6, 4 };
+                    return new byte[] { 2, 1, 1, 64 };
                 case NTRUParamNames.E1499EP1:
-                    return new byte[] { 0, 6, 5 };
+                    return new byte[] { 2, 1, 1, 65 };
                 case NTRUParamNames.FA2011439:
-                    return new byte[] { 0, 7, 101 };
+                    return new byte[] { 2, 2, 2, 101 };
                 case NTRUParamNames.FA2011743:
-                    return new byte[] { 0, 7, 105 };
+                    return new byte[] { 2, 2, 2, 105 };
                 case NTRUParamNames.FE1087EP2:
-                    return new byte[] { 0, 6, 3 };
+                    return new byte[] { 2, 1, 2, 63 };
                 case NTRUParamNames.FE1171EP1:
-                    return new byte[] { 0, 6, 4 };
+                    return new byte[] { 2, 1, 2, 64 };
                 case NTRUParamNames.FE1499EP1:
-                    return new byte[] { 0, 6, 5 };
+                    return new byte[] { 2, 1, 2, 65 };
                 case NTRUParamNames.CX1861:
-                    return new byte[] { 0, 7, 7 };
+                    return new byte[] { 2, 3, 1, 7 };
                 case NTRUParamNames.CX1931:
-                    return new byte[] { 0, 8, 8 };
+                    return new byte[] { 2, 3, 1, 8 };
                 default:
                     throw new CryptoAsymmetricException("NTRUParameters:FromName", "The enumeration name is unknown!", new ArgumentException());
             }
@@ -264,67 +264,68 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
 
         #region Parameter Sets
         // Note: max message size is calculation of N and Db; (N*3/2/8 - Length-Db/8). Max bytes: EES1087EP2:170, EES1171EP1:186, EES1499EP1:248, APR2011439:65, APR2011743:106
-        /// <para>OId is 4 bytes Family:Set:SubSet:Unique</para>
+        // >OId is 4 bytes Family:Set:SubSet:Unique
+
         /// <summary>
-        /// Experimental, use with caution.
-        /// <para>MaxText:, N:1931 Q:2048, Df:380, PublicKey Size: 2660, PrivateKey Size: 388</para>
+        /// Experimental, use with caution. Uses a larger ring and Skein512.
+        /// <para>MaxText: 233, N:1931 Q:2048, Df:380, PublicKey Size: 2660, PrivateKey Size: 388</para>
         /// </summary>
-        public static readonly NTRUParameters CX1931SH512 = new NTRUParameters(new byte[] { 2, 3, 1, 8 }, 1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, true, false, Digests.SHA512, Prngs.CTRPrng);
+        public static readonly NTRUParameters CX1931SK512 = new NTRUParameters(new byte[] { 2, 3, 1, 8 }, 1931, 2048, 380, 380, 0, 1024, 20, 30, 11, true, true, false, Digests.Skein512, Prngs.CTRPrng);
         /// <summary>
-        /// Experimental, use with caution.
-        /// <para>MaxText:, N:1861 Q:2048, Df:290, PublicKey Size: 2563, PrivateKey Size: 374</para>
+        /// Experimental, use with caution. Uses a larger ring and Skein512.
+        /// <para>MaxText: 219, N:1861 Q:2048, Df:290, PublicKey Size: 2563, PrivateKey Size: 374</para>
         /// </summary>
-        public static readonly NTRUParameters CX1861SH512 = new NTRUParameters(new byte[] { 2, 3, 1, 7 }, 1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, true, false, Digests.SHA512, Prngs.CTRPrng);
+        public static readonly NTRUParameters CX1861SK512 = new NTRUParameters(new byte[] { 2, 3, 1, 7 }, 1861, 2048, 290, 290, 0, 1024, 14, 22, 10, true, true, false, Digests.Skein512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is optimized for key size.
-        /// <para>MaxText:, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 221</para>
+        /// <para>MaxText: 170, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 221</para>
         /// </summary>
         public static readonly NTRUParameters EES1087EP2 = new NTRUParameters(new byte[] { 2, 1, 1, 63 }, 1087, 2048, 120, 120, 0, 256, 13, 25, 14, true, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1087EP2</c>
-        /// <para>MaxText:, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 93</para>
+        /// <para>MaxText: 170, N:1087 Q:2048, Df:120, PublicKey Size: 1499, PrivateKey Size: 93</para>
         /// </summary>
         public static readonly NTRUParameters EES1087EP2FAST = new NTRUParameters(new byte[] { 2, 1, 2, 63 }, 1087, 2048, 8, 8, 11, 120, 0, 256, 13, 25, 14, true, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is a tradeoff between key size and encryption/decryption speed.
-        /// <para>MaxText:, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
+        /// <para>MaxText: 186, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
         /// </summary>
         public static readonly NTRUParameters EES1171EP1 = new NTRUParameters(new byte[] { 2, 1, 1, 64 }, 1171, 2048, 106, 106, 0, 256, 13, 20, 15, true, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1171EP1</c>
-        /// <para>MaxText:, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
+        /// <para>MaxText: 186, N:1171 Q:2048, Df:106, PublicKey Size: 1615, PrivateKey Size: 237</para>
         /// </summary>
         public static readonly NTRUParameters EES1171EP1FAST = new NTRUParameters(new byte[] { 2, 1, 2, 64 }, 1171, 2048, 8, 7, 11, 106, 0, 256, 13, 20, 15, true, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A conservative parameter set that gives 256 bits of security and is optimized for encryption/decryption speed.
-        /// <para>MaxText:, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
+        /// <para>MaxText: 248, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
         /// </summary>
         public static readonly NTRUParameters EES1499EP1 = new NTRUParameters(new byte[] { 2, 1, 1, 65 }, 1499, 2048, 79, 79, 0, 256, 13, 17, 19, true, true, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// A product-form version of <c>EES1499EP1</c>
-        /// <para>MaxText:, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
+        /// <para>MaxText: 248, N:1499 Q:2048, Df:79, PublicKey Size: 2066, PrivateKey Size: 302</para>
         /// </summary>
         public static readonly NTRUParameters EES1499EP1FAST = new NTRUParameters(new byte[] { 2, 1, 2, 65 }, 1499, 2048, 7, 6, 11, 79, 0, 256, 13, 17, 19, true, true, true, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
-        /// A parameter set that gives 128 bits of security and uses simple ternary polynomials.
-        /// <para>MaxText:, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 92</para>
-        /// </summary>
-        public static readonly NTRUParameters APR2011439 = new NTRUParameters(new byte[] { 2, 2, 1, 101 }, 439, 2048, 146, 130, 126, 128, 12, 32, 9, true, true, false, Digests.SHA256, Prngs.CTRPrng);
-        /// <summary>
-        /// Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
-        /// <para>MaxText:, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 79</para>
-        /// </summary>
-        public static readonly NTRUParameters APR2011439FAST = new NTRUParameters(new byte[] { 2, 2, 2, 101 }, 439, 2048, 9, 8, 5, 130, 126, 128, 12, 32, 9, true, true, true, Digests.SHA256, Prngs.CTRPrng);
-        /// <summary>
         /// A parameter set that gives 256 bits of security and uses simple ternary polynomials.
-        /// <para>MaxText:, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 153</para>
+        /// <para>MaxText: 106, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 153</para>
         /// </summary>
         public static readonly NTRUParameters APR2011743 = new NTRUParameters(new byte[] { 2, 2, 1, 105 }, 743, 2048, 248, 220, 60, 256, 12, 27, 14, true, false, false, Digests.SHA512, Prngs.CTRPrng);
         /// <summary>
         /// Like <c>APR2011_743</c>, this parameter set gives 256 bits of security but uses product-form polynomials and <c>f=1+pF</c>. 
-        /// <para>MaxText:, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 123</para>
+        /// <para>MaxText: 106, N:743 Q:2048, Df:248, PublicKey Size: 1026, PrivateKey Size: 123</para>
         /// </summary>
         public static readonly NTRUParameters APR2011743FAST = new NTRUParameters(new byte[] { 2, 2, 2, 105 }, 743, 2048, 11, 11, 15, 220, 60, 256, 12, 27, 14, true, false, true, Digests.SHA512, Prngs.CTRPrng);
+        /// <summary>
+        /// A parameter set that gives 128 bits of security and uses simple ternary polynomials.
+        /// <para>MaxText: 65, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 92</para>
+        /// </summary>
+        public static readonly NTRUParameters APR2011439 = new NTRUParameters(new byte[] { 2, 2, 1, 101 }, 439, 2048, 146, 130, 126, 128, 12, 32, 9, true, true, false, Digests.SHA256, Prngs.CTRPrng);
+        /// <summary>
+        /// Like <c>APR2011_439</c>, this parameter set gives 128 bits of security but uses product-form polynomials and <c>f=1+pF</c>.
+        /// <para>MaxText: 65, N:439 Q:2048, Df:146, PublicKey Size: 608, PrivateKey Size: 79</para>
+        /// </summary>
+        public static readonly NTRUParameters APR2011439FAST = new NTRUParameters(new byte[] { 2, 2, 2, 101 }, 439, 2048, 9, 8, 5, 130, 126, 128, 12, 32, 9, true, true, true, Digests.SHA256, Prngs.CTRPrng);
         #endregion
     }
 }

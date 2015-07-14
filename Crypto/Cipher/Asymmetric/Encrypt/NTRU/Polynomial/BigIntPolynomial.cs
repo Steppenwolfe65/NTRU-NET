@@ -270,7 +270,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// 
         /// <returns>The product polynomial</returns>
         /// 
-        /// <exception cref="NTRUException">Throws if the two polynomials have a different number of coefficients</exception>
+        /// <exception cref="CryptoAsymmetricException">Throws if the two polynomials have a different number of coefficients</exception>
         public BigIntPolynomial MultSmall(BigIntPolynomial Factor)
         {
             int N = Coeffs.Length;

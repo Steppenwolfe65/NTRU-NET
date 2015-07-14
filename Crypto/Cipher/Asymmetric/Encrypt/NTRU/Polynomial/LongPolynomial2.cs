@@ -267,6 +267,16 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
             else
                 return false;
         }
+
+        /// <summary>
+        /// Get the hash code for this object
+        /// </summary>
+        /// 
+        /// <returns>Hash code</returns>
+        public override int GetHashCode()
+        {
+            return this.GetHashCode();
+        }
         #endregion
     }
 }

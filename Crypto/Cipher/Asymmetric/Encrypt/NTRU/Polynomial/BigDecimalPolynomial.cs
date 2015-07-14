@@ -126,7 +126,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// 
         /// <returns>Multiplied polynomial</returns>
         /// 
-        /// <exception cref="NTRUException">Thrown if the two polynomials differ in the number of coefficients</exception>
+        /// <exception cref="CryptoAsymmetricException">Thrown if the two polynomials differ in the number of coefficients</exception>
         public BigDecimalPolynomial Multiply(BigIntPolynomial Factor)
         {
             if (Factor.Coeffs.Length != Coeffs.Length)

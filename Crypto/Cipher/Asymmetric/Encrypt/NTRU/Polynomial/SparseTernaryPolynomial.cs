@@ -61,7 +61,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// 
         /// <param name="Coeffs">The coefficients</param>
         /// 
-        /// <exception cref="NTRUException">Throws if the coefficients are not ternary</exception>
+        /// <exception cref="CryptoAsymmetricException">Throws if the coefficients are not ternary</exception>
         public SparseTernaryPolynomial(int[] Coeffs)
         {
             _N = Coeffs.Length;

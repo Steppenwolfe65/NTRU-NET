@@ -12,7 +12,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// <param name="Factor">A polynomial factor</param>
         /// 
         /// <returns>The product of the two polynomials</returns>
-        IntegerPolynomial Multiply(IntegerPolynomial Factor);
+        new IntegerPolynomial Multiply(IntegerPolynomial Factor);
 
         /// <summary>
         /// Get the number of ones
@@ -38,6 +38,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// <summary>
         /// Clear the coefficients
         /// </summary>
-        void Clear();
+        new void Clear();
     }
 }

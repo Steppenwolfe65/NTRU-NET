@@ -133,7 +133,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         private bool _hashSeed;
         private int _length;
         private int _maxM1;
-        private int _maxMsgLenBytes;
+        private int _msgMax;
         private Digests _dgtEngineType;
         private int _minIGFHashCalls;
         private int _minMGFHashCalls;
@@ -309,11 +309,11 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Get: The maximum length a plaintext message can be with this parameter set
+        /// Get: The maximum  length of a plaintext message in bytes
         /// </summary>
-        public int MaxMsgLenBytes
+        public int MessageMax
         {
-            get { return _maxMsgLenBytes; }
+            get { return _msgMax; }
         }
 
         /// <summary>
@@ -575,16 +575,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         }
 
         /// <summary>
-        /// Returns the maximum length a plaintext message can be with this parameter set
-        /// </summary>
-        /// 
-        /// <returns>The maximum length in bytes</returns>
-        public int GetMaxMessageLength()
-        {
-            return MaxMsgLenBytes;
-        }
-
-        /// <summary>
         /// Returns the length of a message after encryption with this parameter set
         /// <para>The length does not depend on the input size.</para>
         /// </summary>
@@ -699,9 +689,9 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             _length = 1;   // ceil(log2(maxMsgLenBytes))
 
             if (MaxM1 > 0)
-                _maxMsgLenBytes = (N - 1) * 3 / 2 / 8 - _length - Db / 8;   // only N-1 coeffs b/c the constant coeff is not used
+                _msgMax = (N - 1) * 3 / 2 / 8 - _length - Db / 8;   // only N-1 coeffs b/c the constant coeff is not used
             else
-                _maxMsgLenBytes = N * 3 / 2 / 8 - _length - Db / 8;
+                _msgMax = N * 3 / 2 / 8 - _length - Db / 8;
 
             BufferLenBits = (N * 3 / 2 + 7) / 8 * 8 + 1;
             _bufferLenTrits = N - 1;
@@ -741,7 +731,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             result = prime * result + RandomEngine.GetHashCode();
             result = prime * result + (HashSeed ? 1231 : 1237);
             result = prime * result + Length;
-            result = prime * result + MaxMsgLenBytes;
+            result = prime * result + MessageMax;
             result = prime * result + MinMGFHashCalls;
             result = prime * result + MinIGFHashCalls;
             result = prime * result + OId.GetHashCode();
@@ -810,7 +800,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
                 return false;
             if (Length != other.Length)
                 return false;
-            if (MaxMsgLenBytes != other.MaxMsgLenBytes)
+            if (MessageMax != other.MessageMax)
                 return false;
             if (MinMGFHashCalls != other.MinMGFHashCalls)
                 return false;

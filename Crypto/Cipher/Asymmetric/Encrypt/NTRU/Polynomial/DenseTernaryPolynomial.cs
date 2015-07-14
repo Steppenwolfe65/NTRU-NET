@@ -130,7 +130,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
         /// <param name="Modulus">The Modulus</param>
         /// 
         /// <returns>Multiplied polynomial</returns>
-        public IntegerPolynomial Multiply(IntegerPolynomial Factor, int Modulus)
+        public new IntegerPolynomial Multiply(IntegerPolynomial Factor, int Modulus)
         {
             // even on 32-bit systems, LongPolynomial5 multiplies faster than IntegerPolynomial
             if (Modulus == 2048)
@@ -205,6 +205,17 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Polyno
             else
                 return false;
         }
+
+        /// <summary>
+        /// Get the hash code for this object
+        /// </summary>
+        /// 
+        /// <returns>Hash code</returns>
+        public override int GetHashCode()
+        {
+            return this.GetHashCode();
+        }
+
         #endregion
     }
 }

@@ -100,13 +100,14 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
     public sealed class NTRUKeyGenerator : IAsymmetricGenerator
     {
         #region Constants
-        private const string ALG_NAME = "NTRUEncrypt";
+        private const string ALG_NAME = "NTRUKeyGenerator";
         #endregion
 
         #region Fields
         private readonly NTRUParameters _ntruParams;
         private bool _isDisposed;
         private IRandom _rndEngine;
+        private bool _frcLinear = false;
         #endregion
 
         #region Properties
@@ -133,6 +134,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
             if (CipherParams.RandomEngine == Prngs.PBPrng)
                 throw new CryptoAsymmetricException("MPKCKeyGenerator:Ctor", "Passphrase based digest and CTR generators must be pre-initialized, use the other constructor!", new ArgumentException());
 
+            _frcLinear = ParallelUtils.ForceLinear;
             ParallelUtils.ForceLinear = !Parallel;
             _ntruParams = CipherParams;
             _rndEngine = GetPrng(_ntruParams.RandomEngine);
@@ -147,6 +149,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// <param name="Parallel">Use parallel processing when generating a key; set to false if using a passphrase type generator (default is true)</param>
         public NTRUKeyGenerator(NTRUParameters CipherParams, IRandom RngEngine, bool Parallel = true)
         {
+            _frcLinear = ParallelUtils.ForceLinear;
             // passphrase gens must be linear processed
             if (RngEngine.GetType().Equals(typeof(PBPRng)))
                 ParallelUtils.ForceLinear = true;
@@ -427,7 +430,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU
         /// </summary>
         public void Dispose()
         {
-            ParallelUtils.ForceLinear = false;
+            ParallelUtils.ForceLinear = _frcLinear;
             Dispose(true);
             GC.SuppressFinalize(this);
         }

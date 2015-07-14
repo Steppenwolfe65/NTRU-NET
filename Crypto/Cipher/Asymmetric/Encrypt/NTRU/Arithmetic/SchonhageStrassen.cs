@@ -531,7 +531,6 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Asymmetric.Encrypt.NTRU.Arithm
         /// </summary>
         /// 
         /// <param name="A">Int arrays whose length is a power of 2</param>
-        [CLSCompliant(false)]
         public static void ModFn(int[][] A)
         {
             for (int i = 0; i < A.Length; i++)
