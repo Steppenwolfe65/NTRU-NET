@@ -336,7 +336,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         /// <param name="OutOffset">Offset in the Output array</param>
         public void Transform(byte[] Input, int InOffset, byte[] Output, int OutOffset)
         {
-            ProcessBlock(Input, 0, Output, 0);
+            ProcessBlock(Input, InOffset, Output, OutOffset);
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace VTDev.Libraries.CEXEngine.Crypto.Cipher.Symmetric.Stream
         /// <param name="OutOffset">Offset in the Output array</param>
         public void Transform(byte[] Input, int InOffset, int Length, byte[] Output, int OutOffset)
         {
-            ProcessBlock(Input, 0, Length, Output, 0);
+            ProcessBlock(Input, InOffset, Length, Output, OutOffset);
         }
         #endregion
 

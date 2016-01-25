@@ -16,3 +16,5 @@ C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\R
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.csproj.GenerateResource.Cache
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.exe
 C:\Users\John\Documents\Visual Studio 2010\Projects\Cryptography\NTRU\Test\obj\Release\Test.pdb
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\Release\Test.exe
+C:\Users\John\Documents\GitHub\NTRU-Sharp\NTRU-Sharp\Test\obj\Release\Test.pdb
